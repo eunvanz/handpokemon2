@@ -22,6 +22,7 @@ if (project.env === 'development') {
     publicPath  : webpackConfig.output.publicPath,
     contentBase : project.paths.client(),
     hot         : true,
+    headers     : { 'Access-Control-Allow-Origin': '*' },
     quiet       : project.compiler_quiet,
     noInfo      : project.compiler_quiet,
     lazy        : false,
