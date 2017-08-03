@@ -20,7 +20,8 @@ class PickMonView extends React.Component {
       picks: null,
       mode: null,
       multiPicks: null,
-      stop: false
+      stop: false,
+      result: null
     }
     this._handleOnClickStop = this._handleOnClickStop.bind(this)
   }
@@ -41,14 +42,14 @@ class PickMonView extends React.Component {
         const picks = pickedMons[0]
         const pickedIdx = _.random(0, picks.length - 1)
         return postCollection(picks[pickedIdx], this.props.user.id)
-        .then(() => {
+        .then(result => {
           this.setState({ picks, pickedIdx })
           return Promise.resolve()
         })
       } else {
         const multiPicks = pickedMons.map(picks => picks[0])
         return Promise.all(multiPicks.map(pick => postCollection(pick, this.props.user.id)))
-        .then(() => {
+        .then(results => {
           this.setState({ multiPicks })
           return Promise.resolve()
         })

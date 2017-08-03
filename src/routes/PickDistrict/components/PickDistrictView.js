@@ -21,7 +21,7 @@ class PickDistrictView extends React.Component {
       attrs: district.attrs,
       grades: ['b']
     }
-    this.props.setStorePickMonInfo(pickMonInfo)
+    this.props.receivePickMonInfo(pickMonInfo)
     this.context.router.push('/pick-mon')
   }
   render () {
@@ -71,7 +71,7 @@ PickDistrictView.contextTypes = {
 }
 
 PickDistrictView.propTypes = {
-  setStorePickMonInfo: PropTypes.func.isRequired
+  receivePickMonInfo: PropTypes.func.isRequired
 }
 
 export default PickDistrictView

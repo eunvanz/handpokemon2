@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { Link } from 'react-router'
 import { connect } from 'react-redux'
 
-import { setUserById, clearUser } from 'store/user'
+import { fetchUserById, clearUser } from 'store/user'
 
 import { showAlert } from 'utils/commonUtil'
 
@@ -15,7 +15,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   clearStoreUser: clearUser,
-  setStoreUserById: setUserById
+  fetchUserById: fetchUserById
 }
 
 class Header extends React.Component {
@@ -28,7 +28,7 @@ class Header extends React.Component {
   componentDidMount () {
     const authUser = getSessionUser()
     if (authUser) { // 세션에 authUser가 있을 경우 store에 세팅하고 db에서 user 가져옴
-      this.props.setStoreUserById(authUser.id)
+      this.props.fetchUserById(authUser.id)
     }
   }
   _handleOnClickLogout () {
@@ -99,7 +99,7 @@ Header.contextTypes = {
 Header.propTypes = {
   user: PropTypes.object,
   clearStoreUser: PropTypes.func.isRequired,
-  setStoreUserById: PropTypes.func.isRequired
+  fetchUserById: PropTypes.func.isRequired
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Header)

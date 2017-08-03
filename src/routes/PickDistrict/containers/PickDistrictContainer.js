@@ -2,10 +2,10 @@ import { connect } from 'react-redux'
 
 import PickDistrictView from '../components/PickDistrictView'
 
-import { setPickMonInfo } from 'store/pickMonInfo'
+import { receivePickMonInfo } from 'store/pickMonInfo'
 
 const mapDispatchToProps = {
-  setStorePickMonInfo: setPickMonInfo
+  receivePickMonInfo: receivePickMonInfo
 }
 
 const mapStateToProps = (state) => ({

@@ -81,7 +81,7 @@ class SignInView extends React.Component {
     const { formData } = this.state
     getSignInUser(formData)
     .then(user => {
-      this.props.setStoreUser(user)
+      this.props.receiveUser(user)
       this.setState({ process: false })
       this.context.router.push('/')
     })
@@ -161,7 +161,7 @@ SignInView.contextTypes = {
 
 SignInView.propTypes = {
   user: PropTypes.object,
-  setStoreUser: PropTypes.func.isRequired
+  receiveUser: PropTypes.func.isRequired
 }
 
 export default SignInView

@@ -2,10 +2,10 @@ import { connect } from 'react-redux'
 
 import SignInView from '../components/SignInView'
 
-import { setUser } from 'store/user'
+import { receiveUser } from 'store/user'
 
 const mapDispatchToProps = {
-  setStoreUser: setUser
+  receiveUser: receiveUser
 }
 
 const mapStateToProps = (state) => ({
