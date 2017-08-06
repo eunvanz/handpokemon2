@@ -1,6 +1,8 @@
 import { applyMiddleware, compose, createStore } from 'redux'
 import thunk from 'redux-thunk'
 import { browserHistory } from 'react-router'
+import { reactReduxFirebase } from 'react-redux-firebase'
+
 import makeRootReducer from './reducers'
 import { updateLocation } from './location'
 
@@ -24,6 +26,19 @@ export default (initialState = {}) => {
     }
   }
 
+  const fbInitConfig = {
+    apiKey: 'AIzaSyDgtFsX7_M1NBLYEOtOmZ54EHM6gxAaLrw',
+    authDomain: 'hand-pokemon-2.firebaseapp.com',
+    databaseURL: 'https://hand-pokemon-2.firebaseio.com',
+    projectId: 'hand-pokemon-2',
+    storageBucket: 'hand-pokemon-2.appspot.com',
+    messagingSenderId: '175186549184'
+  }
+
+  const fbConfig = {
+    userProfile: 'users'
+  }
+
   // ======================================================
   // Store Instantiation and HMR Setup
   // ======================================================
@@ -32,6 +47,7 @@ export default (initialState = {}) => {
     initialState,
     composeEnhancers(
       applyMiddleware(...middleware),
+      reactReduxFirebase(fbInitConfig, fbConfig),
       ...enhancers
     )
   )

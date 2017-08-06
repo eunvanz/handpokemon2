@@ -13,11 +13,11 @@ import ImageInput from 'components/ImageInput'
 import MonCard from 'components/MonCard'
 import Loading from 'components/Loading'
 
-import { checkDupEmail, checkDupNickname, signUp } from 'services/UserService'
+import { isDupEmail, isDupNickname, signUp } from 'services/UserService'
 import { getStartPick } from 'services/MonService'
 import { postImage } from 'services/ImageService'
 
-import { DEFAULT_PROFILE_IMAGE_URL } from 'constants/urls'
+import { DEFAULT_PROFILE_IMAGE_URL, PROFILE_IMAGE_ROOT } from 'constants/urls'
 
 import { showAlert } from 'utils/commonUtil'
 
@@ -25,7 +25,7 @@ class SignUpView extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      step: 2, // 임시로 2로 설정
+      step: 1,
       formData: {
         email: '',
         password: '',
@@ -69,6 +69,7 @@ class SignUpView extends React.Component {
     this.setState({ formData: formData.set(name, value).toJS() })
   }
   _checkEmailField () {
+    const { firebase } = this.props
     let email = this.state.formData.email
     let message = ''
     if (validator.isEmpty(email)) message = '이메일주소를 입력해주세요.'
@@ -79,9 +80,9 @@ class SignUpView extends React.Component {
       return false
     }
     email = validator.normalizeEmail(email)
-    return checkDupEmail(email)
-    .then(res => {
-      if (res.result) {
+    return isDupEmail(firebase, email)
+    .then(isDup => {
+      if (isDup) {
         this._setValidAndHelper('email', '이미 사용중인 이메일주소입니다.', 'error')
         return false
       } else {
@@ -101,6 +102,7 @@ class SignUpView extends React.Component {
     })
   }
   _checkNicknameField () {
+    const { firebase } = this.props
     let nickname = this.state.formData.nickname
     let message = ''
     if (validator.isEmpty(nickname)) message = '닉네임을 입력해주세요.'
@@ -110,9 +112,9 @@ class SignUpView extends React.Component {
       return false
     }
     nickname = validator.escape(nickname) // HTML용으로 변경, replace <, >, &, ', " and / with HTML entities.
-    return checkDupNickname(nickname)
-    .then(res => {
-      if (res.result) {
+    return isDupNickname(firebase, nickname)
+    .then(isDup => {
+      if (isDup) {
         this._setValidAndHelper('nickname', '이미 사용중인 닉네임입니다.', 'error')
         return false
       } else {
@@ -179,33 +181,41 @@ class SignUpView extends React.Component {
   }
   _processSignUp () {
     this.setState({ signUpProcess: true })
+    const { firebase } = this.props
     const { formData, profileImageFile } = this.state
-    let postProfileImage = profileImageFile ? () => postImage(profileImageFile) : () => Promise.resolve()
+    let postProfileImage = () => Promise.resolve()
+    if (profileImageFile) {
+      postProfileImage = () => postImage(firebase, PROFILE_IMAGE_ROOT, [profileImageFile])
+    }
     let profileImageUrl = DEFAULT_PROFILE_IMAGE_URL
     postProfileImage()
     .then(res => {
-      if (res) profileImageUrl = res.data.data.link
+      if (profileImageFile) profileImageUrl = res[0].File.downloadURL
       const user = {
         email: formData.email,
         password: formData.password,
         nickname: formData.nickname,
-        profile: profileImageUrl,
+        profileImage: profileImageUrl,
         introduce: formData.introduce
       }
-      return signUp(user)
+      return signUp(firebase, user)
     })
     .then(() => {
       showAlert({
         title: '정식 포켓몬 트레이너가 된 것을 축하드립니다!',
-        text: '가입한 계정으로 다시 로그인해주세요.',
+        text: '지금 바로 포켓몬을 채집하러 떠나보세요.',
         type: 'success',
-        confirmButtonText: '로그인 하러가기'
+        confirmButtonText: '포켓몬 채집하기'
       })
       .then(() => {
-        this.context.router.push('/sign-in')
+        this.context.router.push('/pick-district')
       })
       .catch(() => {
-        this.context.router.push('/sign-in')
+        showAlert({
+          title: 'OOPS!',
+          text: '회원가입 도중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+          type: 'error'
+        })
       })
     })
   }
@@ -334,7 +344,7 @@ class SignUpView extends React.Component {
             </div>
             <p className='col-sm-offset-3 col-sm-6 f-700'>프로필사진</p>
             <div className='col-sm-offset-3 col-sm-6'>
-              <ImageInput id='profileImage' onSelectImage={this._onSelectProfileImage} />
+              <ImageInput id='profileImage' />
             </div>
           </div>
         )
@@ -411,7 +421,7 @@ SignUpView.contextTypes = {
 }
 
 SignUpView.propTypes = {
-
+  firebase: PropTypes.object.isRequired
 }
 
 export default SignUpView

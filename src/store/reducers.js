@@ -2,12 +2,14 @@ import { combineReducers } from 'redux'
 import userReducer from './user'
 import messageModalReducer from './messageModal'
 import pickMonInfoReducer from './pickMonInfo'
+import { firebaseStateReducer } from 'react-redux-firebase'
 
 export const makeRootReducer = (asyncReducers) => {
   return combineReducers({
     user: userReducer,
     messageModal: messageModalReducer,
     pickMonInfo: pickMonInfoReducer,
+    firebase: firebaseStateReducer,
     ...asyncReducers
   })
 }

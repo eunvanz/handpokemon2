@@ -4,7 +4,7 @@ import { Link } from 'react-router'
 import { fromJS } from 'immutable'
 import validator from 'validator'
 
-import { getSignInUser } from 'services/UserService'
+import { signIn } from 'services/UserService'
 
 import { showAlert } from 'utils/commonUtil'
 
@@ -17,7 +17,7 @@ class SignInView extends React.Component {
         password: '',
         remember: false
       },
-      process: false
+      isLoading: false
     }
     this._handleOnChangeInput = this._handleOnChangeInput.bind(this)
     this._handleOnClickLogin = this._handleOnClickLogin.bind(this)
@@ -77,16 +77,22 @@ class SignInView extends React.Component {
     }
   }
   _loginProcess () {
-    this.setState({ process: true })
+    this.setState({ isLoading: true })
     const { formData } = this.state
-    getSignInUser(formData)
+    const { firebase } = this.props
+    signIn(firebase, formData)
     .then(user => {
-      this.props.receiveUser(user)
-      this.setState({ process: false })
+      this.setState({ isLoading: false })
       this.context.router.push('/')
     })
-    .catch(errMsg => {
-      this.setState({ process: false })
+    .catch(e => {
+      this.setState({ isLoading: false })
+      let errMsg
+      if (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password') {
+        errMsg = '이메일 혹은 비밀번호가 틀렸습니다.'
+      } else {
+        errMsg = '로그인 도중 에러가 발생했습니다. 잠시 후에 다시 시도해주세요.'
+      }
       showAlert({
         confirmButtonText: '확인',
         title: 'OOPS!',
@@ -131,10 +137,10 @@ class SignInView extends React.Component {
                 <i className='input-helper' style={{ top: '3px' }} /> <span style={{ fontSize: '14px' }}>자동로그인</span>
               </label>
             </div>
-            <a onClick={this.state.process ? null : this._handleOnClickLogin}
+            <a onClick={this.state.isLoading ? null : this._handleOnClickLogin}
               className={`btn btn-login btn-success btn-float waves-effect waves-circle waves-float`}
-              style={{ lineHeight: '2.5em', marginTop: '-50px', cursor: this.state.process ? 'default' : 'pointer' }}>
-              <i className={this.state.process ? 'fa fa-spinner fa-pulse fa-fw' : 'zmdi zmdi-arrow-forward'} />
+              style={{ lineHeight: '2.5em', marginTop: '-50px', cursor: this.state.isLoading ? 'default' : 'pointer' }}>
+              <i className={this.state.isLoading ? 'fa fa-spinner fa-pulse fa-fw' : 'zmdi zmdi-arrow-forward'} />
             </a>
           </div>
           <div className='lcb-navigation'>
@@ -160,6 +166,7 @@ SignInView.contextTypes = {
 }
 
 SignInView.propTypes = {
+  firebase: PropTypes.object.isRequired,
   user: PropTypes.object,
   receiveUser: PropTypes.func.isRequired
 }

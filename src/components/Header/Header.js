@@ -2,15 +2,16 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router'
 import { connect } from 'react-redux'
+import { firebaseConnect, pathToJS } from 'react-redux-firebase'
 
 import { fetchUserById, clearUser } from 'store/user'
 
 import { showAlert } from 'utils/commonUtil'
 
-import { getSessionUser, expireSessionUser } from 'services/UserService'
+import { getSessionUser, expireSessionUser, logout } from 'services/UserService'
 
-const mapStateToProps = state => ({
-  user: state.user
+const mapStateToProps = (state) => ({
+  auth: pathToJS(state.firebase, 'auth')
 })
 
 const mapDispatchToProps = {
@@ -42,7 +43,9 @@ class Header extends React.Component {
     })
     .then(() => {
       expireSessionUser()
-      this.props.clearStoreUser()
+      return logout(this.props.firebase)
+    })
+    .then(() => {
       showAlert({
         title: '다음에 또 보자구!',
         text: '로그아웃 되었습니다.',
@@ -50,7 +53,13 @@ class Header extends React.Component {
       })
       this.context.router.push('/')
     })
-    .catch(() => {})
+    .catch(() => {
+      showAlert({
+        title: 'OOPS!',
+        text: '로그아웃 중 에러가 발생했습니다. 잠시 후 다시 시도해주세요.',
+        type: 'error'
+      })
+    })
   }
   render () {
     return (
@@ -69,19 +78,19 @@ class Header extends React.Component {
           <li className='pull-right'>
             <ul className='hi-menu'>
               {
-                !this.props.user &&
+                !this.props.auth &&
                 <li><Link to='/sign-in'><i className='him-icon zmdi zmdi-sign-in' /></Link></li>
               }
               {
-                !this.props.user &&
+                !this.props.auth &&
                 <li><Link to='/sign-up'><i className='him-icon zmdi zmdi-account-add' /></Link></li>
               }
               {
-                this.props.user &&
+                this.props.auth &&
                 <li><Link to='/sign-up'><i className='him-icon zmdi zmdi-settings' /></Link></li>
               }
               {
-                this.props.user &&
+                this.props.auth &&
                 <li><a style={{ cursor: 'pointer' }} onClick={this._handleOnClickLogout}><i className='him-icon zmdi zmdi-power' /></a></li>
               }
             </ul>
@@ -97,9 +106,14 @@ Header.contextTypes = {
 }
 
 Header.propTypes = {
-  user: PropTypes.object,
+  firebase: PropTypes.object.isRequired,
   clearStoreUser: PropTypes.func.isRequired,
-  fetchUserById: PropTypes.func.isRequired
+  fetchUserById: PropTypes.func.isRequired,
+  auth: PropTypes.object
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Header)
+const wrappedHeader = firebaseConnect([
+  '/'
+])(Header)
+
+export default connect(mapStateToProps, mapDispatchToProps)(wrappedHeader)

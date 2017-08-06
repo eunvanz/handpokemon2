@@ -1,4 +1,5 @@
 import { connect } from 'react-redux'
+import { firebaseConnect, dataToJS } from 'react-redux-firebase'
 
 import SignInView from '../components/SignInView'
 
@@ -9,7 +10,11 @@ const mapDispatchToProps = {
 }
 
 const mapStateToProps = (state) => ({
-  user: state.user
+  users: dataToJS(state.firebase, 'users')
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(SignInView)
+const wrappedSignInView = firebaseConnect([
+  '/users'
+])(SignInView)
+
+export default connect(mapStateToProps, mapDispatchToProps)(wrappedSignInView)
