@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 export const isScreenSize = {
   xs: () => window.innerWidth < 768,
   sm: () => window.innerWidth < 992 && window.innerWidth >= 768,
@@ -59,4 +61,22 @@ export const getCookie = cName => {
 
 export const showAlert = option => {
   return window.swal(option)
+}
+
+export const convertEmptyStringToNullInObj = object => {
+  for (const propName in object) {
+    if (object[propName] === '') {
+      object[propName] = null
+    }
+  }
+  return object
+}
+
+export const convertMapToArr = map => {
+  const arr = []
+  _.forEach(map, (value, key) => {
+    value.id = key
+    arr.push(value)
+  })
+  return arr
 }

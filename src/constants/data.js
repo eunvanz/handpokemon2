@@ -1,5 +1,32 @@
 import { colors } from './colors'
 
+export const attrs = [
+  '노말',
+  '불꽃',
+  '물',
+  '전기',
+  '풀',
+  '얼음',
+  '비행',
+  '요정',
+  '땅',
+  '독',
+  '격투',
+  '염력',
+  '벌레',
+  '바위',
+  '유령',
+  '용',
+  '악',
+  '강철'
+]
+
+export const grades = [
+  'b', 'r', 's', 'sr', 'e', 'l'
+]
+
+export const generations = ['1', '2', '3', '4', '5', '6']
+
 export const districts = [
   {
     name: '황량한 대지',

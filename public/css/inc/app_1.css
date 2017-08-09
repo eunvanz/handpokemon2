@@ -13414,7 +13414,7 @@ html:not(.ie9) .select:before {
   background-color: #FFF;
   background-position: right calc(100% - 7px);
   background-repeat: no-repeat;
-  background-image: url("../img/select.png");
+  background-image: url("../../img/select.png");
   pointer-events: none;
   z-index: 5;
 }

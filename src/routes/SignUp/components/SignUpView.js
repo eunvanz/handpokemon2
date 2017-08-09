@@ -21,6 +21,8 @@ import { DEFAULT_PROFILE_IMAGE_URL, PROFILE_IMAGE_ROOT } from 'constants/urls'
 
 import { showAlert } from 'utils/commonUtil'
 
+import User from 'models/user'
+
 class SignUpView extends React.Component {
   constructor (props) {
     super(props)
@@ -191,13 +193,14 @@ class SignUpView extends React.Component {
     postProfileImage()
     .then(res => {
       if (profileImageFile) profileImageUrl = res[0].File.downloadURL
-      const user = {
+      let user = {
         email: formData.email,
         password: formData.password,
         nickname: formData.nickname,
         profileImage: profileImageUrl,
         introduce: formData.introduce
       }
+      user = Object.assign({}, new User(), user)
       return signUp(firebase, user)
     })
     .then(() => {

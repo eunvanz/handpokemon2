@@ -30,7 +30,7 @@ class LabelInput extends React.Component {
   }
   render () {
     return (
-      <div className={`form-group ${this.props.has ? `has-${this.props.has}` : ''} ${this.props.feedback ? 'has-feedback' : ''}`}>
+      <div className={`form-group ${this.props.has ? `has-${this.props.has}` : ''} ${this.props.feedback ? 'has-feedback' : ''} ${this.props.floating ? 'fg-float' : ''}`}>
         {!this.props.floating && this.props.label &&
           <label htmlFor={this.props.id} className={`col-sm-offset-${(12 - this.props.length) / 2 - 2} col-sm-2 control-label f-700`}>
             {this.props.label}
@@ -41,11 +41,11 @@ class LabelInput extends React.Component {
             {this.props.labelElement}
           </span>
         }
-        <div className={`${this.props.floating ? `col-sm-offset-${(12 - this.props.length) / 2}` : ''} col-sm-${this.props.length ? this.props.length : 10} ${this.props.floating ? 'fg-float' : ''}`}>
+        <div className={`${this.props.length ? `col-sm-offset-${(12 - this.props.length) / 2}` : ''} col-sm-${this.props.length ? this.props.length : 10} ${this.props.floating ? 'fg-float' : ''}`} style={{ float: 'none' }}>
           <div className={`fg-line ${this.props.floating && this.props.value !== '' ? 'fg-toggled' : ''}`}>
             <input type={this.props.type} className={`form-control input-${this.props.fontSize}`} name={this.props.name}
               id={this.props.id} placeholder={this.props.placeholder} onChange={this.props.onChange}
-              value={this.props.value} onBlur={this.props.onBlur}
+              value={this.props.value} onBlur={this.props.onBlur} disabled={this.props.disabled} step={this.props.step}
             />
             {
               this.props.floating &&
@@ -74,7 +74,7 @@ LabelInput.propTypes = {
   type: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   name: PropTypes.string.isRequired,
-  value: PropTypes.string.isRequired,
+  value: PropTypes.any.isRequired,
   feedback: PropTypes.bool,
   has: PropTypes.string,
   helper: PropTypes.string,
@@ -82,7 +82,8 @@ LabelInput.propTypes = {
   length: PropTypes.number,
   floating: PropTypes.bool,
   labelElement: PropTypes.element,
-  fontSize: PropTypes.string
+  fontSize: PropTypes.string,
+  step: PropTypes.number
 }
 
 export default LabelInput

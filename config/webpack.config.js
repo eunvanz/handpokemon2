@@ -29,7 +29,8 @@ const webpackConfig = {
       services: 'services',
       utils: 'utils',
       constants: 'constants',
-      dummy: 'dummy'
+      dummy: 'dummy',
+      models: 'models'
     }
   },
   module : {}

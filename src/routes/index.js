@@ -5,6 +5,7 @@ import SignUp from './SignUp'
 import SignIn from './SignIn'
 import PickMon from './PickMon'
 import PickDistrict from './PickDistrict'
+import MonManagement from './MonManagement'
 
 /*  Note: Instead of using JSX, we recommend using react-router
     PlainRoute objects to build route definitions.   */
@@ -17,7 +18,8 @@ export const createRoutes = (store) => ({
     SignUp(store),
     SignIn(store),
     PickMon(store),
-    PickDistrict(store)
+    PickDistrict(store),
+    MonManagement(store)
   ]
 })
 

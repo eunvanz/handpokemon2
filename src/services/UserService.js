@@ -5,21 +5,21 @@ import { SECRET_KEY } from 'constants/security'
 import crypto from 'crypto-js'
 import cookie from 'cookie'
 
-export const isDupEmail = (fb, email) => {
-  const ref = fb.ref('/users')
+export const isDupEmail = (firebase, email) => {
+  const ref = firebase.ref('/users')
   return ref.orderByChild('email').equalTo(email).once('value')
   .then(snapshot => Promise.resolve(snapshot.val()))
 }
 
-export const isDupNickname = (fb, nickname) => {
-  const ref = fb.ref('users')
+export const isDupNickname = (firebase, nickname) => {
+  const ref = firebase.ref('users')
   return ref.orderByChild('nickname').equalTo(nickname).once('value')
   .then(snapshot => Promise.resolve(snapshot.val()))
 }
 
-export const signUp = (fb, user) => {
+export const signUp = (firebase, user) => {
   const { password, ...userToSave } = user
-  return fb.createUser({ email: user.email, password }, userToSave)
+  return firebase.createUser({ email: user.email, password }, userToSave)
 }
 
 export const getUserById = id => {
@@ -28,7 +28,7 @@ export const getUserById = id => {
   })
 }
 
-export const signIn = (fb, data) => {
+export const signIn = (firebase, data) => {
   // return new Promise((resolve, reject) => {
   //   setTimeout(() => {
   //     // 이메일과 비밀번호로 authUser를 얻어온다.
@@ -47,7 +47,7 @@ export const signIn = (fb, data) => {
   //     return resolve(signInUser)
   //   }, 1000)
   // })
-  return fb.login(data)
+  return firebase.login(data)
 }
 
 export const getSessionUser = () => {
@@ -60,8 +60,8 @@ export const getSessionUser = () => {
   return authUser
 }
 
-export const logout = (fb) => {
-  return fb.logout()
+export const logout = (firebase) => {
+  return firebase.logout()
 }
 
 export const expireSessionUser = () => {
