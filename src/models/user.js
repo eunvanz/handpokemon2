@@ -17,6 +17,6 @@ export default class User {
     this.adventureCredit = 10
     this.lastPick = 0
     this.lastLeague = 0
-    this.lastAdventure = null
+    this.lastAdventure = 0
   }
 }

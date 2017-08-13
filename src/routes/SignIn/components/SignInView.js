@@ -49,6 +49,9 @@ class SignInView extends React.Component {
       }
     })
   }
+  componentDidUpdate (prevProps, prevState) {
+    if (this.props.user) this.context.router.push('/')
+  }
   _handleOnChangeInput (e) {
     e.preventDefault
     const { value, name } = e.target
@@ -167,8 +170,7 @@ SignInView.contextTypes = {
 
 SignInView.propTypes = {
   firebase: PropTypes.object.isRequired,
-  user: PropTypes.object,
-  receiveUser: PropTypes.func.isRequired
+  user: PropTypes.object
 }
 
 export default SignInView

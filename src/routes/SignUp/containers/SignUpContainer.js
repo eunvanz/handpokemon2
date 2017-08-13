@@ -5,10 +5,14 @@ import SignUpView from '../components/SignUpView'
 
 import { PROFILE_IMAGE_ROOT } from 'constants/urls'
 
+import { receiveUser } from 'store/user'
+
 const mapDispatchToProps = {
+  receiveUser
 }
 
 const mapStateToProps = (state) => ({
+  user: state.user
 })
 
 const wrappedSignUpView = firebaseConnect([

@@ -1,5 +1,3 @@
-import { auth, allUsers } from 'dummy/user'
-
 import { SECRET_KEY } from 'constants/security'
 
 import crypto from 'crypto-js'
@@ -22,9 +20,12 @@ export const signUp = (firebase, user) => {
   return firebase.createUser({ email: user.email, password }, userToSave)
 }
 
-export const getUserById = id => {
-  return new Promise((resolve, reject) => {
-    return resolve(allUsers.filter(user => user.id === id)[0])
+export const getUserIdByEmail = (firebase, email) => {
+  const ref = firebase.ref('users')
+  return ref.orderByChild('email').equalTo(email).once('value')
+  .then(snapshot => {
+    const userId = Object.keys(snapshot.val())[0]
+    return Promise.resolve(userId)
   })
 }
 

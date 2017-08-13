@@ -104,6 +104,9 @@ class Sidebar extends React.Component {
               <li className='f-700'>
                 <Link to='/'><i className='fa fa-book' style={{ fontSize: '22px' }} /> 게임가이드</Link>
               </li>
+              <li className='f-700'>
+                <Link to='/forbidden-area'><i className='fa fa-lock' style={{ fontSize: '22px' }} /> 포켓몬관리</Link>
+              </li>
             </ul>
           </div>
         </div>

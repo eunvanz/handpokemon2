@@ -1,17 +1,18 @@
 import { connect } from 'react-redux'
-import { firebaseConnect, dataToJS } from 'react-redux-firebase'
+import { firebaseConnect, dataToJS, pathToJS } from 'react-redux-firebase'
 
 import SignInView from '../components/SignInView'
 
-import { receiveUser } from 'store/user'
-
 const mapDispatchToProps = {
-  receiveUser: receiveUser
 }
 
-const mapStateToProps = (state) => ({
-  users: dataToJS(state.firebase, 'users')
-})
+const mapStateToProps = (state) => {
+  const auth = pathToJS(state.firebase, 'auth')
+  return ({
+    user: auth ? dataToJS(state.firebase, `users/${pathToJS(state.firebase, 'auth').uid}`) : null,
+    auth
+  })
+}
 
 const wrappedSignInView = firebaseConnect([
   '/users'

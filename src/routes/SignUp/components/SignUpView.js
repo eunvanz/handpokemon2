@@ -13,9 +13,10 @@ import ImageInput from 'components/ImageInput'
 import MonCard from 'components/MonCard'
 import Loading from 'components/Loading'
 
-import { isDupEmail, isDupNickname, signUp } from 'services/UserService'
+import { isDupEmail, isDupNickname, signUp, getUserIdByEmail } from 'services/UserService'
 import { getStartPick } from 'services/MonService'
 import { postImage } from 'services/ImageService'
+import { postCollection } from 'services/CollectionService'
 
 import { DEFAULT_PROFILE_IMAGE_URL, PROFILE_IMAGE_ROOT } from 'constants/urls'
 
@@ -203,6 +204,14 @@ class SignUpView extends React.Component {
       user = Object.assign({}, new User(), user)
       return signUp(firebase, user)
     })
+    .then(user => {
+      return getUserIdByEmail(firebase, user.email)
+    })
+    .then(userId => {
+      const { startPick } = this.state
+      const promArr = startPick.map(col => postCollection(firebase, userId, col))
+      return Promise.all(promArr)
+    })
     .then(() => {
       showAlert({
         title: '정식 포켓몬 트레이너가 된 것을 축하드립니다!',
@@ -213,12 +222,12 @@ class SignUpView extends React.Component {
       .then(() => {
         this.context.router.push('/pick-district')
       })
-      .catch(() => {
-        showAlert({
-          title: 'OOPS!',
-          text: '회원가입 도중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
-          type: 'error'
-        })
+    })
+    .catch(() => {
+      showAlert({
+        title: 'OOPS!',
+        text: '회원가입 도중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+        type: 'error'
       })
     })
   }
@@ -239,8 +248,9 @@ class SignUpView extends React.Component {
     this.setState({ step: this.state.step - 1 })
   }
   _handleOnClickPick () {
+    const { firebase } = this.props
     this.setState({ loading: true })
-    getStartPick()
+    getStartPick(firebase)
     .then(startPick => {
       this.setState({ startPick })
       this.setState({ loading: false })
@@ -424,7 +434,8 @@ SignUpView.contextTypes = {
 }
 
 SignUpView.propTypes = {
-  firebase: PropTypes.object.isRequired
+  firebase: PropTypes.object.isRequired,
+  receiveUser: PropTypes.func.isRequired
 }
 
 export default SignUpView

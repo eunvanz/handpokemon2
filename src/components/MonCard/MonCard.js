@@ -6,6 +6,7 @@ import MonAttr from '../MonAttr'
 import MonModal from '../MonModal'
 import MonRank from '../MonRank'
 import MonLevel from '../MonLevel'
+import Img from '../Img'
 
 import { getMonImage } from 'utils/monUtil'
 
@@ -41,7 +42,7 @@ class MonCard extends React.Component {
             padding: '4px'
           }}>
           <a className='ci-avatar'>
-            <img src={getMonImage(mon).url} width='100%' style={{ border: '1px dotted #e2e2e2' }} />
+            <Img src={getMonImage(mon).url} width='100%' style={{ border: '1px dotted #e2e2e2' }} />
           </a>
           <div className='c-info text-center' style={{ margin: '5px 0px' }}>
             <MonCost cost={mon.mon.cost} style={{ marginBottom: '5px' }} />

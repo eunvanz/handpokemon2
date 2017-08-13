@@ -1,5 +1,5 @@
 export default (store) => ({
-  path : 'you-are-forbidden',
+  path : 'forbidden-area',
   getComponent (nextState, cb) {
     require.ensure([], (require) => {
       const MonManagement = require('./containers/MonManagementContainer').default

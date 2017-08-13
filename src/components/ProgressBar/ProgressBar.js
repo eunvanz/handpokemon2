@@ -4,22 +4,29 @@ import PropTypes from 'prop-types'
 class ProgressBar extends React.Component {
   render () {
     const { value, max, className, color, ...rest } = this.props
+    const renderProgressBars = () => {
+      return value.map((val, idx) => {
+        return (
+          <div className='progress-bar' role='progressbar' key={idx}
+            aria-valuenow={`${val}`} aria-valuemin='0' aria-valuemax={`${max}`}
+            style={{ width: `${val * 100 / max}%`, backgroundColor: color[idx] }}
+          />
+        )
+      })
+    }
     return (
       <div className={`progress ${className}`} {...rest}>
-        <div className='progress-bar' role='progressbar'
-          aria-valuenow={`${value}`} aria-valuemin='0' aria-valuemax={`${max}`}
-          style={{ width: `${value * 100 / max}%`, backgroundColor: color }}
-        />
+        {renderProgressBars()}
       </div>
     )
   }
 }
 
 ProgressBar.propTypes = {
-  value: PropTypes.number,
+  value: PropTypes.array,
   max: PropTypes.number,
   className: PropTypes.string,
-  color: PropTypes.string
+  color: PropTypes.array
 }
 
 export default ProgressBar

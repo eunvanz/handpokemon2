@@ -15,9 +15,10 @@ import ContentContainer from 'components/ContentContainer'
 import Selectbox from 'components/Selectbox'
 import ImageInput from 'components/ImageInput'
 import Button from 'components/Button'
+import Img from 'components/Img'
 
 import { postImage, deleteImage } from 'services/ImageService'
-import { postMon, updateMon, deleteMon, updateMonWithRoute } from 'services/MonService'
+import { postMon, updateMon, deleteMon } from 'services/MonService'
 
 class MonManagementView extends React.Component {
   constructor (props) {
@@ -47,7 +48,7 @@ class MonManagementView extends React.Component {
         requiredLv: 0
       },
       designer: '',
-      showForm: true,
+      showForm: false,
       editMode: 'write' // write, update
     }
     this._handleOnClickMon = this._handleOnClickMon.bind(this)
@@ -61,7 +62,7 @@ class MonManagementView extends React.Component {
     this._handleOnClickWrite = this._handleOnClickWrite.bind(this)
   }
   _handleOnClickWrite () {
-    this.setState({ editMode: 'write' })
+    this.setState({ editMode: 'write', showForm: true })
     this._initFormData()
   }
   _handleOnClickMon (id) {
@@ -109,28 +110,29 @@ class MonManagementView extends React.Component {
     const mon = Object.assign({}, new Mon(), formData)
     const monImageFile = document.getElementById('monImage').files[0]
     let postMonImageFile = () => Promise.resolve()
-    console.log('monImageFile', monImageFile)
     if (monImageFile) postMonImageFile = () => postImage(firebase, MON_IMAGE_ROOT, [monImageFile])
     postMonImageFile()
     .then(res => {
       if (monImageFile) {
         const monImageURL = res[0].File.downloadURL
         const fullPath = res[0].File.fullPath
-        const monImage = { fullPath, url: monImageURL, seq: formData.monImage ? _.last(formData.monImage).seq + 1 : 0, designer }
-        if (editMode === 'write') {
+        const monImage = { fullPath, url: monImageURL, seq: formData.monImage && formData.monImage.length > 0 ? _.last(formData.monImage).seq + 1 : 0, designer }
+        if (editMode === 'write' || !formData.monImage) {
           mon.monImage = []
         }
         mon.monImage.push(monImage)
       }
-      console.log('editMode', editMode)
       if (editMode === 'write') return postMon(firebase, mon)
       return updateMon(firebase, mon)
     })
     .then(snapshot => { // 진화 전 포켓몬 선택했을경우 처리
       if (formData.prev) {
+        const monId = snapshot ? snapshot.key : formData.id
         let nextOfPrev = mons.filter(mon => mon.id === formData.prev)[0].next
         if (!nextOfPrev) nextOfPrev = []
-        nextOfPrev.push(snapshot ? snapshot.key : formData.id)
+        else if (nextOfPrev.indexOf(monId) > -1) {
+          // 이미 진화 전 포켓몬의 next포켓몬으로 등록되어있는 경우 아무것도 안함
+        } else nextOfPrev.push(monId)
         return updateMon(firebase, { id: formData.prev, next: nextOfPrev, evoLv: parseInt(formData.requiredLv) })
       }
       return Promise.resolve()
@@ -143,8 +145,7 @@ class MonManagementView extends React.Component {
         type: 'success'
       })
     })
-    .catch((err) => {
-      console.log('err', err)
+    .catch(() => {
       this.setState({ isLoading: false })
       showAlert({
         title: '저장실패..',
@@ -163,7 +164,6 @@ class MonManagementView extends React.Component {
       const newMonImage = _.remove(monImage, image => {
         return image.seq !== seq
       })
-      console.log('newMonImage', newMonImage)
       newFormData = Object.assign({}, formData, { monImage: newMonImage })
       updateMon(firebase, newFormData)
       .then(() => {
@@ -184,7 +184,6 @@ class MonManagementView extends React.Component {
   _handleOnClickDelete () {
     const { formData } = this.state
     const { firebase } = this.props
-    console.log('formData', formData)
     deleteMon(firebase, formData)
     .then(() => {
       const promArr = formData.monImage.map(image => () => deleteImage(firebase, image.fullPath))
@@ -264,7 +263,7 @@ class MonManagementView extends React.Component {
           console.log('renderMonImage', monImage)
           return (
             <div className='col-sm-2 text-center' key={idx}>
-              <img src={image.url} width='100%' />
+              <Img src={image.url} width='100%' />
               <p className='text-center'>디자이너: {image.designer}</p>
               <Button
                 text='삭제'

@@ -44,22 +44,22 @@ class Header extends React.Component {
     .then(() => {
       expireSessionUser()
       return logout(this.props.firebase)
-    })
-    .then(() => {
-      showAlert({
-        title: '다음에 또 보자구!',
-        text: '로그아웃 되었습니다.',
-        type: 'success'
+      .then(() => {
+        showAlert({
+          title: '다음에 또 보자구!',
+          text: '로그아웃 되었습니다.',
+          type: 'success'
+        })
+        this.context.router.push('/')
       })
-      this.context.router.push('/')
-    })
-    .catch(() => {
-      showAlert({
-        title: 'OOPS!',
-        text: '로그아웃 중 에러가 발생했습니다. 잠시 후 다시 시도해주세요.',
-        type: 'error'
+      .catch(() => {
+        showAlert({
+          title: 'OOPS!',
+          text: '로그아웃 중 에러가 발생했습니다. 잠시 후 다시 시도해주세요.',
+          type: 'error'
+        })
       })
-    })
+    }, () => {})
   }
   render () {
     return (
