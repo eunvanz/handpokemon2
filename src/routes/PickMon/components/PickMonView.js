@@ -5,11 +5,15 @@ import _ from 'lodash'
 import ContentContainer from 'components/ContentContainer'
 import Roulette from 'components/Roulette'
 import Loading from 'components/Loading'
+import MonCard from 'components/MonCard'
+import Button from 'components/Button'
 
 import { getPickMons } from 'services/MonService'
 import { postCollection } from 'services/CollectionService'
 
 import { PICK_MON_ROULETTE_DELAY } from 'constants/rules'
+
+import { mergePickResults } from 'utils/monUtil'
 
 class PickMonView extends React.Component {
   constructor (props) {
@@ -24,6 +28,7 @@ class PickMonView extends React.Component {
       renderFlag: true
     }
     this._initPick = this._initPick.bind(this)
+    this._handleOnClickContinue = this._handleOnClickContinue.bind(this)
   }
   componentDidMount () {
     const { pickMonInfo, auth } = this.props
@@ -32,8 +37,6 @@ class PickMonView extends React.Component {
     this._initPick()
   }
   componentDidUpdate (prevProps, prevState) {
-    console.log('prevProps.location.query.f', prevProps.location.query.f)
-    console.log('this.props.location.query.f', this.props.location.query.f)
     if (prevProps.location.query.f !== this.props.location.query.f) this._initPick()
   }
   _initPick () {
@@ -60,23 +63,37 @@ class PickMonView extends React.Component {
         })
       } else {
         const multiPicks = pickedMons.map(picks => picks[0])
-        return Promise.all(multiPicks.map(pick => postCollection(firebase, auth.uid, pick)))
-        .then(results => {
-          this.setState({ multiPicks })
+        console.log('multiPicks', multiPicks)
+        let results = []
+        const postArr = multiPicks.map(pick => () => postCollection(firebase, auth.uid, pick))
+        return postArr.reduce((prev, post) => prev.then(() => {
+          return post()
+          .then(result => {
+            results.push(result)
+            return Promise.resolve()
+          })
+        }), Promise.resolve())
+        .then(() => {
+          results = mergePickResults(results)
+          this.setState({ multiPicks: results })
           return Promise.resolve()
         })
       }
     })
   }
-  // _handleOnClickStop () {
-  //   if (!this.state.stop) this.setState({ stop: true })
-  // }
+  _handleOnClickContinue () {
+    this.setState({ multiPicks: null })
+    let { f } = this.props.location.query
+    if (f === '1') f = '0'
+    else f = '1'
+    this.context.router.push(`pick-mon?f=${f}`)
+  }
   render () {
     const renderRoulette = () => {
       return (
         <div id='rouletteContainer'>
           <Roulette
-            images={this.state.picks.map(pick => pick.mon.monImage[0].url)}
+            images={this.state.picks.map(pick => pick.mon[pick.monId].monImage[0].url)}
             stopIdx={this.state.pickedIdx}
             size={220}
             innerSize={200}
@@ -85,10 +102,21 @@ class PickMonView extends React.Component {
             stop={this.state.stop}
             delay={PICK_MON_ROULETTE_DELAY}
             mon={this.state.result}
-            flag={this.props.location.query.f}
+            flag={this.props.location.query.f || '-1'}
           />
         </div>
       )
+    }
+    const renderMultiPick = () => {
+      const { multiPicks } = this.state
+      let className = ''
+      if (multiPicks.length === 4) className = 'col-md-offset-2'
+      else if (multiPicks.length === 3) className = 'col-md-offset-3 col-sm-offset-1'
+      else if (multiPicks.length === 2) className = 'col-md-offset-4 col-sm-offset-3'
+      else if (multiPicks.length === 1) className = 'col-md-offset-5 col-sm-offset-4 col-xs-offset-3'
+      else if (multiPicks.length === 5) className = 'col-md-offset-1'
+      return multiPicks.map((pick, idx) => <MonCard mon={pick} pick
+        className={idx === 0 ? className : null} key={idx} type='collection' />)
     }
     const renderBody = () => {
       return (
@@ -104,11 +132,21 @@ class PickMonView extends React.Component {
           }
           {
             this.state.multiPicks && this.state.mode === 'multi' &&
-            <div>ss</div>
+            <div>
+              <div className='row m-t-30'>
+                {renderMultiPick()}
+              </div>
+              <div className='row'>
+                <div className='text-center'>
+                  <Button link text='돌아가기' className='m-r-5'
+                    onClick={() => this.context.router.push('pick-district')} />
+                  <Button text='계속채집' color='orange' onClick={this._handleOnClickContinue} />
+                </div>
+              </div>
+            </div>
           }
           {
-            ((this.state.pickedIdx < 0 && this.state.mode === 'single') ||
-            (this.state.multiPicks && this.state.mode === 'multi')) &&
+            ((this.state.pickedIdx < 0 && this.state.mode === 'single') || (!this.state.multiPicks && this.state.mode === 'multi')) &&
             <Loading
               text='채집 중...'
               height={277}

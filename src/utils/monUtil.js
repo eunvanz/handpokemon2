@@ -4,8 +4,8 @@ import collection from 'models/collection'
 import _ from 'lodash'
 
 export const getMonImage = mon => {
-  if (mon.mon) {
-    return mon.mon.monImage.filter(monImage => mon.imageSeq === monImage.seq)[0]
+  if (mon.mon[mon.monId]) {
+    return mon.mon[mon.monId].monImage.filter(monImage => mon.imageSeq === monImage.seq)[0]
   } else {
     return mon.monImage[0]
   }
@@ -45,6 +45,7 @@ export const getRank = (total, monTotal) => {
 }
 
 export const convertMonToCol = mon => {
+  console.log('mon to convert', mon)
   const hp = getRandomStat(mon.hp)
   const power = getRandomStat(mon.power)
   const armor = getRandomStat(mon.armor)
@@ -55,7 +56,7 @@ export const convertMonToCol = mon => {
   const rank = getRank(total, mon.total)
   const height = _.round(mon.height * _.random(0.5, 1.5), 1)
   const weight = _.round(mon.weight * _.random(0.5, 1.5), 1)
-  const col = Object.assign({}, collection, { mon },
+  const col = Object.assign({}, collection, { mon: { [mon.id]: mon } },
     { hp, power, armor, sPower, sArmor, dex, rank, monId: mon.id, level: 1, total, height, weight, imageSeq: mon.monImage[0].seq })
   return col
 }
@@ -64,7 +65,7 @@ export const levelUpCollection = col => {
   // console.log('levelup param col', col)
   // console.log('point', col.mon.point)
   const updateObj = {}
-  for (let i = 0; i < col.mon.point; i++) {
+  for (let i = 0; i < col.mon[col.monId].point; i++) {
     const idx = _.random(1, 6)
 
     if (idx === 1) updateObj.addedHp = col.addedHp + 1
@@ -73,10 +74,31 @@ export const levelUpCollection = col => {
     else if (idx === 4) updateObj.addedSPower = col.addedSPower + 1
     else if (idx === 5) updateObj.addedSArmor = col.addedSArmor + 1
     else updateObj.addedDex = col.addedDex + 1
-
-    updateObj.level = col.level + 1
-    updateObj.addedTotal = col.mon.point
   }
+  updateObj.level = col.level + 1
+  updateObj.addedTotal = col.mon[col.monId].point
   // console.log('updateObj', updateObj)
   return Object.assign({}, col, updateObj)
+}
+
+export const mergePickResults = pickArr => {
+  // asis, tobe 객체 배열을 merge
+  const result = []
+  pickArr.forEach(pick => {
+    if (pick.asis) {
+      // result에서 monId가 존재하는 인덱스를 찾는다
+      let exist = false
+      for (let i = 0; i < result.length; i++) {
+        if (result[i].tobe.monId === pick.tobe.monId) {
+          result[i].tobe = pick.tobe
+          exist = true
+          break
+        }
+      }
+      if (!exist) result.push(pick)
+    } else {
+      result.push(pick)
+    }
+  })
+  return result
 }

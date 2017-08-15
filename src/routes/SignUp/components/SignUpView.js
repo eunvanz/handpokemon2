@@ -205,10 +205,13 @@ class SignUpView extends React.Component {
       return signUp(firebase, user)
     })
     .then(user => {
+      console.log('user', user)
       return getUserIdByEmail(firebase, user.email)
     })
     .then(userId => {
+      console.log('userId', userId)
       const { startPick } = this.state
+      console.log('startPick', startPick)
       const promArr = startPick.map(col => postCollection(firebase, userId, col))
       return Promise.all(promArr)
     })
@@ -253,6 +256,7 @@ class SignUpView extends React.Component {
     getStartPick(firebase)
     .then(startPick => {
       this.setState({ startPick })
+      console.log('startPick', startPick)
       this.setState({ loading: false })
       if (!this.state.applicable) this.setState({ applicable: true })
     })
@@ -266,7 +270,7 @@ class SignUpView extends React.Component {
       return startPick.map(mon => {
         seq++
         return (
-          <MonCard mon={mon} key={keygen._()} type='collection'
+          <MonCard mon={{ tobe: mon }} key={keygen._()} type='collection'
             className={`${seq === 1 ? 'col-md-offset-3 col-sm-offset-1 col-xs-offset-0' : ''}`} />
         )
       })

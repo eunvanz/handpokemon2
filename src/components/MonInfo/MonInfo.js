@@ -23,7 +23,7 @@ class MonInfo extends React.Component {
     const { monObj, type, forModal } = this.props
     const mon = monObj.tobe
     const asisMon = monObj.asis
-    let monToView = type === 'collection' ? mon.mon : mon
+    let monToView = type === 'collection' ? mon.mon[mon.monId] : mon
     const colClassName = forModal ? 'col-sm-8 col-xs-12 text-left' : 'col-sm-4 col-sm-offset-4 text-left'
     const renderInfo = () => {
       return (

@@ -8,6 +8,8 @@ import MonInfo from 'components/MonInfo'
 
 import { getMonImage } from 'utils/monUtil'
 
+import { colors } from 'constants/colors'
+
 class MonModal extends React.Component {
   constructor (props) {
     super(props)
@@ -17,19 +19,30 @@ class MonModal extends React.Component {
   }
   render () {
     const { mon, show, close, type, ...restProps } = this.props
+    const tobeMon = mon.tobe
+    const renderLevel = () => {
+      if (mon.asis) {
+        return (
+          <div className='text-center m-b-30' style={{ height: '60px' }}>
+            <MonLevel level={mon.asis.level} style={{ backgroundColor: colors.gray }} /> <i className='fa fa-long-arrow-right c-gray' /> <MonLevel level={mon.tobe.level} style={{ fontSize: 'medium'}} />
+          </div>
+        )
+      }
+      return <MonLevel level={tobeMon.level} />
+    }
     const renderBody = () => {
       return (
         <div className='row'>
           <div className='col-sm-4 col-xs-12 text-center' style={{ marginBottom: '20px' }}>
             <p style={{ marginBottom: '10px' }}>
-              <img src={getMonImage(mon).url} width='100%'
+              <img src={getMonImage(tobeMon).url} width='100%'
                 style={{ border: '1px dotted #e2e2e2', maxWidth: '200px' }} />
             </p>
-            {mon.level &&
-              <MonLevel level={mon.level} />
+            {tobeMon.level &&
+              renderLevel()
             }
           </div>
-          <MonInfo monObj={{ tobe: mon }} showStat={this.state.showStat} type={type} forModal />
+          <MonInfo monObj={mon} showStat={this.state.showStat} type={type} forModal />
         </div>
       )
     }
@@ -57,7 +70,7 @@ class MonModal extends React.Component {
 }
 
 MonModal.propTypes = {
-  mon: PropTypes.object,
+  mon: PropTypes.object, // asis, tobe
   show: PropTypes.bool.isRequired,
   close: PropTypes.func,
   type: PropTypes.string

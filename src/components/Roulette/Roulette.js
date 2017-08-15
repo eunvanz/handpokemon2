@@ -79,7 +79,7 @@ class Roulette extends React.Component {
         // 새로운 포켓몬
         return <div className='text-center m-b-30'>
           <LabelBadge text='새로운 포켓몬' style={{ fontSize: 'medium', backgroundColor: colors.red }} />
-          <p>콜렉션점수 <span className='c-lightblue f-700'>+{mon.tobe.mon.point}</span></p>
+          <p className='m-t-5'>콜렉션점수 <span className='c-lightblue f-700'>+{mon.tobe.mon[mon.tobe.monId].point}</span></p>
         </div>
       }
     }
@@ -100,7 +100,7 @@ class Roulette extends React.Component {
             <MonInfo monObj={mon} type='collection' showStat={mon.asis !== null} />
           </div>
         </div>
-        <div className='m-t-30 text-center' id='btnArea' style={{ display: 'none' }}>
+        <div className='text-center' id='btnArea' style={{ display: 'none', marginTop: '40px' }}>
           <Button link text='돌아가기' className='m-r-5'
             onClick={() => this.context.router.push('pick-district')} />
           <Button text='계속채집' color='orange' onClick={this._handleOnClickContinue} />

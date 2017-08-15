@@ -16,6 +16,7 @@ import Selectbox from 'components/Selectbox'
 import ImageInput from 'components/ImageInput'
 import Button from 'components/Button'
 import Img from 'components/Img'
+import MonAttr from 'components/MonAttr'
 
 import { postImage, deleteImage } from 'services/ImageService'
 import { postMon, updateMon, deleteMon } from 'services/MonService'
@@ -230,7 +231,7 @@ class MonManagementView extends React.Component {
             <div className='list-group-item media' key={idx}>
               <div className='media-body'>
                 <div className='lgi-heading' style={{ cursor: 'pointer' }}
-                  onClick={() => this._handleOnClickMon(mon.id)}>{mon.name}</div>
+                  onClick={() => this._handleOnClickMon(mon.id)}>{mon.no}. {mon.name} <MonAttr mainAttr={mon.mainAttr} subAttr={mon.subAttr} grade={mon.grade} /></div>
               </div>
             </div>
           )

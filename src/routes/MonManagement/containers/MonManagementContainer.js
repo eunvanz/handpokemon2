@@ -1,5 +1,6 @@
 import { connect } from 'react-redux'
 import { firebaseConnect, dataToJS } from 'react-redux-firebase'
+import _ from 'lodash'
 
 import MonManagementView from '../components/MonManagementView'
 
@@ -9,7 +10,7 @@ const mapDispatchToProps = {
 }
 
 const mapStateToProps = (state) => ({
-  mons: convertMapToArr(dataToJS(state.firebase, 'mons'))
+  mons: _.sortBy(convertMapToArr(dataToJS(state.firebase, 'mons')), ['no'])
 })
 
 const wrappedMonManagementView = firebaseConnect([

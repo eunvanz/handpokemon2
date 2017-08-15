@@ -12,7 +12,7 @@ class LabelBadge extends React.Component {
 }
 
 LabelBadge.propTypes = {
-  text: PropTypes.number.isRequired,
+  text: PropTypes.string.isRequired,
   style: PropTypes.object
 }
 
