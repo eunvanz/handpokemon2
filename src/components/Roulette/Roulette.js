@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import keygen from 'keygenerator'
+import ReactDOM from 'react-dom'
 
 import Button from 'components/Button'
 import MonInfo from 'components/MonInfo'
@@ -34,6 +35,10 @@ class Roulette extends React.Component {
       $('#monInfo').css('display', 'block')
       $('#btnArea').css('display', 'block')
     }
+    if (this.props.btnComponent !== nextProps.btnComponent) {
+      console.log('btn should update')
+      ReactDOM.render(nextProps.btnComponent, document.getElementById('btnArea'))
+    }
     return false
   }
   componentDidUpdate (prevProps, prevState) {
@@ -65,7 +70,7 @@ class Roulette extends React.Component {
     this.context.router.push(`pick-mon?f=${f}`)
   }
   render () {
-    const { images, size, id, style, innerSize, mon } = this.props
+    const { images, size, id, style, innerSize, mon, btnComponent } = this.props
     const renderImages = () => {
       return images.map(image => <img src={image} key={keygen._()} style={{ width: `${innerSize || size}px`, height: `${innerSize || size}px` }} />)
     }
@@ -101,9 +106,10 @@ class Roulette extends React.Component {
           </div>
         </div>
         <div className='text-center' id='btnArea' style={{ display: 'none', marginTop: '40px' }}>
-          <Button link text='돌아가기' className='m-r-5'
+          {btnComponent}
+          {/*<Button link text='돌아가기' className='m-r-5'
             onClick={() => this.context.router.push('pick-district')} />
-          <Button text='계속채집' color='orange' onClick={this._handleOnClickContinue} />
+          <Button text='계속채집' color='orange' onClick={this._handleOnClickContinue} />*/}
         </div>
       </div>
     )
@@ -123,7 +129,8 @@ Roulette.propTypes = {
   style: PropTypes.object,
   innerSize: PropTypes.number,
   mon: PropTypes.object,
-  flag: PropTypes.string.isRequired
+  flag: PropTypes.string.isRequired,
+  btnComponent: PropTypes.element
 }
 
 export default Roulette

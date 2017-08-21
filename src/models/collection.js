@@ -1,5 +1,4 @@
 export const collection = {
-  id: 0,
   monId: null,
   userId: null,
   rank: null,

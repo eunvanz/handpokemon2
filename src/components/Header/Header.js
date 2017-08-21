@@ -4,19 +4,15 @@ import { Link } from 'react-router'
 import { connect } from 'react-redux'
 import { firebaseConnect, pathToJS } from 'react-redux-firebase'
 
-import { fetchUserById, clearUser } from 'store/user'
-
 import { showAlert } from 'utils/commonUtil'
 
-import { getSessionUser, expireSessionUser, logout } from 'services/UserService'
+import { logout } from 'services/UserService'
 
 const mapStateToProps = (state) => ({
   auth: pathToJS(state.firebase, 'auth')
 })
 
 const mapDispatchToProps = {
-  clearStoreUser: clearUser,
-  fetchUserById: fetchUserById
 }
 
 class Header extends React.Component {
@@ -26,12 +22,12 @@ class Header extends React.Component {
     }
     this._handleOnClickLogout = this._handleOnClickLogout.bind(this)
   }
-  componentDidMount () {
-    const authUser = getSessionUser()
-    if (authUser) { // 세션에 authUser가 있을 경우 store에 세팅하고 db에서 user 가져옴
-      this.props.fetchUserById(authUser.id)
-    }
-  }
+  // componentDidMount () {
+  //   const authUser = getSessionUser()
+  //   if (authUser) { // 세션에 authUser가 있을 경우 store에 세팅하고 db에서 user 가져옴
+  //     this.props.fetchUserById(authUser.id)
+  //   }
+  // }
   _handleOnClickLogout () {
     showAlert({
       title: '로그아웃 하시겠습니까?',
@@ -42,7 +38,7 @@ class Header extends React.Component {
       cancelButtonText: '아니오'
     })
     .then(() => {
-      expireSessionUser()
+      // expireSessionUser()
       return logout(this.props.firebase)
       .then(() => {
         showAlert({
@@ -107,8 +103,6 @@ Header.contextTypes = {
 
 Header.propTypes = {
   firebase: PropTypes.object.isRequired,
-  clearStoreUser: PropTypes.func.isRequired,
-  fetchUserById: PropTypes.func.isRequired,
   auth: PropTypes.object
 }
 

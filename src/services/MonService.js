@@ -1,5 +1,5 @@
 import { convertMapToArr } from 'utils/commonUtil'
-import { convertMonToCol } from 'utils/monUtil'
+import { convertMonToCol, convertNextMonToCol } from 'utils/monUtil'
 
 import _ from 'lodash'
 
@@ -41,13 +41,37 @@ export const getPickMons = (firebase, attrs, grades) => {
   })
 }
 
+export const getNextMons = (firebase, evoluteCol) => {
+  const nextIds = evoluteCol.mon[evoluteCol.monId].next
+  return firebase.ref('mons').once('value')
+  .then(snapshot => {
+    const mons = snapshot.val()
+    console.log('mons', mons)
+    const nextMons = nextIds.map(nextId => Object.assign({}, mons[nextId], { id: nextId }))
+    console.log('nextMons', nextMons)
+    const nextCols = _.shuffle(nextMons.map(nextMon => convertNextMonToCol(nextMon, evoluteCol)))
+    console.log('nextCols', nextCols)
+    return Promise.resolve(nextCols)
+  })
+}
+
 export const postMon = (firebase, mon) => {
   return firebase.push('mons', mon)
 }
 
 export const updateMon = (firebase, mon) => {
-  // mons, collections, userCollections 모두 업데이트 <-- 서버사이드로 이관
-  return firebase.update(`mons/${mon.id}`, mon)
+  // mons, collections, monCollections, userCollections 모두 업데이트
+  const updateObj = {
+    [`mons/${mon.id}`]: mon
+  }
+  // monCollections를 이용해 해당 mon의 콜렉션 id들을 알아냄
+  firebase.ref(`monCollections/${mon.id}`).once('value')
+  .then(snapshot => {
+    const collectionIds = Object.keys(snapshot.val())
+    const collectionsToUpdate = collectionIds
+  })
+  // const collectionIds = 
+  // return firebase.update(`mons/${mon.id}`, mon)
 }
 
 export const updateMonWithRoute = (firebase, route, value) => {

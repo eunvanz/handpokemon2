@@ -18,5 +18,6 @@ export default class User {
     this.lastPick = 0
     this.lastLeague = 0
     this.lastAdventure = 0
+    this.pokemoney = 0
   }
 }

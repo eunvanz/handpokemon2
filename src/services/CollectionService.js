@@ -1,4 +1,5 @@
 import { levelUpCollection } from 'utils/monUtil'
+import { convertMapToArr } from 'utils/commonUtil'
 
 const getCollectionsRefUserIdAndMonId = (firebase, userId, monId) => {
   return firebase.ref(`userCollections/${userId}`).once('value') // 사용자의 콜렉션 가져옴
@@ -7,6 +8,39 @@ const getCollectionsRefUserIdAndMonId = (firebase, userId, monId) => {
     console.log('snapshot.val()', snapshot.val())
     console.log('snapshot.key', snapshot.key)
     return snapshot.ref.orderByChild('monId').equalTo(monId).limitToFirst(1).once('value') // 그 중에서 monId가 collection.monId와 같은 데이터를 가져옴
+  })
+}
+
+export const getCollectionsByUserId = (firebase, userId) => {
+  return firebase.ref(`userCollections/${userId}`).once('value')
+  .then(snapshot => {
+    const userCollections = convertMapToArr(snapshot.val())
+    console.log('userCollections', userCollections)
+    return Promise.resolve(userCollections)
+  })
+}
+
+export const updateCollection = (firebase, col) => {
+  const updateObj = {
+    [`collections/${col.id}`]: col,
+    [`userCollections/${col.userId}/${col.id}`]: col,
+    [`monCollections/${col.monId}/${col.id}`]: col
+  }
+  return firebase.ref().update(updateObj)
+}
+
+export const deleteCollection = (firebase, col) => {
+  return firebase.ref(`user/${col.userId}/colPoint`).once('value')
+  .then(snapshot => {
+    const asisPoint = snapshot.val()
+    const tobePoint = asisPoint - col.mon[col.monId].point
+    const updateObj = {
+      [`collections/${col.id}`]: null,
+      [`userCollections/${col.userId}/${col.id}`]: null,
+      [`monCollections/${col.monId}/${col.id}`]: null,
+      [`user/${col.userId}/colPoint`]: tobePoint
+    }
+    return firebase.ref().update(updateObj)
   })
 }
 

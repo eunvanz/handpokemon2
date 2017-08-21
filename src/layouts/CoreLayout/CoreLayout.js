@@ -50,7 +50,7 @@ export const CoreLayout = ({ children, messageModal, closeMessageModal }) => (
         {
           'rel': 'stylesheet',
           'href': '/css/inc/app_2.css'
-        }
+        }      
       ]}
     />
     <Header />

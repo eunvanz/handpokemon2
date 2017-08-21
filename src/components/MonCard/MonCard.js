@@ -32,6 +32,7 @@ class MonCard extends React.Component {
         // 레벨 업 시
         return <div className='text-center m-b-30' style={{ height: '60px' }}>
           <MonLevel level={mon.asis.level} style={{ backgroundColor: colors.gray }} /> <i className='fa fa-long-arrow-right c-gray' /> <MonLevel level={mon.tobe.level} style={{ fontSize: 'small'}} />
+          <p className='m-t-5'>레벨 <span className='c-lightblue f-700'>+{mon.tobe.level - mon.asis.level}</span></p>
         </div>
       } else {
         // 새로운 포켓몬
@@ -46,7 +47,7 @@ class MonCard extends React.Component {
         style={{ padding: '0px 5px' }} onClick={this._showMonModal}
       >
         {type === 'collection' && <MonLevel level={tobeMon.level}
-          style={{ position: 'absolute', top: '0px', borderRadius: '0px 0px 2px 0px' }} />}
+          style={{ position: 'absolute', top: '0px', borderRadius: '0px 0px 2px 0px', backgroundColor: tobeMon.level >= (tobeMon.mon[tobeMon.monId].evoLv === 0 ? 99999 : tobeMon.mon[tobeMon.monId].evoLv) ? colors.deepOrange : colors.lightBlue }} />}
         <div className='text-right' style={{ marginRight: '18px' }}>
           {type === 'collection' && <MonRank rank={tobeMon.rank} style={{ borderRadius: '0px 0px 0px 2px' }} />}
         </div>
@@ -54,18 +55,20 @@ class MonCard extends React.Component {
           style={{
             cursor: 'pointer',
             border: '1px solid #e2e2e2',
-            marginBottom: '20px',
+            marginBottom: '8px',
             borderRadius: '2px',
             boxShadow: '1px 1px 1px rgba(0, 0, 0, 0.1)',
             padding: '4px'
           }}>
           <a className='ci-avatar'>
-            <Img src={getMonImage(tobeMon).url} width='100%' style={{ border: '1px dotted #e2e2e2' }} />
+            <Img src={type === 'collection' ? getMonImage(tobeMon).url : 'hidden'} width='100%' style={{ border: '1px dotted #e2e2e2' }} />
           </a>
           <div className='c-info text-center' style={{ margin: '5px 0px' }}>
-            <MonCost cost={tobeMon.mon[tobeMon.monId].cost} style={{ marginBottom: '5px' }} />
-            <MonAttr grade={tobeMon.mon[tobeMon.monId].grade} mainAttr={tobeMon.mon[tobeMon.monId].mainAttr}
-              subAttr={tobeMon.mon[tobeMon.monId].subAttr}
+            <MonCost cost={type === 'collection' ? tobeMon.mon[tobeMon.monId].cost : tobeMon.cost}
+              style={{ marginBottom: '5px' }} />
+            <MonAttr grade={type === 'collection' ? tobeMon.mon[tobeMon.monId].grade : tobeMon.grade}
+              mainAttr={type === 'collection' ? tobeMon.mon[tobeMon.monId].mainAttr : tobeMon.mainAttr}
+              subAttr={type === 'collection' ? tobeMon.mon[tobeMon.monId].subAttr : tobeMon.subAttr}
               style={{ marginBottom: '10px' }} />
           </div>
         </div>

@@ -1,4 +1,6 @@
 import _ from 'lodash'
+import numeral from 'numeral'
+import { pathToJS, dataToJS } from 'react-redux-firebase'
 
 export const isScreenSize = {
   xs: () => window.innerWidth < 768,
@@ -79,4 +81,18 @@ export const convertMapToArr = map => {
     arr.push(value)
   })
   return arr
+}
+
+export const convertTimeToMMSS = time => {
+  const min = Math.floor(time / (1000 * 60))
+  const sec = Math.floor((time - (min * 1000 * 60)) / 1000)
+  return `${min}:${numeral(sec).format('00')}`
+}
+
+export const getAuthUserFromFirebase = state => {
+  const auth = pathToJS(state.firebase, 'auth')
+  return {
+    user: auth ? dataToJS(state.firebase, `users/${pathToJS(state.firebase, 'auth').uid}`) : null,
+    auth
+  }
 }

@@ -4,14 +4,14 @@ import collection from 'models/collection'
 import _ from 'lodash'
 
 export const getMonImage = mon => {
-  if (mon.mon[mon.monId]) {
+  if (mon.mon && mon.mon[mon.monId]) {
     return mon.mon[mon.monId].monImage.filter(monImage => mon.imageSeq === monImage.seq)[0]
   } else {
     return mon.monImage[0]
   }
 }
 
-export const getRandomStat = (stat) => {
+const getRandomStat = (stat) => {
   const idx = _.random(0, 100)
   if (idx > 100 - RANK.SS.chance) {
     return _.round(stat * _.random(RANK.SS.range.min, RANK.SS.range.max))
@@ -45,7 +45,6 @@ export const getRank = (total, monTotal) => {
 }
 
 export const convertMonToCol = mon => {
-  console.log('mon to convert', mon)
   const hp = getRandomStat(mon.hp)
   const power = getRandomStat(mon.power)
   const armor = getRandomStat(mon.armor)
@@ -58,6 +57,36 @@ export const convertMonToCol = mon => {
   const weight = _.round(mon.weight * _.random(0.5, 1.5), 1)
   const col = Object.assign({}, collection, { mon: { [mon.id]: mon } },
     { hp, power, armor, sPower, sArmor, dex, rank, monId: mon.id, level: 1, total, height, weight, imageSeq: mon.monImage[0].seq })
+  return col
+}
+
+const getStatRatio = col => {
+  const result = {}
+  result.hp = col.hp / col.mon[col.monId].hp
+  result.power = col.power / col.mon[col.monId].power
+  result.armor = col.armor / col.mon[col.monId].armor
+  result.sPower = col.sPower / col.mon[col.monId].sPower
+  result.sArmor = col.sArmor / col.mon[col.monId].sArmor
+  result.dex = col.dex / col.mon[col.monId].dex
+  result.height = col.height / col.mon[col.monId].height
+  result.weight = col.weight / col.mon[col.monId].weight
+  return result
+}
+
+export const convertNextMonToCol = (nextMon, evoluteCol) => {
+  // 진화할 콜렉션의 능력치 비율만큼 다음 진화체에도 능력치 부여
+  const ratioObj = getStatRatio(evoluteCol)
+  const hp = _.round(nextMon.hp * ratioObj.hp)
+  const power = _.round(nextMon.power * ratioObj.power)
+  const armor = _.round(nextMon.armor * ratioObj.armor)
+  const sPower = _.round(nextMon.sPower * ratioObj.sPower)
+  const sArmor = _.round(nextMon.sArmor * ratioObj.sArmor)
+  const dex = _.round(nextMon.dex * ratioObj.dex)
+  const total = hp + power + armor + sPower + sArmor + dex
+  const height = _.round(nextMon.height * ratioObj.height, 1)
+  const weight = _.round(nextMon.weight * ratioObj.weight, 1)
+  const col = Object.assign({}, collection, { mon: { [nextMon.id]: nextMon } },
+    { hp, power, armor, sPower, sArmor, dex, rank: evoluteCol.rank, monId: nextMon.id, level: 1, total, height, weight, imageSeq: nextMon.monImage[0].seq })
   return col
 }
 

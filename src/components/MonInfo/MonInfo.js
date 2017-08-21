@@ -27,7 +27,7 @@ class MonInfo extends React.Component {
     const colClassName = forModal ? 'col-sm-8 col-xs-12 text-left' : 'col-sm-4 col-sm-offset-4 text-left'
     const renderInfo = () => {
       return (
-        <div className='row m-b-20'>
+        <div className='m-b-20'>
           {
             !this.state.showStat &&
             <div>
@@ -57,7 +57,7 @@ class MonInfo extends React.Component {
               </div>
               <div className='row' style={{ marginBottom: '15px' }}>
                 <div className='col-xs-3 f-700'>피지컬</div>
-                <div className='col-xs-9'><span className='f-700 c-blue'>{mon.height}</span>m / <span className='f-700 c-blue'>{mon.weight}</span>kg</div>
+                <div className='col-xs-9'>{type === 'mon' ? '평균 ' : ''}<span className='f-700 c-blue'>{mon.height}</span>m / {type === 'mon' ? '평균 ' : ''}<span className='f-700 c-blue'>{mon.weight}</span>kg</div>
               </div>
               <div className='row' style={{ marginBottom: '15px' }}>
                 <div className='col-xs-3 f-700'>진화</div>

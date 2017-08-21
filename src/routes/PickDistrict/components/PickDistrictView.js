@@ -5,6 +5,7 @@ import keygen from 'keygenerator'
 import Card from 'components/Card'
 import Button from 'components/Button'
 import AttrBadge from 'components/AttrBadge'
+import WarningText from 'components/WarningText'
 
 import { districts } from 'constants/data'
 
@@ -15,6 +16,10 @@ class PickDistrictView extends React.Component {
     super(props)
     this._handleOnClickPick = this._handleOnClickPick.bind(this)
   }
+  componentDidMount () {
+    const { user } = this.props
+    if (!user) this.context.router.push('sign-in')
+  }
   _handleOnClickPick (district, quantity) {
     const pickMonInfo = {
       quantity,
@@ -22,9 +27,10 @@ class PickDistrictView extends React.Component {
       grades: ['b']
     }
     this.props.receivePickMonInfo(pickMonInfo)
-    this.context.router.push('/pick-mon')
+    this.context.router.push('pick-mon')
   }
   render () {
+    const { user } = this.props
     const renderAttrBadges = attrs => {
       return attrs.map(attr =>
         <AttrBadge
@@ -45,10 +51,23 @@ class PickDistrictView extends React.Component {
                 <p className='text-center' style={{ marginTop: '12px' }}>
                   {district.name === '중앙던전' ? '모든 속성의 포켓몬' : renderAttrBadges(district.attrs)}
                 </p>
-                <div className='text-center'>
-                  <Button className='m-r-5' text='채집 X 1' onClick={() => this._handleOnClickPick(district, 1)} />
-                  <Button text='채집 X 6' onClick={() => this._handleOnClickPick(district, 6)} />
-                </div>
+                {
+                  user && user.pickCredit > 0 &&
+                  <div className='text-center'>
+                    <Button className='m-r-5' text='채집 X 1' onClick={() => this._handleOnClickPick(district, 1)} />
+                    {
+                      user.pickCredit > 1 &&
+                      <Button text={`채집 X ${user.pickCredit > 6 ? 6 : user.pickCredit}`}
+                        onClick={() => this._handleOnClickPick(district, user.pickCredit > 6 ? 6 : user.pickCredit)} />
+                    }
+                  </div>
+                }
+                {
+                  user && user.pickCredit < 1 &&
+                  <div className='text-center c-gray f-13'>
+                    <WarningText text='채집크레딧이 부족합니다.' />
+                  </div>
+                }
               </div>
             }
           />
@@ -71,7 +90,8 @@ PickDistrictView.contextTypes = {
 }
 
 PickDistrictView.propTypes = {
-  receivePickMonInfo: PropTypes.func.isRequired
+  receivePickMonInfo: PropTypes.func.isRequired,
+  user: PropTypes.object
 }
 
 export default PickDistrictView

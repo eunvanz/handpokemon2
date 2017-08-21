@@ -72,6 +72,7 @@ class MonManagementView extends React.Component {
       editMode: 'update',
       formData: this.props.mons.filter(mon => mon.id === id)[0]
     })
+    console.log('updateMon', this.props.mons.filter(mon => mon.id === id)[0])
   }
   _handleOnChangeInput (e) {
     e.preventDefault()
@@ -130,10 +131,12 @@ class MonManagementView extends React.Component {
       if (formData.prev) {
         const monId = snapshot ? snapshot.key : formData.id
         let nextOfPrev = mons.filter(mon => mon.id === formData.prev)[0].next
+        console.log('nextOfPrev1', nextOfPrev)
         if (!nextOfPrev) nextOfPrev = []
-        else if (nextOfPrev.indexOf(monId) > -1) {
+        if (nextOfPrev.indexOf(monId) > -1) {
           // 이미 진화 전 포켓몬의 next포켓몬으로 등록되어있는 경우 아무것도 안함
         } else nextOfPrev.push(monId)
+        console.log('nextOfPrev2', nextOfPrev)
         return updateMon(firebase, { id: formData.prev, next: nextOfPrev, evoLv: parseInt(formData.requiredLv) })
       }
       return Promise.resolve()
