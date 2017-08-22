@@ -15,6 +15,7 @@ import WarningText from 'components/WarningText'
 import { getCollectionsByUserId } from 'services/CollectionService'
 
 import { attrs } from 'constants/data'
+import { colors } from 'constants/colors'
 
 class CollectionView extends React.Component {
   constructor (props) {
@@ -22,6 +23,8 @@ class CollectionView extends React.Component {
     this.state = {
       collections: null,
       filteredCollections: null,
+      isMixMode: false,
+      openFloatMenu: false,
       showFilterModal: false,
       filter: {
         has: {
@@ -178,7 +181,7 @@ class CollectionView extends React.Component {
     this.setState({ filter: newFilter })
   }
   render () {
-    const { collections, filter, filteredCollections } = this.state
+    const { collections, filter, filteredCollections, openFloatMenu } = this.state
     const renderCollections = () => {
       if (filteredCollections.length === 0) {
         return <div className='text-center'><WarningText text='조건에 맞는 포켓몬이 없습니다.' /></div>
@@ -253,7 +256,24 @@ class CollectionView extends React.Component {
       else {
         return (
           <div className='row'>
-            <FloatingButton iconClassName='zmdi zmdi-filter-list' onClick={this._handleOnClickFilter} />
+            <FloatingButton iconClassName={openFloatMenu ? 'fa fa-times' : 'fa fa-plus'}
+              onClick={() => this.setState({ openFloatMenu: !openFloatMenu })}
+              tooltipText={openFloatMenu ? '메뉴닫기' : '메뉴열기'}
+            />
+            <FloatingButton iconClassName='fa fa-filter'
+              onClick={this._handleOnClickFilter}
+              bottom={100}
+              backgroundColor={colors.amber}
+              hidden={!openFloatMenu}
+              tooltipText='필터'
+            />
+            <FloatingButton iconClassName='fa fa-flask'
+              onClick={this._handleOnClickFilter}
+              bottom={160}
+              backgroundColor={colors.amber}
+              hidden={!openFloatMenu}
+              tooltipText='교배하기'
+            />
             {renderCollections()}
             <CustomModal
               title='콜렉션 필터'

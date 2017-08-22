@@ -93,21 +93,35 @@ export const convertNextMonToCol = (nextMon, evoluteCol) => {
 export const levelUpCollection = col => {
   // console.log('levelup param col', col)
   // console.log('point', col.mon.point)
-  const updateObj = {}
+  const updateObj = Object.assign({}, col)
   for (let i = 0; i < col.mon[col.monId].point; i++) {
     const idx = _.random(1, 6)
 
-    if (idx === 1) updateObj.addedHp = col.addedHp + 1
-    else if (idx === 2) updateObj.addedPower = col.addedPower + 1
-    else if (idx === 3) updateObj.addedArmor = col.addedArmor + 1
-    else if (idx === 4) updateObj.addedSPower = col.addedSPower + 1
-    else if (idx === 5) updateObj.addedSArmor = col.addedSArmor + 1
-    else updateObj.addedDex = col.addedDex + 1
+    if (idx === 1) updateObj.addedHp = updateObj.addedHp + 1
+    else if (idx === 2) updateObj.addedPower = updateObj.addedPower + 1
+    else if (idx === 3) updateObj.addedArmor = updateObj.addedArmor + 1
+    else if (idx === 4) updateObj.addedSPower = updateObj.addedSPower + 1
+    else if (idx === 5) updateObj.addedSArmor = updateObj.addedSArmor + 1
+    else updateObj.addedDex = updateObj.addedDex + 1
   }
   updateObj.level = col.level + 1
   updateObj.addedTotal = col.mon[col.monId].point
   // console.log('updateObj', updateObj)
-  return Object.assign({}, col, updateObj)
+  return updateObj
+}
+
+export const levelDownCollection = col => {
+  const updateObj = Object.assign({}, col, { level: col.level - col.mon[col.monId].evoLv })
+  for (let i = 0; i < col.mon[col.monId].point; i++) {
+    const idx = _.random(0, 5)
+    const stat = ['addedHp', 'addedPower', 'addedArmor', 'addedSPower', 'addedSArmor', 'addedDex']
+    if (updateObj[stat[idx]] > 0) {
+      updateObj[stat[idx]] = updateObj[stat[idx]] - 1
+    } else {
+      i = i - 1
+    }
+  }
+  return updateObj
 }
 
 export const mergePickResults = pickArr => {

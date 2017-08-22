@@ -49,7 +49,7 @@ export const getNextMons = (firebase, evoluteCol) => {
     console.log('mons', mons)
     const nextMons = nextIds.map(nextId => Object.assign({}, mons[nextId], { id: nextId }))
     console.log('nextMons', nextMons)
-    const nextCols = _.shuffle(nextMons.map(nextMon => convertNextMonToCol(nextMon, evoluteCol)))
+    const nextCols = _.shuffle(nextMons.map(nextMon => convertMonToCol(nextMon)))
     console.log('nextCols', nextCols)
     return Promise.resolve(nextCols)
   })
@@ -61,17 +61,45 @@ export const postMon = (firebase, mon) => {
 
 export const updateMon = (firebase, mon) => {
   // mons, collections, monCollections, userCollections 모두 업데이트
-  const updateObj = {
-    [`mons/${mon.id}`]: mon
-  }
-  // monCollections를 이용해 해당 mon의 콜렉션 id들을 알아냄
-  firebase.ref(`monCollections/${mon.id}`).once('value')
+  const collectionsPaths = []
+  const monCollectionsPaths = []
+  const userCollectionsPaths = []
+  let updateObj
+  let tobeMon
+  return firebase.ref(`mons/${mon.id}`).once('value')
   .then(snapshot => {
-    const collectionIds = Object.keys(snapshot.val())
-    const collectionsToUpdate = collectionIds
+    const asisMon = snapshot.val()
+    console.log('asisMon', asisMon)
+    tobeMon = Object.assign({}, asisMon, mon)
+    console.log('tobeMon', tobeMon)
+    updateObj = {
+      [`mons/${mon.id}`]: tobeMon
+    }
+    return firebase.ref(`monCollections/${mon.id}`).once('value')
   })
-  // const collectionIds = 
-  // return firebase.update(`mons/${mon.id}`, mon)
+  .then(snapshot => {
+    console.log('snapshot.val()', snapshot.val())
+    if (snapshot.val()) { // 콜렉션이 있는경우
+      const collectionIds = Object.keys(snapshot.val())
+      collectionIds.forEach(colId => {
+        monCollectionsPaths.push(`monCollections/${mon.id}/${colId}/mon/${mon.id}`)
+        collectionsPaths.push(`collections/${colId}/mon/${mon.id}`)
+      })
+    }
+    return firebase.ref('collections').orderByChild('monId').equalTo(mon.id).once('value')
+  })
+  .then(snapshot => {
+    snapshot.forEach(snap => {
+      const colId = snap.key
+      const userId = snap.val().userId
+      userCollectionsPaths.push(`userCollections/${userId}/${colId}/mon/${mon.id}`)
+    })
+    const merge = _.concat(collectionsPaths, monCollectionsPaths, userCollectionsPaths)
+    merge.forEach(elem => {
+      updateObj[elem] = tobeMon
+    })
+    return firebase.ref().update(updateObj)
+  })
 }
 
 export const updateMonWithRoute = (firebase, route, value) => {

@@ -14,7 +14,7 @@ import { decreaseCredit } from 'services/UserService'
 
 import { PICK_MON_ROULETTE_DELAY } from 'constants/rules'
 
-import { mergePickResults } from 'utils/monUtil'
+import { mergePickResults, levelDownCollection } from 'utils/monUtil'
 
 class PickMonView extends React.Component {
   constructor (props) {
@@ -83,11 +83,11 @@ class PickMonView extends React.Component {
                 return Promise.resolve()
               })
           }), Promise.resolve())
-            .then(() => {
-              results = mergePickResults(results)
-              this.setState({ multiPicks: results })
-              return Promise.resolve()
-            })
+          .then(() => {
+            results = mergePickResults(results)
+            this.setState({ multiPicks: results })
+            return Promise.resolve()
+          })
         }
       })
       .then(() => {
@@ -101,8 +101,7 @@ class PickMonView extends React.Component {
           return deleteCollection(firebase, evoluteCol)
         } else {
           // 레벨하락
-          return updateCollection(firebase,
-            Object.assign({}, evoluteCol, { level: evoluteCol.level - evoluteCol.mon[evoluteCol.monId].evoLv }))
+          return updateCollection(firebase, levelDownCollection(evoluteCol))
         }
       }
       getNextMons(firebase, evoluteCol)

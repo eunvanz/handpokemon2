@@ -50,7 +50,7 @@ class MonModal extends React.Component {
           <div className='text-center m-b-30' style={{ height: '60px' }}>
             <MonLevel level={mon.asis.level} style={{ backgroundColor: colors.gray }} /> <i className='fa fa-long-arrow-right c-gray' /> <MonLevel level={mon.tobe.level} style={{ fontSize: 'small'}} />
             {
-              tobeMon.level >= tobeMon.mon[tobeMon.monId].evoLv &&
+              tobeMon.mon[tobeMon.monId].evoLv !== 0 && tobeMon.level >= tobeMon.mon[tobeMon.monId].evoLv &&
               <div className='m-t-15'>
                 <Button text='진화하기' color='deeporange' onClick={this._handleOnClickEvolution} />
               </div>
@@ -62,7 +62,7 @@ class MonModal extends React.Component {
         <div>
           <MonLevel level={tobeMon.level} />
           {
-            tobeMon.evoLv !== 0 && tobeMon.level >= tobeMon.mon[tobeMon.monId].evoLv &&
+            tobeMon.mon[tobeMon.monId].evoLv !== 0 && tobeMon.level >= tobeMon.mon[tobeMon.monId].evoLv &&
             <div className='m-t-15'>
               <Button text='진화하기' color='deeporange' onClick={this._handleOnClickEvolution} />
             </div>

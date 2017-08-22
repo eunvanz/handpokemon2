@@ -130,6 +130,7 @@ class MonManagementView extends React.Component {
     .then(snapshot => { // 진화 전 포켓몬 선택했을경우 처리
       if (formData.prev) {
         const monId = snapshot ? snapshot.key : formData.id
+        console.log('formData.prev', formData.prev)
         let nextOfPrev = mons.filter(mon => mon.id === formData.prev)[0].next
         console.log('nextOfPrev1', nextOfPrev)
         if (!nextOfPrev) nextOfPrev = []
