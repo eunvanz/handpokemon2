@@ -96,3 +96,7 @@ export const getAuthUserFromFirebase = state => {
     auth
   }
 }
+
+export const updater = (firebase, updateObj) => {
+  return firebase.ref().update(updateObj)
+}

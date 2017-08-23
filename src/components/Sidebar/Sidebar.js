@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { Link } from 'react-router'
 import { connect } from 'react-redux'
 import numeral from 'numeral'
-import { firebaseConnect, pathToJS, dataToJS } from 'react-redux-firebase'
+import { firebaseConnect } from 'react-redux-firebase'
 
 import { DEFAULT_PROFILE_IMAGE_URL } from 'constants/urls'
 import { PICK_CREDIT_REFRESH, BATTLE_CREDIT_REFRESH, ADVENTURE_CREDIT_REFRESH,
@@ -44,7 +44,6 @@ class Sidebar extends React.Component {
       this._refreshUserCredits()
     } else if (prevProps.user && user) {
       if (prevProps.user.pickCredit !== user.pickCredit) {
-        console.log('timeouts', timeouts)
         clearTimeout(timeouts.pick)
         this._handleCredit(user, 'pick')
       } else if (prevProps.user.battleCredit !== user.battleCredit) {
@@ -67,10 +66,8 @@ class Sidebar extends React.Component {
   }
   _handleCredit (creditInfo, type) {
     const { pickCredit, lastPick, battleCredit, lastLeague, adventureCredit, lastAdventure } = creditInfo
-    console.log('creditInfo', creditInfo)
     const handleByType = type => { // type = 'pick', 'battle', 'adventure'
       const currentTime = new Date().getTime()
-      console.log('currentTime', currentTime)
       const interval = () => {
         if (type === 'pick') return PICK_CREDIT_REFRESH - (currentTime - lastPick)
         else if (type === 'battle') return BATTLE_CREDIT_REFRESH - (currentTime - lastLeague)
@@ -86,7 +83,6 @@ class Sidebar extends React.Component {
         else if (type === 'battle') return battleCredit
         else if (type === 'adventure') return adventureCredit
       }
-      console.log('interval', interval())
       if (credit() === 0) this._startCreditTimer(type, interval())
       else if (credit() < max()) {
         this.setState({ [`${type}CreditTimer`]: null })
@@ -96,12 +92,10 @@ class Sidebar extends React.Component {
     handleByType(type)
   }
   _increaseCredit (type) {
-    console.log('increaseCredit ' + type)
     const { firebase, auth } = this.props
     increaseCredit(firebase, auth.uid, 1, type)
   }
   _startCreditTimer (type, interval) {
-    console.log('이만큼 카운트다운', interval)
     const timer = setInterval(() => {
       const timeString = convertTimeToMMSS(interval)
       this.setState({ [`${type}CreditTimer`]: timeString })

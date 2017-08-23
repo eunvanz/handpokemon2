@@ -9,12 +9,12 @@ import MonCard from 'components/MonCard'
 import Button from 'components/Button'
 
 import { getPickMons, getNextMons } from 'services/MonService'
-import { postCollection, updateCollection, deleteCollection } from 'services/CollectionService'
+import { postCollection } from 'services/CollectionService'
 import { decreaseCredit } from 'services/UserService'
 
 import { PICK_MON_ROULETTE_DELAY } from 'constants/rules'
 
-import { mergePickResults, levelDownCollection } from 'utils/monUtil'
+import { mergePickResults } from 'utils/monUtil'
 
 class PickMonView extends React.Component {
   constructor (props) {
@@ -37,7 +37,6 @@ class PickMonView extends React.Component {
     this._initPick()
   }
   componentDidUpdate (prevProps, prevState) {
-    console.log('this.state', this.state)
     if (prevProps.location.query.f !== this.props.location.query.f) this._initPick()
   }
   componentWillUnmount () {
@@ -65,7 +64,7 @@ class PickMonView extends React.Component {
         if (quantity === 1) {
           const picks = pickedMons[0]
           const pickedIdx = _.random(0, picks.length - 1)
-          return postCollection(firebase, auth.uid, picks[pickedIdx])
+          return postCollection(firebase, auth.uid, picks[pickedIdx], 'pick')
             .then(result => {
               console.log('result', result)
               this.setState({ picks, pickedIdx, result })
@@ -75,7 +74,7 @@ class PickMonView extends React.Component {
           const multiPicks = pickedMons.map(picks => picks[0])
           console.log('multiPicks', multiPicks)
           let results = []
-          const postArr = multiPicks.map(pick => () => postCollection(firebase, auth.uid, pick))
+          const postArr = multiPicks.map(pick => () => postCollection(firebase, auth.uid, pick, 'pick'))
           return postArr.reduce((prev, post) => prev.then(() => {
             return post()
               .then(result => {
@@ -95,26 +94,13 @@ class PickMonView extends React.Component {
         return decreaseCredit(firebase, auth.uid, quantity, 'pick')
       })
     } else { // 진화일때
-      const proceedAfterPostCollection = () => {
-        if (evoluteCol.level <= evoluteCol.mon[evoluteCol.monId].evoLv) {
-          // 삭제
-          return deleteCollection(firebase, evoluteCol)
-        } else {
-          // 레벨하락
-          return updateCollection(firebase, levelDownCollection(evoluteCol))
-        }
-      }
       getNextMons(firebase, evoluteCol)
       .then(nextMons => {
         const picks = _.compact(nextMons)
         console.log('picks', picks)
         if (picks.length > 1) { // 진화체가 여러개일 경우 단건채집과 같은방식으로 진행
           const pickedIdx = _.random(0, picks.length - 1)
-          return postCollection(firebase, auth.uid, picks[pickedIdx])
-          .then(result => { // 콜렉션의 레벨 하락 혹은 삭제
-            return proceedAfterPostCollection()
-            .then(() => Promise.resolve(result))
-          })
+          return postCollection(firebase, auth.uid, picks[pickedIdx], 'evolution', [evoluteCol])
           .then(result => {
             console.log('result', result)
             this.setState({ picks, pickedIdx, result })
@@ -123,11 +109,7 @@ class PickMonView extends React.Component {
         } else { // 진화체가 하나인 경우 다건체집 화면
           const multiPicks = picks
           console.log('multiPicks', multiPicks)
-          return postCollection(firebase, auth.uid, multiPicks[0])
-          .then(result => {
-            return proceedAfterPostCollection()
-            .then(() => Promise.resolve(result))
-          })
+          return postCollection(firebase, auth.uid, multiPicks[0], 'evolution', [evoluteCol])
           .then(result => {
             console.log('result', result)
             this.setState({ multiPicks: [result] })
@@ -212,7 +194,16 @@ class PickMonView extends React.Component {
             renderRoulette()
           }
           {
-            this.state.pickedIdx > -1 && this.state.mode === 'single' && this.props.location.query.f !== '1' &&
+            this.state.pickedIdx > -1 && this.state.mode === 'single' && this.props.location.query.f === '0' &&
+            renderRoulette()
+          }
+          {
+            this.state.pickedIdx > -1 && this.state.mode === 'single' && this.props.location.query.f === undefined &&
+            renderRoulette()
+          }
+          {
+            this.state.pickedIdx > -1 && this.state.mode === 'single' && this.props.location.query.f !== '0' &&
+            this.props.location.query.f !== '1' && this.props.location.query.f !== undefined &&
             renderRoulette()
           }
           {

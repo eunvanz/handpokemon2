@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import keygen from 'keygenerator'
 import ReactDOM from 'react-dom'
+import { connect } from 'react-redux'
 
 import Button from 'components/Button'
 import MonInfo from 'components/MonInfo'
@@ -9,6 +10,16 @@ import MonLevel from 'components/MonLevel'
 import LabelBadge from 'components/LabelBadge'
 
 import { colors } from 'constants/colors'
+
+import { receivePickMonInfo } from 'store/pickMonInfo'
+
+const mapDispatchToProps = {
+  receivePickMonInfo
+}
+
+const mapStateToProps = (state) => {
+  return {}
+}
 
 class Roulette extends React.Component {
   constructor (props) {
@@ -20,6 +31,7 @@ class Roulette extends React.Component {
     this._startRoulette = this._startRoulette.bind(this)
     this._handleOnClickStop = this._handleOnClickStop.bind(this)
     this._handleOnClickContinue = this._handleOnClickContinue.bind(this)
+    this._handleOnClickEvolution = this._handleOnClickEvolution.bind(this)
   }
   componentDidMount () {
     this._startRoulette()
@@ -36,13 +48,22 @@ class Roulette extends React.Component {
       $('#btnArea').css('display', 'block')
     }
     if (this.props.btnComponent !== nextProps.btnComponent) {
-      console.log('btn should update')
       ReactDOM.render(nextProps.btnComponent, document.getElementById('btnArea'))
     }
     return false
   }
   componentDidUpdate (prevProps, prevState) {
     this._startRoulette()
+  }
+  _handleOnClickEvolution (mon) {
+    const { receivePickMonInfo } = this.props
+    const pickMonInfo = {
+      quantity: 1,
+      evoluteCol: mon
+    }
+    receivePickMonInfo(pickMonInfo)
+    close()
+    this.context.router.push(`pick-mon?f=${keygen._()}`)
   }
   _startRoulette () {
     const $ = window.$
@@ -79,6 +100,11 @@ class Roulette extends React.Component {
         // 레벨 업 시
         return <div className='text-center m-b-20'>
           <MonLevel level={mon.asis.level} style={{ backgroundColor: colors.gray }} /> <i className='fa fa-long-arrow-right c-gray' /> <MonLevel level={mon.tobe.level} style={{ fontSize: 'medium'}} />
+          {mon.tobe.mon[mon.tobe.monId].evoLv !== 0 && mon.tobe.level >= mon.tobe.mon[mon.tobe.monId].evoLv &&
+            <div className='m-t-15'>
+              <Button text='진화하기' color='deeporange' onClick={() => this._handleOnClickEvolution(mon.tobe)} />
+            </div>
+          }
         </div>
       } else {
         // 새로운 포켓몬
@@ -130,7 +156,8 @@ Roulette.propTypes = {
   innerSize: PropTypes.number,
   mon: PropTypes.object,
   flag: PropTypes.string.isRequired,
-  btnComponent: PropTypes.element
+  btnComponent: PropTypes.element,
+  receivePickMonInfo: PropTypes.func.isRequired
 }
 
-export default Roulette
+export default connect(mapStateToProps, mapDispatchToProps)(Roulette)

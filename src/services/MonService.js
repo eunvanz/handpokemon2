@@ -1,5 +1,5 @@
 import { convertMapToArr } from 'utils/commonUtil'
-import { convertMonToCol, convertNextMonToCol } from 'utils/monUtil'
+import { convertMonToCol } from 'utils/monUtil'
 
 import _ from 'lodash'
 
@@ -42,7 +42,7 @@ export const getPickMons = (firebase, attrs, grades) => {
 }
 
 export const getNextMons = (firebase, evoluteCol) => {
-  const nextIds = evoluteCol.mon[evoluteCol.monId].next
+  const nextIds = _.compact(evoluteCol.mon[evoluteCol.monId].next)
   return firebase.ref('mons').once('value')
   .then(snapshot => {
     const mons = snapshot.val()
@@ -56,7 +56,9 @@ export const getNextMons = (firebase, evoluteCol) => {
 }
 
 export const postMon = (firebase, mon) => {
-  return firebase.push('mons', mon)
+  const id = firebase.ref().push('mons').key
+  mon.id = id
+  firebase.ref(`mons/${id}`).update(mon)
 }
 
 export const updateMon = (firebase, mon) => {
