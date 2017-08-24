@@ -8,7 +8,7 @@ import { colors } from 'constants/colors'
 
 class FloatingButton extends React.Component {
   render () {
-    const { right, bottom, backgroundColor, hidden, tooltipText } = this.props
+    const { right, bottom, backgroundColor, hidden, tooltipText, rotateIcon } = this.props
     const style = {
       right: right ? `${isMobile.any() ? right - 30 : right}px` : isMobile.any() ? '10px' : '40px',
       bottom: bottom ? `${isMobile.any() ? bottom - 30 : bottom}px` : isMobile.any() ? '10px' : '40px',
@@ -32,12 +32,12 @@ class FloatingButton extends React.Component {
       )
     } else {
       return (
-        <OverlayTrigger placement='left' overlay={tooltip}>
+        <OverlayTrigger placement='left' overlay={tooltip} style={{ position: 'fixed' }}>
           <button className='btn btn-float btn-danger m-btn waves-effect waves-circle waves-float'
             style={style}
             onClick={this.props.onClick}
           >
-            <i className={this.props.iconClassName} />
+            <i className={this.props.iconClassName} style={{ webkitTransform: `${rotateIcon ? 'rotate(45deg)' : 'none'}` }} />
           </button>
         </OverlayTrigger>
       )
@@ -56,7 +56,8 @@ FloatingButton.propTypes = {
   bottom: PropTypes.number,
   backgroundColor: PropTypes.string,
   hidden: PropTypes.bool,
-  tooltipText: PropTypes.string
+  tooltipText: PropTypes.string,
+  rotateIcon: PropTypes.bool
 }
 
 export default FloatingButton

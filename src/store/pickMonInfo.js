@@ -27,7 +27,8 @@ export function clearPickMonInfo (pickMonInfo = null) {
 //   quantity: 1,
 //   attrs: ['불꽃', '물', '요정'],
 //   grades: ['b', 'r'],
-//   evoluteCol: null
+//   evoluteCol: null,
+//   mixCols: []
 // }
 const initialState = null
 export default function pickMonInfoReducer (state = initialState, action) {

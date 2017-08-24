@@ -30,6 +30,7 @@ class MonModal extends React.Component {
       showStat: false
     }
     this._handleOnClickEvolution = this._handleOnClickEvolution.bind(this)
+    this._handleOnClickMix = this._handleOnClickMix.bind(this)
   }
   _handleOnClickEvolution () {
     const { mon, receivePickMonInfo, close } = this.props
@@ -39,7 +40,17 @@ class MonModal extends React.Component {
     }
     receivePickMonInfo(pickMonInfo)
     close()
-    this.context.router.push(`pick-mon?f=${keygen._()}`)
+    this.context.router.push(`/pick-mon?f=${keygen._()}`)
+  }
+  _handleOnClickMix () {
+    const { mon, receivePickMonInfo, close } = this.props
+    const pickMonInfo = {
+      quantity: 1,
+      mixCols: [mon.tobe]
+    }
+    receivePickMonInfo(pickMonInfo)
+    close()
+    this.context.router.push(`/collection/${mon.tobe.userId}`)
   }
   render () {
     const { mon, show, close, type, ...restProps } = this.props
@@ -48,25 +59,27 @@ class MonModal extends React.Component {
       if (mon.asis) {
         return (
           <div className='text-center m-b-30' style={{ height: '60px' }}>
-            <MonLevel level={mon.asis.level} style={{ backgroundColor: colors.gray }} /> <i className='fa fa-long-arrow-right c-gray' /> <MonLevel level={mon.tobe.level} style={{ fontSize: 'small'}} />
-            {
-              tobeMon.mon[tobeMon.monId].evoLv !== 0 && tobeMon.level >= tobeMon.mon[tobeMon.monId].evoLv &&
-              <div className='m-t-15'>
-                <Button text='진화하기' color='deeporange' onClick={this._handleOnClickEvolution} />
-              </div>
-            }
+            <MonLevel level={mon.asis.level} style={{ backgroundColor: colors.gray }} /> <i className='fa fa-long-arrow-right c-gray' /> <MonLevel level={mon.tobe.level} style={{ fontSize: 'small' }} />
+            <div className='m-t-15'>
+              {
+                tobeMon.mon[tobeMon.monId].evoLv !== 0 && tobeMon.level >= tobeMon.mon[tobeMon.monId].evoLv &&
+                <Button text='진화하기' color='deeporange' size='xs' className='m-r-5' onClick={this._handleOnClickEvolution} />
+              }
+              <Button text='교배하기' color='orange' size='xs' onClick={this._handleOnClickMix} />
+            </div>
           </div>
         )
       }
       return (
         <div>
           <MonLevel level={tobeMon.level} />
-          {
-            tobeMon.mon[tobeMon.monId].evoLv !== 0 && tobeMon.level >= tobeMon.mon[tobeMon.monId].evoLv &&
-            <div className='m-t-15'>
-              <Button text='진화하기' color='deeporange' onClick={this._handleOnClickEvolution} />
-            </div>
-          }
+          <div className='m-t-15'>
+            {
+              tobeMon.mon[tobeMon.monId].evoLv !== 0 && tobeMon.level >= tobeMon.mon[tobeMon.monId].evoLv &&
+              <Button text='진화하기' color='deeporange' size='xs' className='m-r-5' onClick={this._handleOnClickEvolution} />
+            }
+            <Button text='교배하기' color='orange' size='xs' onClick={this._handleOnClickMix} />
+          </div>
         </div>
       )
     }

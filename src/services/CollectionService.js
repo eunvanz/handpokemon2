@@ -38,7 +38,7 @@ export const updateCollection = (firebase, col) => {
   return firebase.ref().update(updateObj)
 }
 
-export const deleteCollection = (firebase, col) => {
+export const getDeleteColObj = (firebase, col) => {
   return firebase.ref(`user/${col.userId}/colPoint`).once('value')
     .then(snapshot => {
       const asisPoint = snapshot.val()
@@ -47,9 +47,9 @@ export const deleteCollection = (firebase, col) => {
         [`collections/${col.id}`]: null,
         [`userCollections/${col.userId}/${col.id}`]: null,
         [`monCollections/${col.monId}/${col.id}`]: null,
-        [`user/${col.userId}/colPoint`]: tobePoint
+        [`users/${col.userId}/colPoint`]: tobePoint
       }
-      return firebase.ref().update(updateObj)
+      return Promise.resolve(updateObj)
     })
 }
 
@@ -114,7 +114,7 @@ export const postCollection = (firebase, userId, collection, type, srcCols) => {
             [`collections/${srcCol.id}`]: null,
             [`userCollections/${srcCol.userId}/${srcCol.id}`]: null,
             [`monCollections/${srcCol.monId}/${srcCol.id}`]: null,
-            [`user/${srcCol.userId}/colPoint`]: tobePoint
+            [`users/${srcCol.userId}/colPoint`]: tobePoint
           }
           console.log('updateSrcColObj', updateSrcColObj)
           updateObj = Object.assign({}, updateObj, updateSrcColObj)

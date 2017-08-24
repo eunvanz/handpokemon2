@@ -17,21 +17,33 @@ class MonCard extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      showMonModal: false
+      showMonModal: false,
+      isSelected: false
     }
     this._showMonModal = this._showMonModal.bind(this)
+    this._handleOnSelect = this._handleOnSelect.bind(this)
+    this._handleOnUnselect = this._handleOnUnselect.bind(this)
   }
   _showMonModal () {
     this.setState({ showMonModal: true })
   }
+  _handleOnSelect () {
+    if (this.props.onSelect()) {
+      this.setState({ isSelected: true })
+    }
+  }
+  _handleOnUnselect () {
+    this.setState({ isSelected: false })
+    this.props.onUnselect()
+  }
   render () {
-    const { mon, pick, className, type, ...restProps } = this.props
+    const { mon, pick, className, type, isSelectable, ...restProps } = this.props
     const tobeMon = mon.tobe
     const renderLevelUpInfo = () => {
       if (mon.asis) {
         // 레벨 업 시
         return <div className='text-center m-b-30' style={{ height: '60px' }}>
-          <MonLevel level={mon.asis.level} style={{ backgroundColor: colors.gray }} /> <i className='fa fa-long-arrow-right c-gray' /> <MonLevel level={mon.tobe.level} style={{ fontSize: 'small'}} />
+          <MonLevel level={mon.asis.level} style={{ backgroundColor: colors.gray }} /> <i className='fa fa-long-arrow-right c-gray' /> <MonLevel level={mon.tobe.level} style={{ fontSize: 'small' }} />
           <p className='m-t-5'>레벨 <span className='c-lightblue f-700'>+{mon.tobe.level - mon.asis.level}</span></p>
         </div>
       } else {
@@ -44,7 +56,7 @@ class MonCard extends React.Component {
     }
     return (
       <div className={`col-md-2 col-sm-3 col-xs-6 text-left ${className || ''}`} {...restProps}
-        style={{ padding: '0px 5px' }} onClick={this._showMonModal}
+        style={{ padding: '0px 5px' }} onClick={isSelectable ? (this.state.isSelected ? this._handleOnUnselect : this._handleOnSelect) : this._showMonModal}
       >
         {type === 'collection' && <MonLevel level={tobeMon.level}
           style={{ position: 'absolute', top: '0px', borderRadius: '0px 0px 2px 0px', backgroundColor: tobeMon.level >= (tobeMon.mon[tobeMon.monId].evoLv === 0 ? 99999 : tobeMon.mon[tobeMon.monId].evoLv) ? colors.deepOrange : colors.lightBlue }} />}
@@ -54,7 +66,7 @@ class MonCard extends React.Component {
         <div className='c-item'
           style={{
             cursor: 'pointer',
-            border: '1px solid #e2e2e2',
+            border: this.state.isSelected ? '2px solid #ff9800' : '1px solid #e2e2e2',
             marginBottom: '8px',
             borderRadius: '2px',
             boxShadow: '1px 1px 1px rgba(0, 0, 0, 0.1)',
@@ -87,7 +99,10 @@ MonCard.propTypes = {
   mon: PropTypes.object, // asis, tobe
   className: PropTypes.string,
   type: PropTypes.string,
-  pick: PropTypes.bool // 채집시
+  pick: PropTypes.bool, // 채집시
+  isSelectable: PropTypes.bool,
+  onSelect: PropTypes.func,
+  onUnselect: PropTypes.func
 }
 
 export default MonCard

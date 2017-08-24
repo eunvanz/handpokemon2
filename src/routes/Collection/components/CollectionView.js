@@ -17,10 +17,13 @@ import { getCollectionsByUserId } from 'services/CollectionService'
 import { attrs } from 'constants/data'
 import { colors } from 'constants/colors'
 
+import { showAlert } from 'utils/commonUtil'
+
 class CollectionView extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
+      mode: 'view',
       collections: null,
       filteredCollections: null,
       isMixMode: false,
@@ -107,19 +110,32 @@ class CollectionView extends React.Component {
     this._handleOnClickFilter = this._handleOnClickFilter.bind(this)
     this._handleOnChangeFilterInput = this._handleOnChangeFilterInput.bind(this)
     this._initCollectionState = this._initCollectionState.bind(this)
+    this._initMixMode = this._initMixMode.bind(this)
+    this._handleOnSelectMon = this._handleOnSelectMon.bind(this)
+    this._applyFilter = this._applyFilter.bind(this)
+    this._cancelMix = this._cancelMix.bind(this)
   }
   componentDidMount () {
+    const { pickMonInfo } = this.props
     this._initCollectionState()
+    if (pickMonInfo && pickMonInfo.mixCols) this.setState({ mode: 'mix' })
   }
   componentDidUpdate (prevProps, prevState) {
-    console.log('this.props.mons', this.props.mons)
+    console.log(this.state.filter.has)
     if (!fromJS(prevProps.mons).equals(fromJS(this.props.mons))) {
-      console.log('mons are not equal')
       this._initCollectionState()
     }
+    console.log('pickMonInfo', this.props.pickMonInfo)
+    if (this.props.pickMonInfo && !prevProps.pickMonInfo && this.props.pickMonInfo.mixCols) {
+      this.setState({ mode: 'mix' })
+      this._initMixMode()
+    }
+  }
+  componentWillUnmount () {
+    const { pickMonInfo, receivePickMonInfo } = this.props
+    if (pickMonInfo && pickMonInfo.mixCols && pickMonInfo.mixCols.length === 1) receivePickMonInfo(null)
   }
   _initCollectionState () {
-    console.log('initCollectionState')
     const { params, firebase, mons } = this.props
     const { userId } = params
     const collections = []
@@ -141,7 +157,11 @@ class CollectionView extends React.Component {
     this.setState({ showFilterModal: true })
   }
   _handleOnClickApplyFilter () {
-    const { collections, filter } = this.state
+    const { filter } = this.state
+    this._applyFilter(filter)
+  }
+  _applyFilter (filter) {
+    const { collections } = this.state
     const filteredCollections = collections.filter(col => {
       const mon = col.mon ? col.mon[col.monId] : col
       return filter.has[col.mon ? 'yes' : 'no'] &&
@@ -180,14 +200,60 @@ class CollectionView extends React.Component {
     const newFilter = oldFilter.set(filterCategory, newCategoryFilterMap).toJS()
     this.setState({ filter: newFilter })
   }
+  _initMixMode () {
+    const filter = Object.assign({}, this.state.filter, { has: { yes: true, no: false } })
+    this.setState({
+      filter
+    })
+    this._applyFilter(filter)
+  }
+  _handleOnSelectMon (col) {
+    // 교배 후 상대 포켓몬 선택시
+    console.log('col', col)
+    const { pickMonInfo, receivePickMonInfo } = this.props
+    if (col.id === pickMonInfo.mixCols[0].id) {
+      showAlert('같은 포켓몬은 선택할 수 없습니다.')
+      return false
+    }
+    const asisMixCols = pickMonInfo.mixCols
+    const mixCols = _.concat(asisMixCols, col)
+    console.log('mixCols', mixCols)
+    const newPickMonInfo = Object.assign({}, pickMonInfo, { mixCols })
+    receivePickMonInfo(newPickMonInfo)
+    showAlert({
+      title: `<span class='c-lightblue f-700'>${mixCols[0].mon[mixCols[0].monId].name}</span>와(과) <span class='c-lightblue f-700'>${mixCols[1].mon[mixCols[1].monId].name}</span>을(를) 교배를 하시겠습니까?`,
+      text: '교배하는 포켓몬의 레벨이 1 하락하고, 레벨 1의 포켓몬의 경우 영원히 사라집니다.',
+      showCloseButton: true,
+      showCancelButton: true,
+      confirmButtonText: '예',
+      cancelButtonText: '아니오'
+    })
+    .then(() => {
+      this.context.router.push('/pick-mon')
+    })
+    .catch(() => {
+      receivePickMonInfo(Object.assign({}, pickMonInfo, { mixCols: asisMixCols }))
+    })
+  }
+  _cancelMix () {
+    this.props.receivePickMonInfo(null)
+    const filter = Object.assign({}, this.state.filter, { has: { yes: true, no: true } })
+    this.setState({
+      filter,
+      mode: 'view'
+    })
+    this._applyFilter(filter)
+  }
   render () {
-    const { collections, filter, filteredCollections, openFloatMenu } = this.state
+    const { collections, filter, filteredCollections, openFloatMenu, mode } = this.state
     const renderCollections = () => {
       if (filteredCollections.length === 0) {
         return <div className='text-center'><WarningText text='조건에 맞는 포켓몬이 없습니다.' /></div>
       }
       return filteredCollections.map((col, idx) => {
-        return <MonCard key={idx} mon={{ asis: null, tobe: col }} type={col.mon ? 'collection' : 'mon'} />
+        return <MonCard isSelectable={this.state.mode === 'mix'} onSelect={() => this._handleOnSelectMon(col)}
+          onUnselect={() => {}}
+          key={idx} mon={{ asis: null, tobe: col }} type={col.mon ? 'collection' : 'mon'} />
       })
     }
     const renderFilterBody = () => {
@@ -224,11 +290,15 @@ class CollectionView extends React.Component {
       }
       return (
         <div>
-          <h4 className='m-t-20'>보유여부</h4>
-          <Checkbox label='전체' name='has-all'
-            checked={filter.has.yes && filter.has.no} onChange={this._handleOnChangeFilterInput} />
-          <Checkbox label='보유' checked={filter.has.yes} name='has-yes' onChange={this._handleOnChangeFilterInput} />
-          <Checkbox label='미보유' checked={filter.has.no} name='has-no' onChange={this._handleOnChangeFilterInput} />
+          { mode !== 'mix' &&
+            <div>
+              <h4 className='m-t-20'>보유여부</h4>
+              <Checkbox label='전체' name='has-all'
+                checked={filter.has.yes && filter.has.no} onChange={this._handleOnChangeFilterInput} />
+              <Checkbox label='보유' checked={filter.has.yes} name='has-yes' onChange={this._handleOnChangeFilterInput} />
+              <Checkbox label='미보유' checked={filter.has.no} name='has-no' onChange={this._handleOnChangeFilterInput} />
+            </div>
+          }
           <h4 className='m-t-20'>등급</h4>
           {grades.names.map((name, idx) => <Checkbox label={name} checked={grades.values[idx] === 'all' ? isAllTrue(filter.grade) : filter.grade[grades.values[idx]]} name={`grade-${grades.values[idx]}`} onChange={this._handleOnChangeFilterInput} key={idx} />)}
           <h4 className='m-t-20'>주속성</h4>
@@ -256,23 +326,31 @@ class CollectionView extends React.Component {
       else {
         return (
           <div className='row'>
-            <FloatingButton iconClassName={openFloatMenu ? 'fa fa-times' : 'fa fa-plus'}
+            <FloatingButton iconClassName='zmdi zmdi-plus'
+              rotateIcon={openFloatMenu}
               onClick={() => this.setState({ openFloatMenu: !openFloatMenu })}
               tooltipText={openFloatMenu ? '메뉴닫기' : '메뉴열기'}
             />
-            <FloatingButton iconClassName='fa fa-filter'
+            <FloatingButton iconClassName='zmdi zmdi-filter-list'
               onClick={this._handleOnClickFilter}
               bottom={100}
-              backgroundColor={colors.amber}
+              backgroundColor={colors.orange}
               hidden={!openFloatMenu}
               tooltipText='필터'
             />
-            <FloatingButton iconClassName='fa fa-flask'
+            <FloatingButton iconClassName='zmdi zmdi-sort-asc'
               onClick={this._handleOnClickFilter}
               bottom={160}
-              backgroundColor={colors.amber}
+              backgroundColor={colors.orange}
               hidden={!openFloatMenu}
-              tooltipText='교배하기'
+              tooltipText='정렬'
+            />
+            <FloatingButton iconClassName='zmdi zmdi-account'
+              onClick={this._handleOnClickFilter}
+              bottom={220}
+              backgroundColor={colors.orange}
+              hidden={!openFloatMenu}
+              tooltipText='트레이너프로필'
             />
             {renderCollections()}
             <CustomModal
@@ -287,8 +365,21 @@ class CollectionView extends React.Component {
         )
       }
     }
+    const renderHeader = () => {
+      if (mode === 'mix') {
+        return (<div>
+          <h2>교배할 상대 포켓몬을 선택해주세요.</h2>
+          <ul className='actions' style={{ right: '20px' }}>
+            <li><Button text='취소' onClick={this._cancelMix} /></li>
+          </ul>
+        </div>)
+      }
+      return null
+    }
     return (
       <ContentContainer
+        header={renderHeader()}
+        stickyHeader
         title='내 콜렉션'
         body={renderBody()}
       />
@@ -305,7 +396,9 @@ CollectionView.propTypes = {
   firebase: PropTypes.object.isRequired,
   auth: PropTypes.object,
   user: PropTypes.object,
-  mons: PropTypes.array
+  mons: PropTypes.array,
+  receivePickMonInfo: PropTypes.func.isRequired,
+  pickMonInfo: PropTypes.object
 }
 
 export default CollectionView

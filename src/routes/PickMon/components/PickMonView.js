@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
+import keygen from 'keygenerator'
 
 import ContentContainer from 'components/ContentContainer'
 import Roulette from 'components/Roulette'
@@ -122,9 +123,6 @@ class PickMonView extends React.Component {
   _handleOnClickContinue () {
     const { pickMonInfo, user, receivePickMonInfo } = this.props
     this.setState({ multiPicks: null })
-    let { f } = this.props.location.query
-    if (f === '1') f = '0'
-    else f = '1'
     if (this.state.mode === 'multi') {
       const newPickMonInfo = {
         quantity: user.pickCredit < pickMonInfo.quantity ? user.pickCredit : pickMonInfo.quantity,
@@ -133,11 +131,11 @@ class PickMonView extends React.Component {
       }
       receivePickMonInfo(newPickMonInfo)
     }
-    this.context.router.push(`pick-mon?f=${f}`)
+    this.context.router.push(`pick-mon?f=${keygen._()}`)
   }
   render () {
     const { mode } = this.state
-    const { user, pickMonInfo, auth } = this.props
+    const { user, pickMonInfo, auth, location } = this.props
     const renderBtnComponent = () => {
       return (
         <div className='text-center'>
@@ -153,7 +151,7 @@ class PickMonView extends React.Component {
     }
     const renderRoulette = () => {
       return (
-        <div id='rouletteContainer'>
+        <div id='rouletteContainer' key={location.query.f}>
           <Roulette
             images={this.state.picks.map(pick => pick.mon[pick.monId].monImage[0].url)}
             stopIdx={this.state.pickedIdx}
@@ -164,7 +162,6 @@ class PickMonView extends React.Component {
             stop={this.state.stop}
             delay={PICK_MON_ROULETTE_DELAY}
             mon={this.state.result}
-            flag={this.props.location.query.f || '-1'}
             btnComponent={renderBtnComponent()}
           />
         </div>
@@ -189,23 +186,7 @@ class PickMonView extends React.Component {
       return (
         <div className='text-center'>
           <h4>야호! 새로운 포켓몬을 발견했어!<br />과연 어떤 친구일까?</h4>
-          {
-            this.state.pickedIdx > -1 && this.state.mode === 'single' && this.props.location.query.f === '1' &&
-            renderRoulette()
-          }
-          {
-            this.state.pickedIdx > -1 && this.state.mode === 'single' && this.props.location.query.f === '0' &&
-            renderRoulette()
-          }
-          {
-            this.state.pickedIdx > -1 && this.state.mode === 'single' && this.props.location.query.f === undefined &&
-            renderRoulette()
-          }
-          {
-            this.state.pickedIdx > -1 && this.state.mode === 'single' && this.props.location.query.f !== '0' &&
-            this.props.location.query.f !== '1' && this.props.location.query.f !== undefined &&
-            renderRoulette()
-          }
+          {this.state.pickedIdx > -1 && this.state.mode === 'single' && renderRoulette()}
           {
             this.state.multiPicks && this.state.mode === 'multi' &&
             <div>

@@ -15,7 +15,7 @@ class ContentContainer extends React.Component {
             <h1 style={{ fontSize: '23px' }}>{this.props.title}</h1>
           </div>
         }
-        <Card header={this.props.header} body={this.props.body} clearPadding={this.props.clearPadding} />
+        <Card stickyHeader={this.props.stickyHeader} header={this.props.header} body={this.props.body} clearPadding={this.props.clearPadding} />
       </div>
     )
   }
@@ -25,7 +25,8 @@ ContentContainer.propTypes = {
   title: PropTypes.string,
   body: PropTypes.element,
   header: PropTypes.element,
-  clearPadding: PropTypes.bool
+  clearPadding: PropTypes.bool,
+  stickyHeader: PropTypes.bool
 }
 
 export default ContentContainer

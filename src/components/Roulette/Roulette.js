@@ -85,10 +85,7 @@ class Roulette extends React.Component {
     if (!this.state.stop) this.setState({ stop: true })
   }
   _handleOnClickContinue () {
-    let f = this.props.flag
-    if (f === '1') f = '0'
-    else f = '1'
-    this.context.router.push(`pick-mon?f=${f}`)
+    this.context.router.push(`pick-mon?f=${keygen._()}`)
   }
   render () {
     const { images, size, id, style, innerSize, mon, btnComponent } = this.props
@@ -133,9 +130,6 @@ class Roulette extends React.Component {
         </div>
         <div className='text-center' id='btnArea' style={{ display: 'none', marginTop: '40px' }}>
           {btnComponent}
-          {/*<Button link text='돌아가기' className='m-r-5'
-            onClick={() => this.context.router.push('pick-district')} />
-          <Button text='계속채집' color='orange' onClick={this._handleOnClickContinue} />*/}
         </div>
       </div>
     )
@@ -155,7 +149,6 @@ Roulette.propTypes = {
   style: PropTypes.object,
   innerSize: PropTypes.number,
   mon: PropTypes.object,
-  flag: PropTypes.string.isRequired,
   btnComponent: PropTypes.element,
   receivePickMonInfo: PropTypes.func.isRequired
 }

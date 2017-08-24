@@ -27,7 +27,7 @@ class PickDistrictView extends React.Component {
       grades: ['b']
     }
     this.props.receivePickMonInfo(pickMonInfo)
-    this.context.router.push('pick-mon')
+    this.context.router.push(`pick-mon?f=${keygen._()}`)
   }
   render () {
     const { user } = this.props

@@ -1,17 +1,32 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { StickyContainer, Sticky } from 'react-sticky'
 
 class Card extends React.Component {
   render () {
-    const { header, body, headerBgColor, headerTextColor, clearPadding, ...restProps } = this.props
+    const { header, body, headerBgColor, headerTextColor, clearPadding, stickyHeader, ...restProps } = this.props
     return (
-      <div className='card' {...restProps}>
-        {header &&
-          <div className='card-header' style={{ backgroundColor: headerBgColor || 'white', color: headerTextColor || '#333' }}>{header}</div>}
-        <div className={`card-body ${clearPadding ? '' : 'card-padding'}`}>
-          {body}
+      <StickyContainer>
+        <div className='card' {...restProps}>
+          {header && !stickyHeader &&
+            <div className='card-header' style={{ backgroundColor: headerBgColor || 'white', color: headerTextColor || '#333' }}>{header}</div>}
+          {
+            header && stickyHeader &&
+            <Sticky topOffset={0}>
+              {
+                ({ style, calculatedHeight }) => {
+                  console.log('calculatedHeight', calculatedHeight)
+                  const newStyle = Object.assign({}, style, { marginTop: '70px' })
+                  return <div className='card-header' style={Object.assign({}, { borderBottom: '1px solid #eeeeee', backgroundColor: headerBgColor || 'white', color: headerTextColor || '#333', zIndex: '10' }, newStyle)}>{header}</div>
+                }
+              }
+            </Sticky>
+          }
+          <div className={`card-body ${clearPadding ? '' : 'card-padding'}`}>
+            {body}
+          </div>
         </div>
-      </div>
+      </StickyContainer>
     )
   }
 }
@@ -21,7 +36,8 @@ Card.propTypes = {
   body: PropTypes.element.isRequired,
   headerBgColor: PropTypes.string,
   headerTextColor: PropTypes.string,
-  clearPadding: PropTypes.bool
+  clearPadding: PropTypes.bool,
+  stickyHeader: PropTypes.bool
 }
 
 export default Card

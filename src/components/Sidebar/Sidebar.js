@@ -143,7 +143,7 @@ class Sidebar extends React.Component {
               {
                 auth &&
                 <li className='f-700'>
-                  <Link to={`/collection/${auth.uid}`}><i className='fa fa-github-alt' style={{ fontSize: '22px' }} /> 내 콜렉션</Link>
+                  <Link to={`/collection/${auth.uid}`}><i className='fa fa-th-large' style={{ fontSize: '22px' }} /> 내 콜렉션</Link>
                 </li>
               }
               <li className='f-700'>
