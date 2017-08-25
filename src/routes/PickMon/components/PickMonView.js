@@ -13,7 +13,8 @@ import { getPickMons, getNextMons } from 'services/MonService'
 import { postCollection } from 'services/CollectionService'
 import { decreaseCredit } from 'services/UserService'
 
-import { PICK_MON_ROULETTE_DELAY } from 'constants/rules'
+import { PICK_MON_ROULETTE_DELAY, getMixGrades } from 'constants/rules'
+import { attrs as allAttrs } from 'constants/data'
 
 import { mergePickResults } from 'utils/monUtil'
 
@@ -34,6 +35,7 @@ class PickMonView extends React.Component {
   componentDidMount () {
     const { pickMonInfo, auth } = this.props
     if (!auth) return this.context.router.push('sign-in')
+    console.log('pickMonInfo @ cdm in PickMonView', pickMonInfo)
     if (!pickMonInfo) return this.context.router.push('pick-district')
     this._initPick()
   }
@@ -45,35 +47,31 @@ class PickMonView extends React.Component {
   }
   _initPick () {
     const { pickMonInfo, firebase, auth, user } = this.props
-    const { quantity, attrs, grades, evoluteCol } = pickMonInfo
-    if (!evoluteCol && quantity > user.pickCredit) {  // 유저의 크레딧보다 더 많은 포켓몬을 채집하는 경우
+    const { quantity, attrs, grades, evoluteCol, mixCols } = pickMonInfo
+    if (!evoluteCol && !mixCols && quantity > user.pickCredit) {  // 유저의 크레딧보다 더 많은 포켓몬을 채집하는 경우
       this.context.router.push('pick-district')
       return
     }
     this.setState({ mode: quantity === 1 && (!evoluteCol || _.compact(evoluteCol.mon[evoluteCol.monId].next).length > 1) ? 'single' : 'multi' })
     let pickedMons = []
     const pickFuncArr = []
-    console.log('pickMonInfo', pickMonInfo)
-    if (!evoluteCol) { // 채집일때
+    if (!evoluteCol && !mixCols) { // 채집일때
       for (let i = 0; i < quantity; i++) {
         pickFuncArr.push(getPickMons(firebase, attrs, grades))
       }
       Promise.all(pickFuncArr)
       .then(pickedMonsArr => {
         pickedMons = pickedMonsArr
-        console.log('pickedMons', pickedMons)
         if (quantity === 1) {
           const picks = pickedMons[0]
           const pickedIdx = _.random(0, picks.length - 1)
           return postCollection(firebase, auth.uid, picks[pickedIdx], 'pick')
             .then(result => {
-              console.log('result', result)
               this.setState({ picks, pickedIdx, result })
               return Promise.resolve()
             })
         } else {
           const multiPicks = pickedMons.map(picks => picks[0])
-          console.log('multiPicks', multiPicks)
           let results = []
           const postArr = multiPicks.map(pick => () => postCollection(firebase, auth.uid, pick, 'pick'))
           return postArr.reduce((prev, post) => prev.then(() => {
@@ -94,25 +92,31 @@ class PickMonView extends React.Component {
         // 유저의 채집 크레딧 감소
         return decreaseCredit(firebase, auth.uid, quantity, 'pick')
       })
-    } else { // 진화일때
+    } else if (mixCols) { // 교배일때
+      getPickMons(firebase, allAttrs, getMixGrades(mixCols), mixCols) // 마지막 파라미터는 특정 포켓몬 교배 처리를 위함
+      .then(picks => {
+        const pickedIdx = _.random(0, picks.length - 1)
+        return postCollection(firebase, auth.uid, picks[pickedIdx], 'mix', mixCols)
+        .then(result => {
+          this.setState({ picks, pickedIdx, result })
+          return Promise.resolve()
+        })
+      })
+    } else if (evoluteCol) { // 진화일때
       getNextMons(firebase, evoluteCol)
       .then(nextMons => {
         const picks = _.compact(nextMons)
-        console.log('picks', picks)
         if (picks.length > 1) { // 진화체가 여러개일 경우 단건채집과 같은방식으로 진행
           const pickedIdx = _.random(0, picks.length - 1)
           return postCollection(firebase, auth.uid, picks[pickedIdx], 'evolution', [evoluteCol])
           .then(result => {
-            console.log('result', result)
             this.setState({ picks, pickedIdx, result })
             return Promise.resolve()
           })
         } else { // 진화체가 하나인 경우 다건체집 화면
           const multiPicks = picks
-          console.log('multiPicks', multiPicks)
           return postCollection(firebase, auth.uid, multiPicks[0], 'evolution', [evoluteCol])
           .then(result => {
-            console.log('result', result)
             this.setState({ multiPicks: [result] })
             return Promise.resolve()
           })
@@ -139,11 +143,11 @@ class PickMonView extends React.Component {
     const renderBtnComponent = () => {
       return (
         <div className='text-center'>
-          <Button link text='돌아가기' className='m-r-5'
+          <Button link text='채집구역선택' className='m-r-5'
             onClick={() => this.context.router.push('pick-district')} />
-          {user.pickCredit !== 0 && !pickMonInfo.evoluteCol &&
+          {user.pickCredit !== 0 && !pickMonInfo.evoluteCol && !pickMonInfo.mixCols &&
             <Button text={`계속채집 X ${renderQuantity()}`} color='orange' onClick={this._handleOnClickContinue} />}
-          {(user.pickCredit === 0 || pickMonInfo.evoluteCol) &&
+          {(user.pickCredit === 0 || pickMonInfo.evoluteCol || pickMonInfo.mixCols) &&
             <Button text='내 콜렉션' color='green'
               onClick={() => this.context.router.push(`collection/${auth.uid}`)} />}
         </div>
@@ -225,7 +229,7 @@ PickMonView.contextTypes = {
 
 PickMonView.propTypes = {
   firebase: PropTypes.object.isRequired,
-  pickMonInfo: PropTypes.object.isRequired,
+  pickMonInfo: PropTypes.object,
   user: PropTypes.object,
   auth: PropTypes.object,
   location: PropTypes.object,

@@ -10,8 +10,8 @@ class FloatingButton extends React.Component {
   render () {
     const { right, bottom, backgroundColor, hidden, tooltipText, rotateIcon } = this.props
     const style = {
-      right: right ? `${isMobile.any() ? right - 30 : right}px` : isMobile.any() ? '10px' : '40px',
-      bottom: bottom ? `${isMobile.any() ? bottom - 30 : bottom}px` : isMobile.any() ? '10px' : '40px',
+      right: right ? `${isMobile.any() ? right - 15 : right}px` : isMobile.any() ? '15px' : '40px',
+      bottom: bottom ? `${isMobile.any() ? bottom - 20 : bottom}px` : isMobile.any() ? '20px' : '40px',
       backgroundColor: backgroundColor || colors.red,
       display: hidden ? 'none' : 'block',
       lineHeight: 1

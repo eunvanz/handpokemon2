@@ -221,9 +221,8 @@ class CollectionView extends React.Component {
     const newPickMonInfo = Object.assign({}, pickMonInfo, { mixCols })
     receivePickMonInfo(newPickMonInfo)
     showAlert({
-      title: `<span class='c-lightblue f-700'>${mixCols[0].mon[mixCols[0].monId].name}</span>와(과) <span class='c-lightblue f-700'>${mixCols[1].mon[mixCols[1].monId].name}</span>을(를) 교배를 하시겠습니까?`,
+      title: `<span class='c-lightblue f-700'>${mixCols[0].mon[mixCols[0].monId].name}</span>와(과) <span class='c-lightblue f-700'>${mixCols[1].mon[mixCols[1].monId].name}</span>을(를) 교배 하시겠습니까?`,
       text: '교배하는 포켓몬의 레벨이 1 하락하고, 레벨 1의 포켓몬의 경우 영원히 사라집니다.',
-      showCloseButton: true,
       showCancelButton: true,
       confirmButtonText: '예',
       cancelButtonText: '아니오'
@@ -246,6 +245,7 @@ class CollectionView extends React.Component {
   }
   render () {
     const { collections, filter, filteredCollections, openFloatMenu, mode } = this.state
+    const { pickMonInfo } = this.props
     const renderCollections = () => {
       if (filteredCollections.length === 0) {
         return <div className='text-center'><WarningText text='조건에 맞는 포켓몬이 없습니다.' /></div>
@@ -322,7 +322,7 @@ class CollectionView extends React.Component {
       )
     }
     const renderBody = () => {
-      if (!collections) return <Loading text='콜렉션을 불러오는 중...' height={window.innerHeight} />
+      if (!collections) return <Loading text='콜렉션을 불러오는 중...' height={window.innerHeight - 110} />
       else {
         return (
           <div className='row'>
@@ -368,9 +368,9 @@ class CollectionView extends React.Component {
     const renderHeader = () => {
       if (mode === 'mix') {
         return (<div>
-          <h2>교배할 상대 포켓몬을 선택해주세요.</h2>
+          <h2><span className='c-lightblue f-700'>{pickMonInfo.mixCols[0].mon[pickMonInfo.mixCols[0].monId].name}</span>와(과) 교배할 포켓몬을 선택해주세요.</h2>
           <ul className='actions' style={{ right: '20px' }}>
-            <li><Button text='취소' onClick={this._cancelMix} /></li>
+            <li><Button icon='zmdi zmdi-long-arrow-left' text='취소' link onClick={this._cancelMix} /></li>
           </ul>
         </div>)
       }

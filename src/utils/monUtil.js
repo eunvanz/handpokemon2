@@ -110,9 +110,9 @@ export const levelUpCollection = col => {
   return updateObj
 }
 
-export const levelDownCollection = col => {
-  const updateObj = Object.assign({}, col, { level: col.level - col.mon[col.monId].evoLv })
-  for (let i = 0; i < col.mon[col.monId].point * col.mon[col.monId].evoLv; i++) {
+export const levelDownCollection = (col, levelToDown) => {
+  const updateObj = Object.assign({}, col, { level: col.level - (levelToDown || col.mon[col.monId].evoLv) })
+  for (let i = 0; i < col.mon[col.monId].point * (levelToDown || col.mon[col.monId].evoLv); i++) {
     const idx = _.random(0, 5)
     const stat = ['addedHp', 'addedPower', 'addedArmor', 'addedSPower', 'addedSArmor', 'addedDex']
     if (updateObj[stat[idx]] > 0) {

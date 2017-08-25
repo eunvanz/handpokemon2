@@ -4,6 +4,7 @@ import { Link } from 'react-router'
 import { connect } from 'react-redux'
 import numeral from 'numeral'
 import { firebaseConnect } from 'react-redux-firebase'
+import $ from 'jquery'
 
 import { DEFAULT_PROFILE_IMAGE_URL } from 'constants/urls'
 import { PICK_CREDIT_REFRESH, BATTLE_CREDIT_REFRESH, ADVENTURE_CREDIT_REFRESH,
@@ -135,7 +136,7 @@ class Sidebar extends React.Component {
             </div>
             <ul className='main-menu'>
               <li className='f-700'>
-                <Link to='/'><i className='fa fa-home' style={{ fontSize: '22px' }} /> 홈</Link>
+                <Link to='/' onClick={() => $('.ma-backdrop').click()}><i className='fa fa-home' style={{ fontSize: '22px' }} /> 홈</Link>
               </li>
               <li className='f-700'>
                 <Link to='/'><i className='fa fa-bookmark' style={{ fontSize: '22px' }} /> 업적</Link>
@@ -143,11 +144,11 @@ class Sidebar extends React.Component {
               {
                 auth &&
                 <li className='f-700'>
-                  <Link to={`/collection/${auth.uid}`}><i className='fa fa-th-large' style={{ fontSize: '22px' }} /> 내 콜렉션</Link>
+                  <Link to={`/collection/${auth.uid}`} onClick={() => $('.ma-backdrop').click()}><i className='zmdi zmdi-apps' style={{ fontSize: '22px' }} /> 내 콜렉션</Link>
                 </li>
               }
               <li className='f-700'>
-                <Link to='/pick-district'>
+                <Link to='/pick-district' onClick={() => $('.ma-backdrop').click()}>
                   <i className='fa fa-paw' style={{ fontSize: '22px' }} /> 포켓몬 채집
                   {
                     user && (user.pickCredit !== 0 || pickCreditTimer) &&

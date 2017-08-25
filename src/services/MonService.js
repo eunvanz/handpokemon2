@@ -29,11 +29,13 @@ export const getStartPick = firebase => {
   })
 }
 
-export const getPickMons = (firebase, attrs, grades) => {
+export const getPickMons = (firebase, attrs, grades, mixCols) => {
+  // TODO: 특정 포켓몬 교배처리 해야함
   return firebase.ref('mons').once('value')
   .then(snapshot => {
     const mons = convertMapToArr(snapshot.val())
     let picks = mons.filter(mon => {
+      if (mixCols) return _.includes(attrs, mon.mainAttr) && _.includes(grades, mon.grade) && !_.includes([mixCols[0].monId, mixCols[1].monId], mon.id)
       return _.includes(attrs, mon.mainAttr) && _.includes(grades, mon.grade)
     })
     const takedPick = _.take(_.shuffle(picks), 5)

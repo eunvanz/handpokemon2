@@ -12,11 +12,10 @@ class Card extends React.Component {
             <div className='card-header' style={{ backgroundColor: headerBgColor || 'white', color: headerTextColor || '#333' }}>{header}</div>}
           {
             header && stickyHeader &&
-            <Sticky topOffset={0}>
+            <Sticky topOffset={-70}>
               {
-                ({ style, calculatedHeight }) => {
-                  console.log('calculatedHeight', calculatedHeight)
-                  const newStyle = Object.assign({}, style, { marginTop: '70px' })
+                ({ style, isSticky }) => {
+                  const newStyle = Object.assign({}, style, { marginTop: isSticky ? '70px' : '0px' })
                   return <div className='card-header' style={Object.assign({}, { borderBottom: '1px solid #eeeeee', backgroundColor: headerBgColor || 'white', color: headerTextColor || '#333', zIndex: '10' }, newStyle)}>{header}</div>
                 }
               }

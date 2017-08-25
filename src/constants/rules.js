@@ -44,3 +44,13 @@ export const ADVENTURE_CREDIT_REFRESH = 60 * 60 * 1000
 export const MAX_PICK_CREDIT = 12
 export const MAX_BATTLE_CREDIT = 12
 export const MAX_ADVENTURE_CREDIT = 10
+
+export const getMixGrades = (mixCols) => {
+  if (mixCols[0].mon[mixCols[0].monId].grade === mixCols[0].mon[mixCols[0].monId].grade === 'r') {
+    return ['b', 'r', 'e']
+  } else if (mixCols[0].mon[mixCols[0].monId].grade === mixCols[0].mon[mixCols[0].monId].grade === 'e') {
+    return ['b', 'r', 'e', 'l']
+  } else {
+    return ['b', 'r']
+  }
+}
