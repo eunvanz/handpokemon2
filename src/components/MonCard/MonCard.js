@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { fromJS, is } from 'immutable'
 
 import MonCost from '../MonCost'
 import MonAttr from '../MonAttr'
@@ -24,6 +25,9 @@ class MonCard extends React.Component {
     this._handleOnSelect = this._handleOnSelect.bind(this)
     this._handleOnUnselect = this._handleOnUnselect.bind(this)
   }
+  shouldComponentUpdate (nextProps, nextState) {
+    return !is(fromJS(nextProps), fromJS(this.props)) || !is(fromJS(nextState), fromJS(this.state))
+  }
   _showMonModal () {
     this.setState({ showMonModal: true })
   }
@@ -37,7 +41,7 @@ class MonCard extends React.Component {
     this.props.onUnselect()
   }
   render () {
-    const { mon, pick, className, type, isSelectable, ...restProps } = this.props
+    const { mon, pick, className, type, isSelectable, onUnselect, ...restProps } = this.props
     const tobeMon = mon.tobe
     const renderLevelUpInfo = () => {
       if (mon.asis) {

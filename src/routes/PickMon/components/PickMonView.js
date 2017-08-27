@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
 import keygen from 'keygenerator'
+import { fromJS, is } from 'immutable'
 
 import ContentContainer from 'components/ContentContainer'
 import Roulette from 'components/Roulette'
@@ -38,6 +39,9 @@ class PickMonView extends React.Component {
     console.log('pickMonInfo @ cdm in PickMonView', pickMonInfo)
     if (!pickMonInfo) return this.context.router.push('pick-district')
     this._initPick()
+  }
+  shouldComponentUpdate (nextProps, nextState) {
+    return !is(fromJS(nextProps), fromJS(this.props)) || !is(fromJS(nextState), fromJS(this.state))
   }
   componentDidUpdate (prevProps, prevState) {
     if (prevProps.location.query.f !== this.props.location.query.f) this._initPick()

@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import keygen from 'keygenerator'
+import { fromJS, is } from 'immutable'
 
 import CustomModal from 'components/CustomModal'
 import Button from 'components/Button'
@@ -32,6 +33,9 @@ class MonModal extends React.Component {
     this._handleOnClickEvolution = this._handleOnClickEvolution.bind(this)
     this._handleOnClickMix = this._handleOnClickMix.bind(this)
   }
+  shouldComponentUpdate (nextProps, nextState) {
+    return !is(fromJS(nextProps), fromJS(this.props)) || !is(fromJS(nextState), fromJS(this.state))
+  }
   _handleOnClickEvolution () {
     const { mon, receivePickMonInfo, close } = this.props
     const pickMonInfo = {
@@ -53,7 +57,7 @@ class MonModal extends React.Component {
     this.context.router.push(`/collection/${mon.tobe.userId}`)
   }
   render () {
-    const { mon, show, close, type, ...restProps } = this.props
+    const { mon, show, close, type, receivePickMonInfo, ...restProps } = this.props
     const tobeMon = mon.tobe
     const renderLevel = () => {
       if (mon.asis) {
@@ -102,9 +106,9 @@ class MonModal extends React.Component {
     const renderFooter = () => {
       return (
         <div className='text-right'>
-          <Button link text='닫기' onClick={close} />
           <Button text='뒤집기' icon='fa fa-refresh'
             onClick={() => this.setState({ showStat: !this.state.showStat })} />
+          <Button link text='닫기' onClick={close} />
         </div>
       )
     }

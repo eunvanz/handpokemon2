@@ -11430,7 +11430,7 @@ h6 small,
 }
 
 .easy-pie .percent:after {
-  content: "%";
+  /*content: "%";*/
 }
 
 .easy-pie.main-pie .percent {

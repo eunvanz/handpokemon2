@@ -1,8 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { StickyContainer, Sticky } from 'react-sticky'
+import { fromJS, is } from 'immutable'
 
 class Card extends React.Component {
+  shouldComponentUpdate (nextProps, nextState) {
+    return !is(fromJS(nextProps), fromJS(this.props))
+  }
   render () {
     const { header, body, headerBgColor, headerTextColor, clearPadding, stickyHeader, ...restProps } = this.props
     return (

@@ -19,6 +19,7 @@ export const isDupNickname = (firebase, nickname) => {
 
 export const signUp = (firebase, user) => {
   const { password, ...userToSave } = user
+  // 랭킹기록 해야함
   return firebase.createUser({ email: user.email, password }, userToSave)
 }
 
@@ -28,6 +29,13 @@ export const getUserIdByEmail = (firebase, email) => {
   .then(snapshot => {
     const userId = Object.keys(snapshot.val())[0]
     return Promise.resolve(userId)
+  })
+}
+
+export const getUserByUserId = (firebase, userId) => {
+  const ref = firebase.ref(`users/${userId}`)
+  return ref.once('value').then(snapshot => {
+    return Promise.resolve(snapshot.val())
   })
 }
 

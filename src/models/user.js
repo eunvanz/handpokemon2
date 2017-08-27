@@ -19,5 +19,7 @@ export default class User {
     this.lastLeague = 0
     this.lastAdventure = 0
     this.pokemoney = 0
+    this.battleWin = 0
+    this.battleLose = 0
   }
 }

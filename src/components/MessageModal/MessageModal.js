@@ -1,5 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { fromJS, is } from 'immutable'
+
 import CustomModal from '../CustomModal'
 import Button from '../Button'
 
@@ -7,6 +9,9 @@ class MessageModal extends React.Component {
   constructor (props) {
     super(props)
     this.displayName = 'MessageModal'
+  }
+  shouldComponentUpdate (nextProps, nextState) {
+    return !is(fromJS(nextProps), fromJS(this.props))
   }
   componentWillReceiveProps (nextProps) {
     this.setState({ showModal: nextProps.show })

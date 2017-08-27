@@ -33,7 +33,7 @@ class MonInfo extends React.Component {
             <div>
               <div className='row' style={{ marginBottom: '15px' }}>
                 <div className='col-xs-3 f-700'>이름</div>
-                <div className='col-xs-9'>{monToView.name}</div>
+                <div className='col-xs-9'>{mon.mon ? monToView.name : '????'}</div>
               </div>
               {mon.rank && <div className='row' style={{ marginBottom: '15px' }}>
                 <div className='col-xs-3 f-700'>랭크</div>
@@ -74,23 +74,23 @@ class MonInfo extends React.Component {
               {
                 !asisMon &&
                 <div>
-                  <Stat label='체력' value={mon.hp} addedValue1={mon.addedHp ? mon.addedHp : 0} addedValue2={0} />
-                  <Stat label='공격' value={mon.power} addedValue1={mon.addedPower ? mon.addedPower : 0} addedValue2={0} />
-                  <Stat label='방어' value={mon.armor} addedValue1={mon.addedArmor ? mon.addedArmor : 0} addedValue2={0} />
-                  <Stat label='특수공격' value={mon.sPower} addedValue1={mon.addedSPower ? mon.addedSPower : 0} addedValue2={0} />
-                  <Stat label='특수방어' value={mon.sArmor} addedValue1={mon.addedSArmor ? mon.addedSArmor : 0} addedValue2={0} />
-                  <Stat label='민첩' value={mon.dex} addedValue1={mon.addedDex ? mon.addedDex : 0} addedValue2={0} />
+                  <Stat label={mon.mon ? '체력' : '평균 체력'} value={mon.hp} addedValue1={mon.addedHp ? mon.addedHp : 0} addedValue2={0} />
+                  <Stat label={mon.mon ? '공격' : '평균 공격'} value={mon.power} addedValue1={mon.addedPower ? mon.addedPower : 0} addedValue2={0} />
+                  <Stat label={mon.mon ? '방어' : '평균 방어'} value={mon.armor} addedValue1={mon.addedArmor ? mon.addedArmor : 0} addedValue2={0} />
+                  <Stat label={mon.mon ? '특수공격' : '평균 특수공격'} value={mon.sPower} addedValue1={mon.addedSPower ? mon.addedSPower : 0} addedValue2={0} />
+                  <Stat label={mon.mon ? '특수방어' : '평균 특수방어'} value={mon.sArmor} addedValue1={mon.addedSArmor ? mon.addedSArmor : 0} addedValue2={0} />
+                  <Stat label={mon.mon ? '민첩' : '평균 민첩'} value={mon.dex} addedValue1={mon.addedDex ? mon.addedDex : 0} addedValue2={0} />
                 </div>
               }
               {
                 asisMon &&
                 <div>
-                  <Stat label='체력' value={mon.hp} addedValue1={asisMon.addedHp} addedValue2={mon.addedHp - asisMon.addedHp} />
-                  <Stat label='공격' value={mon.power} addedValue1={asisMon.addedPower} addedValue2={mon.addedPower - asisMon.addedPower} />
-                  <Stat label='방어' value={mon.armor} addedValue1={asisMon.addedArmor} addedValue2={mon.addedArmor - asisMon.addedArmor} />
-                  <Stat label='특수공격' value={mon.sPower} addedValue1={asisMon.addedSPower} addedValue2={mon.addedSPower - asisMon.addedSPower} />
-                  <Stat label='특수방어' value={mon.sArmor} addedValue1={asisMon.addedSArmor} addedValue2={mon.addedSArmor - asisMon.addedSArmor} />
-                  <Stat label='민첩' value={mon.dex} addedValue1={asisMon.addedDex} addedValue2={mon.addedDex - asisMon.addedDex} />
+                  <Stat label={mon.mon ? '체력' : '평균 체력'} value={mon.hp} addedValue1={asisMon.addedHp} addedValue2={mon.addedHp - asisMon.addedHp} />
+                  <Stat label={mon.mon ? '공격' : '평균 공격'} value={mon.power} addedValue1={asisMon.addedPower} addedValue2={mon.addedPower - asisMon.addedPower} />
+                  <Stat label={mon.mon ? '방어' : '평균 방어'} value={mon.armor} addedValue1={asisMon.addedArmor} addedValue2={mon.addedArmor - asisMon.addedArmor} />
+                  <Stat label={mon.mon ? '특수공격' : '평균 특수공격'} value={mon.sPower} addedValue1={asisMon.addedSPower} addedValue2={mon.addedSPower - asisMon.addedSPower} />
+                  <Stat label={mon.mon ? '특수방어' : '평균 특수방어'} value={mon.sArmor} addedValue1={asisMon.addedSArmor} addedValue2={mon.addedSArmor - asisMon.addedSArmor} />
+                  <Stat label={mon.mon ? '민첩' : '평균 민첩'} value={mon.dex} addedValue1={asisMon.addedDex} addedValue2={mon.addedDex - asisMon.addedDex} />
                 </div>
               }
             </div>

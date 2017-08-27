@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import numeral from 'numeral'
 import { firebaseConnect } from 'react-redux-firebase'
 import $ from 'jquery'
+import { fromJS, is } from 'immutable'
 
 import { DEFAULT_PROFILE_IMAGE_URL } from 'constants/urls'
 import { PICK_CREDIT_REFRESH, BATTLE_CREDIT_REFRESH, ADVENTURE_CREDIT_REFRESH,
@@ -38,6 +39,9 @@ class Sidebar extends React.Component {
     this._refreshUserCredits = this._refreshUserCredits.bind(this)
     this._handleCredit = this._handleCredit.bind(this)
     this._increaseCredit = this._increaseCredit.bind(this)
+  }
+  shouldComponentUpdate (nextProps, nextState) {
+    return !is(fromJS(this.pros), fromJS(nextProps)) || !is(fromJS(this.state), fromJS(nextState))
   }
   componentDidUpdate (prevProps, prevState) {
     const { user } = this.props

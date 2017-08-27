@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import keygen from 'keygenerator'
+import { fromJS, is } from 'immutable'
 
 import Card from 'components/Card'
 import Button from 'components/Button'
@@ -19,6 +20,9 @@ class PickDistrictView extends React.Component {
   componentDidMount () {
     const { user } = this.props
     if (!user) this.context.router.push('sign-in')
+  }
+  shouldComponentUpdate (nextProps, nextState) {
+    return !is(fromJS(nextProps), fromJS(this.props))
   }
   _handleOnClickPick (district, quantity) {
     const pickMonInfo = {

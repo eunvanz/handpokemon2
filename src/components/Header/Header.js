@@ -4,9 +4,11 @@ import { Link } from 'react-router'
 import { connect } from 'react-redux'
 import { firebaseConnect, pathToJS } from 'react-redux-firebase'
 
-import { showAlert } from 'utils/commonUtil'
+import { showAlert, isMobile } from 'utils/commonUtil'
 
 import { logout } from 'services/UserService'
+
+import logo from './assets/logo.png'
 
 const mapStateToProps = (state) => ({
   auth: pathToJS(state.firebase, 'auth')
@@ -59,7 +61,7 @@ class Header extends React.Component {
   }
   render () {
     return (
-      <header id='header' className='clearfix' data-ma-theme='lightblue'>
+      <header id='header' className='clearfix' data-ma-theme='blue'>
         <ul className='h-inner'>
           <li className='hi-trigger ma-trigger' data-ma-action='sidebar-open' data-ma-target='#sidebar'>
             <div className='line-wrap'>
@@ -68,8 +70,8 @@ class Header extends React.Component {
               <div className='line bottom' />
             </div>
           </li>
-          <li className='hi-logo hidden-xs'>
-            <Link to='/'>손켓몬2</Link>
+          <li className='hi-logo visible-lg' style={{ top: '5px', position: 'absolute' }}>
+            <Link to='/'><img src={logo} height={46} /></Link>
           </li>
           <li className='pull-right'>
             <ul className='hi-menu'>

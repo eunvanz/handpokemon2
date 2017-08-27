@@ -1,7 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { fromJS } from 'immutable'
+import { fromJS, is } from 'immutable'
 import _ from 'lodash'
+import { Collapse } from 'react-bootstrap'
 
 import ContentContainer from 'components/ContentContainer'
 import Loading from 'components/Loading'
@@ -11,8 +12,10 @@ import CustomModal from 'components/CustomModal'
 import Button from 'components/Button'
 import Checkbox from 'components/Checkbox'
 import WarningText from 'components/WarningText'
+import PieChart from 'components/PieChart'
 
 import { getCollectionsByUserId } from 'services/CollectionService'
+import { getUserByUserId } from 'services/UserService'
 
 import { attrs } from 'constants/data'
 import { colors } from 'constants/colors'
@@ -29,6 +32,7 @@ class CollectionView extends React.Component {
       isMixMode: false,
       openFloatMenu: false,
       showFilterModal: false,
+      quantity: null,
       filter: {
         has: {
           yes: true,
@@ -103,7 +107,20 @@ class CollectionView extends React.Component {
           '5': true,
           '6': true,
           '7': true
+        },
+        isEvolutable: {
+          yes: true,
+          no: true
         }
+      },
+      filterCollapse: {
+        has: false,
+        grade: false,
+        mainAttr: false,
+        subAttr: false,
+        cost: false,
+        generation: false,
+        isEvolutable: false
       }
     }
     this._handleOnClickApplyFilter = this._handleOnClickApplyFilter.bind(this)
@@ -114,20 +131,30 @@ class CollectionView extends React.Component {
     this._handleOnSelectMon = this._handleOnSelectMon.bind(this)
     this._applyFilter = this._applyFilter.bind(this)
     this._cancelMix = this._cancelMix.bind(this)
+    this._handleOnClickTrainerInfo = this._handleOnClickTrainerInfo.bind(this)
   }
   componentDidMount () {
     const { pickMonInfo } = this.props
     this._initCollectionState()
     if (pickMonInfo && pickMonInfo.mixCols) this.setState({ mode: 'mix' })
   }
+  shouldComponentUpdate (nextProps, nextState) {
+    console.log('this.state.quantity', this.state.quantity)
+    console.log('nextState.quantity', nextState.quantity)
+    console.log('shouldComponentUpdate', !is(fromJS(nextState), fromJS(this.state)))
+    return !is(fromJS(nextProps), fromJS(this.props)) || !is(fromJS(nextState), fromJS(this.state))
+  }
+  componentWillUpdate (nextProps, nextState) {
+    if (nextProps.pickMonInfo && !this.props.pickMonInfo && nextProps.pickMonInfo.mixCols) {
+      this.setState({ mode: 'mix' })
+    }
+  }
   componentDidUpdate (prevProps, prevState) {
-    console.log(this.state.filter.has)
+    console.log('component updated')
     if (!fromJS(prevProps.mons).equals(fromJS(this.props.mons))) {
       this._initCollectionState()
     }
-    console.log('pickMonInfo', this.props.pickMonInfo)
     if (this.props.pickMonInfo && !prevProps.pickMonInfo && this.props.pickMonInfo.mixCols) {
-      this.setState({ mode: 'mix' })
       this._initMixMode()
     }
   }
@@ -139,18 +166,31 @@ class CollectionView extends React.Component {
     const { params, firebase, mons } = this.props
     const { userId } = params
     const collections = []
+    const quantity = {
+      b: { has: 0, total: 0 },
+      r: { has: 0, total: 0 },
+      s: { has: 0, total: 0 },
+      sr: { has: 0, total: 0 },
+      e: { has: 0, total: 0 },
+      l: { has: 0, total: 0 }
+    }
     getCollectionsByUserId(firebase, userId)
     .then(cols => {
       mons.forEach(mon => {
         const monId = mon.id
         const has = cols.filter(col => col.monId === monId)[0]
-        if (has) collections.push(has)
-        else {
+        if (has) {
+          quantity[mon.grade].has++
+          quantity[mon.grade].total++
+          collections.push(has)
+        } else {
+          quantity[mon.grade].total++
           collections.push(mon)
         }
       })
       const orederdCollections = _.orderBy(collections, (e) => { return e.no || e.mon[e.monId].no }, ['asc'])
-      this.setState({ collections: orederdCollections, filteredCollections: orederdCollections })
+      console.log('quantity', quantity)
+      this.setState({ collections: orederdCollections, filteredCollections: orederdCollections, quantity })
     })
   }
   _handleOnClickFilter () {
@@ -165,6 +205,7 @@ class CollectionView extends React.Component {
     const filteredCollections = collections.filter(col => {
       const mon = col.mon ? col.mon[col.monId] : col
       return filter.has[col.mon ? 'yes' : 'no'] &&
+        filter.isEvolutable[(col.mon && col.mon[col.monId].evoLv !== 0 && (col.level >= col.mon[col.monId].evoLv)) ? 'yes' : 'no'] &&
         filter.grade[mon.grade] && filter.mainAttr[mon.mainAttr] &&
         filter.subAttr[!mon.subAttr ? '없음' : mon.subAttr] && filter.cost[mon.cost] && filter.generation[mon.generation]
     })
@@ -243,8 +284,21 @@ class CollectionView extends React.Component {
     })
     this._applyFilter(filter)
   }
+  _handleOnClickCollapse (key) {
+    const { filterCollapse } = this.state
+    this.setState({ filterCollapse: Object.assign({}, filterCollapse, { [key]: !filterCollapse[key] }) })
+  }
+  _handleOnClickTrainerInfo () {
+    const { userId } = this.props.params
+    const { showUserModal, firebase, auth } = this.props
+    showUserModal({ user: null, isLoading: true })
+    getUserByUserId(firebase, userId)
+    .then(userToView => {
+      showUserModal({ user: userToView, isMyself: auth.uid === userId, isLoading: false })
+    })
+  }
   render () {
-    const { collections, filter, filteredCollections, openFloatMenu, mode } = this.state
+    const { collections, filter, filteredCollections, filterCollapse, openFloatMenu, mode } = this.state
     const { pickMonInfo } = this.props
     const renderCollections = () => {
       if (filteredCollections.length === 0) {
@@ -289,26 +343,113 @@ class CollectionView extends React.Component {
         return result
       }
       return (
-        <div>
+        <div className='panel-group'>
           { mode !== 'mix' &&
-            <div>
-              <h4 className='m-t-20'>보유여부</h4>
-              <Checkbox label='전체' name='has-all'
-                checked={filter.has.yes && filter.has.no} onChange={this._handleOnChangeFilterInput} />
-              <Checkbox label='보유' checked={filter.has.yes} name='has-yes' onChange={this._handleOnChangeFilterInput} />
-              <Checkbox label='미보유' checked={filter.has.no} name='has-no' onChange={this._handleOnChangeFilterInput} />
+            <div className='panel panel-collapse'>
+              <div className={`panel-heading${filterCollapse.has ? ' active' : ''}`}>
+                <h4 className='panel-title'>
+                  <a style={{ cursor: 'pointer' }} onClick={() => this._handleOnClickCollapse('has')}>
+                  보유여부
+                  </a>
+                </h4>
+              </div>
+              <Collapse in={filterCollapse.has}>
+                <div className='panel-body'>
+                  <Checkbox label='전체' name='has-all'
+                    checked={filter.has.yes && filter.has.no} onChange={this._handleOnChangeFilterInput} />
+                  <Checkbox label='보유' checked={filter.has.yes} name='has-yes' onChange={this._handleOnChangeFilterInput} />
+                  <Checkbox label='미보유' checked={filter.has.no} name='has-no' onChange={this._handleOnChangeFilterInput} />
+                </div>
+              </Collapse>
             </div>
           }
-          <h4 className='m-t-20'>등급</h4>
-          {grades.names.map((name, idx) => <Checkbox label={name} checked={grades.values[idx] === 'all' ? isAllTrue(filter.grade) : filter.grade[grades.values[idx]]} name={`grade-${grades.values[idx]}`} onChange={this._handleOnChangeFilterInput} key={idx} />)}
-          <h4 className='m-t-20'>주속성</h4>
-          {attrObj.names.map((name, idx) => <Checkbox label={name} checked={attrObj.values[idx] === 'all' ? isAllTrue(filter.mainAttr) : filter.mainAttr[attrObj.values[idx]]} name={`mainAttr-${attrObj.values[idx]}`} onChange={this._handleOnChangeFilterInput} key={idx} />)}
-          <h4 className='m-t-20'>부속성</h4>
-          {subAttrObj.names.map((name, idx) => <Checkbox label={name} checked={subAttrObj.values[idx] === 'all' ? isAllTrue(filter.subAttr) : filter.subAttr[subAttrObj.values[idx]]} name={`subAttr-${subAttrObj.values[idx]}`} onChange={this._handleOnChangeFilterInput} key={idx} />)}
-          <h4 className='m-t-20'>코스트</h4>
-          {costObj.names.map((name, idx) => <Checkbox label={name} checked={costObj.values[idx] === 'all' ? isAllTrue(filter.cost) : filter.cost[costObj.values[idx]]} name={`cost-${costObj.values[idx]}`} onChange={this._handleOnChangeFilterInput} key={idx} />)}
-          <h4 className='m-t-20'>세대</h4>
-          {genObj.names.map((name, idx) => <Checkbox label={name} checked={genObj.values[idx] === 'all' ? isAllTrue(filter.generation) : filter.generation[genObj.values[idx]]} name={`generation-${genObj.values[idx]}`} onChange={this._handleOnChangeFilterInput} key={idx} />)}
+          <div className='panel panel-collapse m-t-20'>
+            <div className={`panel-heading${filterCollapse.grade ? ' active' : ''}`}>
+              <h4 className='panel-title'>
+                <a style={{ cursor: 'pointer' }} onClick={() => this._handleOnClickCollapse('grade')}>
+                등급
+                </a>
+              </h4>
+            </div>
+            <Collapse in={filterCollapse.grade}>
+              <div className='panel-body'>
+                {grades.names.map((name, idx) => <Checkbox label={name} checked={grades.values[idx] === 'all' ? isAllTrue(filter.grade) : filter.grade[grades.values[idx]]} name={`grade-${grades.values[idx]}`} onChange={this._handleOnChangeFilterInput} key={idx} />)}
+              </div>
+            </Collapse>
+          </div>
+          <div className='panel panel-collapse m-t-20'>
+            <div className={`panel-heading${filterCollapse.mainAttr ? ' active' : ''}`}>
+              <h4 className='panel-title'>
+                <a style={{ cursor: 'pointer' }} onClick={() => this._handleOnClickCollapse('mainAttr')}>
+                  주속성
+                </a>
+              </h4>
+            </div>
+            <Collapse in={filterCollapse.mainAttr}>
+              <div className='panel-body'>
+                {attrObj.names.map((name, idx) => <Checkbox label={name} checked={attrObj.values[idx] === 'all' ? isAllTrue(filter.mainAttr) : filter.mainAttr[attrObj.values[idx]]} name={`mainAttr-${attrObj.values[idx]}`} onChange={this._handleOnChangeFilterInput} key={idx} />)}
+              </div>
+            </Collapse>
+          </div>
+          <div className='panel panel-collapse m-t-20'>
+            <div className={`panel-heading${filterCollapse.subAttr ? ' active' : ''}`}>
+              <h4 className='panel-title'>
+                <a style={{ cursor: 'pointer' }} onClick={() => this._handleOnClickCollapse('subAttr')}>
+                  부속성
+                </a>
+              </h4>
+            </div>
+            <Collapse in={filterCollapse.subAttr}>
+              <div className='panel-body'>
+                {subAttrObj.names.map((name, idx) => <Checkbox label={name} checked={subAttrObj.values[idx] === 'all' ? isAllTrue(filter.subAttr) : filter.subAttr[subAttrObj.values[idx]]} name={`subAttr-${subAttrObj.values[idx]}`} onChange={this._handleOnChangeFilterInput} key={idx} />)}
+              </div>
+            </Collapse>
+          </div>
+          <div className='panel panel-collapse m-t-20'>
+            <div className={`panel-heading${filterCollapse.cost ? ' active' : ''}`}>
+              <h4 className='panel-title'>
+                <a style={{ cursor: 'pointer' }} onClick={() => this._handleOnClickCollapse('cost')}>
+                  코스트
+                </a>
+              </h4>
+            </div>
+            <Collapse in={filterCollapse.cost}>
+              <div className='panel-body'>
+                {costObj.names.map((name, idx) => <Checkbox label={name} checked={costObj.values[idx] === 'all' ? isAllTrue(filter.cost) : filter.cost[costObj.values[idx]]} name={`cost-${costObj.values[idx]}`} onChange={this._handleOnChangeFilterInput} key={idx} />)}
+              </div>
+            </Collapse>
+          </div>
+          <div className='panel panel-collapse m-t-20'>
+            <div className={`panel-heading${filterCollapse.generation ? ' active' : ''}`}>
+              <h4 className='panel-title'>
+                <a style={{ cursor: 'pointer' }} onClick={() => this._handleOnClickCollapse('generation')}>
+                  세대
+                </a>
+              </h4>
+            </div>
+            <Collapse in={filterCollapse.generation}>
+              <div className='panel-body'>
+                {genObj.names.map((name, idx) => <Checkbox label={name} checked={genObj.values[idx] === 'all' ? isAllTrue(filter.generation) : filter.generation[genObj.values[idx]]} name={`generation-${genObj.values[idx]}`} onChange={this._handleOnChangeFilterInput} key={idx} />)}
+              </div>
+            </Collapse>
+          </div>
+          <div className='panel panel-collapse m-t-20'>
+            <div className={`panel-heading${filterCollapse.isEvolutable ? ' active' : ''}`}>
+              <h4 className='panel-title'>
+                <a style={{ cursor: 'pointer' }} onClick={() => this._handleOnClickCollapse('isEvolutable')}>
+                  진화가능여부
+                </a>
+              </h4>
+            </div>
+            <Collapse in={filterCollapse.isEvolutable}>
+              <div className='panel-body'>
+                <Checkbox label='전체' name='isEvolutable-all'
+                  checked={filter.isEvolutable.yes && filter.isEvolutable.no} onChange={this._handleOnChangeFilterInput} />
+                <Checkbox label='가능' checked={filter.isEvolutable.yes} name='isEvolutable-yes' onChange={this._handleOnChangeFilterInput} />
+                <Checkbox label='불가능' checked={filter.isEvolutable.no} name='isEvolutable-no' onChange={this._handleOnChangeFilterInput} />
+              </div>
+            </Collapse>
+          </div>
         </div>
       )
     }
@@ -322,7 +463,7 @@ class CollectionView extends React.Component {
       )
     }
     const renderBody = () => {
-      if (!collections) return <Loading text='콜렉션을 불러오는 중...' height={window.innerHeight - 110} />
+      if (!collections) return <Loading text='콜렉션을 불러오는 중...' height={window.innerHeight - 280} />
       else {
         return (
           <div className='row'>
@@ -333,21 +474,14 @@ class CollectionView extends React.Component {
             />
             <FloatingButton iconClassName='zmdi zmdi-filter-list'
               onClick={this._handleOnClickFilter}
-              bottom={100}
+              bottom={60}
               backgroundColor={colors.orange}
               hidden={!openFloatMenu}
               tooltipText='필터'
             />
-            <FloatingButton iconClassName='zmdi zmdi-sort-asc'
-              onClick={this._handleOnClickFilter}
-              bottom={160}
-              backgroundColor={colors.orange}
-              hidden={!openFloatMenu}
-              tooltipText='정렬'
-            />
             <FloatingButton iconClassName='zmdi zmdi-account'
-              onClick={this._handleOnClickFilter}
-              bottom={220}
+              onClick={this._handleOnClickTrainerInfo}
+              bottom={120}
               backgroundColor={colors.orange}
               hidden={!openFloatMenu}
               tooltipText='트레이너프로필'
@@ -365,6 +499,19 @@ class CollectionView extends React.Component {
         )
       }
     }
+    const renderCharts = () => {
+      const { quantity } = this.state
+      if (!quantity) return null
+      const grades = Object.keys(quantity)
+      return grades.map((grade, idx) => {
+        const barColor = grade === 'b' ? colors.amber : grade === 'r' ? colors.green : grade === 's' ? colors.lightBlue : grade === 'sr' ? colors.purple : grade === 'e' ? colors.pink : grade === 'l' ? colors.orange : ''
+        return (
+          <PieChart sub={quantity[grade].has} total={quantity[grade].total} key={idx} trackColor={colors.lightgray} barColor={barColor}
+            label={grade === 'b' ? 'BASIC' : grade === 'r' ? 'RARE' : grade === 's' ? 'SPECIAL' : grade === 'sr' ? 'S.RARE' : grade === 'e' ? 'ELITE' : grade === 'l' ? 'LEGEND' : ''}
+          />
+        )
+      })
+    }
     const renderHeader = () => {
       if (mode === 'mix') {
         return (<div>
@@ -374,12 +521,16 @@ class CollectionView extends React.Component {
           </ul>
         </div>)
       }
-      return null
+      return (
+        <div className='row'>
+          {renderCharts()}
+        </div>
+      )
     }
     return (
       <ContentContainer
         header={renderHeader()}
-        stickyHeader
+        stickyHeader={mode === 'mix'}
         title='내 콜렉션'
         body={renderBody()}
       />
@@ -398,7 +549,9 @@ CollectionView.propTypes = {
   user: PropTypes.object,
   mons: PropTypes.array,
   receivePickMonInfo: PropTypes.func.isRequired,
-  pickMonInfo: PropTypes.object
+  pickMonInfo: PropTypes.object,
+  showUserModal: PropTypes.func.isRequired,
+  userModal: PropTypes.object.isRequired
 }
 
 export default CollectionView

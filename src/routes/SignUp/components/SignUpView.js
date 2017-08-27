@@ -12,6 +12,7 @@ import TextArea from 'components/TextArea'
 import ImageInput from 'components/ImageInput'
 import MonCard from 'components/MonCard'
 import Loading from 'components/Loading'
+import AvatarImgInput from 'components/AvatarImgInput'
 
 import { isDupEmail, isDupNickname, signUp, getUserIdByEmail } from 'services/UserService'
 import { getStartPick } from 'services/MonService'
@@ -20,7 +21,7 @@ import { postCollection } from 'services/CollectionService'
 
 import { DEFAULT_PROFILE_IMAGE_URL, PROFILE_IMAGE_ROOT } from 'constants/urls'
 
-import { showAlert } from 'utils/commonUtil'
+import { showAlert, dataURItoBlob } from 'utils/commonUtil'
 
 import User from 'models/user'
 
@@ -243,7 +244,14 @@ class SignUpView extends React.Component {
     } else if (step === 3) {
       this._processSignUp()
     } else if (step === 2) {
-      this.setState({ profileImageFile: document.getElementById('profileImage').files[0] })
+      // this.setState({ profileImageFile: document.getElementById('profileImage').files[0] })
+      if (window.editor) {
+        const dataURI = window.editor.getImageScaledToCanvas().toDataURL()
+        if (dataURI) {
+          const blob = dataURItoBlob(dataURI)
+          this.setState({ profileImageFile: new File([blob], keygen._(), { type: blob.type }) })
+        }
+      }
       this.setState({ step: this.state.step + 1 })
     }
   }
@@ -361,7 +369,8 @@ class SignUpView extends React.Component {
             </div>
             <p className='col-sm-offset-3 col-sm-6 f-700'>프로필사진</p>
             <div className='col-sm-offset-3 col-sm-6'>
-              <ImageInput id='profileImage' />
+              {/*<ImageInput id='profileImage' />*/}
+              <AvatarImgInput />
             </div>
           </div>
         )

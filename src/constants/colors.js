@@ -48,5 +48,6 @@ export const colors = {
   brown: '#795548',
   gray: '#9e9e9e',
   blueGray: '#607d8b',
-  black: '#000000'
+  black: '#000000',
+  lightgray: '#eaeaea'
 }

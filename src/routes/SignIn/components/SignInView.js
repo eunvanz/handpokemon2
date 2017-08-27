@@ -133,17 +133,10 @@ class SignInView extends React.Component {
                   onChange={this._handleOnChangeInput} />
               </div>
             </div>
-            <div className='checkbox'>
-              <label style={{ lineHeight: '1' }}>
-                <input type='checkbox' value={this.state.remember}
-                  onChange={this._handleOnChangeInput} name='remember' hidden='hidden' id='remember' />
-                <i className='input-helper' style={{ top: '3px' }} /> <span style={{ fontSize: '14px' }}>자동로그인</span>
-              </label>
-            </div>
             <a onClick={this.state.isLoading ? null : this._handleOnClickLogin}
               className={`btn btn-login btn-success btn-float waves-effect waves-circle waves-float`}
               style={{ lineHeight: '2.5em', marginTop: '-50px', cursor: this.state.isLoading ? 'default' : 'pointer' }}>
-              <i className={this.state.isLoading ? 'fa fa-spinner fa-pulse fa-fw' : 'zmdi zmdi-arrow-forward'} />
+              <i className={this.state.isLoading ? 'fa fa-circle-o-notch fa-spin fa-fw' : 'zmdi zmdi-arrow-forward'} />
             </a>
           </div>
           <div className='lcb-navigation'>

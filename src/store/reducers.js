@@ -2,6 +2,8 @@ import { combineReducers } from 'redux'
 import userReducer from './user'
 import messageModalReducer from './messageModal'
 import pickMonInfoReducer from './pickMonInfo'
+import userModalReducer from './userModal'
+
 import { firebaseStateReducer } from 'react-redux-firebase'
 
 export const makeRootReducer = (asyncReducers) => {
@@ -10,6 +12,7 @@ export const makeRootReducer = (asyncReducers) => {
     messageModal: messageModalReducer,
     pickMonInfo: pickMonInfoReducer,
     firebase: firebaseStateReducer,
+    userModal: userModalReducer,
     ...asyncReducers
   })
 }

@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Modal } from 'react-bootstrap'
 import $ from 'jquery'
+import { fromJS, is } from 'immutable'
 
 class CustomModal extends React.Component {
   constructor (props) {
@@ -10,6 +11,9 @@ class CustomModal extends React.Component {
     this.state = {
       showModal: this.props.show
     }
+  }
+  shouldComponentUpdate (nextProps, nextState) {
+    return !is(fromJS(nextProps), fromJS(this.props)) || !is(fromJS(nextState), fromJS(this.state))
   }
   componentWillReceiveProps (nextProps) {
     this.setState({ showModal: nextProps.show })

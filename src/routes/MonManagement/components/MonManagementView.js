@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { fromJS } from 'immutable'
 import _ from 'lodash'
+import keygen from 'keygenerator'
 
 import Mon from 'models/mon'
 
@@ -112,6 +113,7 @@ class MonManagementView extends React.Component {
     const mon = Object.assign({}, new Mon(), formData)
     const monImageFile = document.getElementById('monImage').files[0]
     let postMonImageFile = () => Promise.resolve()
+    if (monImageFile) monImageFile.filename = keygen._()
     if (monImageFile) postMonImageFile = () => postImage(firebase, MON_IMAGE_ROOT, [monImageFile])
     postMonImageFile()
     .then(res => {

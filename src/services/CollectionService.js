@@ -35,7 +35,7 @@ export const updateCollection = (firebase, col) => {
 }
 
 export const getDeleteColObj = (firebase, col) => {
-  return firebase.ref(`user/${col.userId}/colPoint`).once('value')
+  return firebase.ref(`users/${col.userId}/colPoint`).once('value')
     .then(snapshot => {
       const asisPoint = snapshot.val()
       const tobePoint = asisPoint - col.mon[col.monId].point
@@ -51,7 +51,7 @@ export const getDeleteColObj = (firebase, col) => {
 
 const getResolveLevelDownObj = (firebase, srcCol, type) => {
   if (srcCol.level <= srcCol.mon[srcCol.monId].evoLv) { // 진회레벨과 같거나 작을경우 삭제
-    return firebase.ref(`user/${srcCol.userId}/colPoint`).once('value')
+    return firebase.ref(`users/${srcCol.userId}/colPoint`).once('value')
       .then(snapshot => {
         const asisPoint = snapshot.val()
         const tobePoint = asisPoint - srcCol.mon[srcCol.monId].point

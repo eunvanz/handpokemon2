@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { fromJS, is } from 'immutable'
 
 import { gradesColors, attrColors } from 'constants/colors'
 import { badgeStyle } from 'constants/styles'
@@ -7,6 +8,9 @@ import { badgeStyle } from 'constants/styles'
 import { isScreenSize } from 'utils/commonUtil'
 
 class MonAttr extends React.Component {
+  shouldComponentUpdate (nextProps, nextState) {
+    return !is(fromJS(nextProps), fromJS(this.props)) || !is(fromJS(nextState), fromJS(this.state))
+  }
   render () {
     const { grade, mainAttr, subAttr, point, ...restProps } = this.props
     const getGradeColor = grade => {
