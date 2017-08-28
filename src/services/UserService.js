@@ -2,6 +2,9 @@
 //
 // import crypto from 'crypto-js'
 // import cookie from 'cookie'
+
+import _ from 'lodash'
+
 import { PICK_CREDIT_REFRESH, BATTLE_CREDIT_REFRESH, ADVENTURE_CREDIT_REFRESH,
 MAX_ADVENTURE_CREDIT, MAX_BATTLE_CREDIT, MAX_PICK_CREDIT } from 'constants/rules'
 
@@ -94,7 +97,21 @@ export const decreaseCredit = (firebase, uid, number, type) => {
   }
   const creditRef = firebase.ref(`users/${uid}/${creditRefPath}`)
   const lastRef = firebase.ref(`users/${uid}/${lastRefPath}`)
-  return lastRef.once('value') // 마지막 업데이트 시간과의 gap이 Refresh 시간보다 클경우 last업데이트 시간을 현재시간으로 설정
+  let isError = false
+  return creditRef.transaction(credit => {
+    if (credit - number < 0) {
+      isError = true
+      return 0
+    }
+    return credit - number
+  })
+  .then(() => {
+    if (isError) return Promise.reject('크레딧이 부족합니다.')
+    else return Promise.resolve()
+  })
+  .then(() => {
+    return lastRef.once('value') // 마지막 업데이트 시간과의 gap이 Refresh 시간보다 클경우 last업데이트 시간을 현재시간으로 설정
+  })
   .then(snapshot => {
     const lastUpdate = snapshot.val()
     const currentTime = new Date().getTime()
@@ -103,10 +120,8 @@ export const decreaseCredit = (firebase, uid, number, type) => {
     if (shouldUpdate) return lastRef.set(currentTime)
     return Promise.resolve()
   })
-  .then(() => {
-    return creditRef.transaction(credit => {
-      return credit - number < 0 ? 0 : credit - number
-    })
+  .catch(msg => {
+    return Promise.reject(msg)
   })
 }
 
@@ -114,28 +129,61 @@ export const increaseCredit = (firebase, uid, number, type) => {
   let creditRefPath
   let lastRefPath
   let max
+  let refreshInterval
   if (type === 'pick') {
     creditRefPath = 'pickCredit'
     lastRefPath = 'lastPick'
     max = MAX_PICK_CREDIT
+    refreshInterval = PICK_CREDIT_REFRESH - 5
   } else if (type === 'battle') {
     creditRefPath = 'battleCredit'
     lastRefPath = 'lastLeague'
     max = MAX_BATTLE_CREDIT
+    refreshInterval = BATTLE_CREDIT_REFRESH - 5
   } else if (type === 'adventure') {
     creditRefPath = 'adventureCredit'
     lastRefPath = 'lastAdventure'
     max = MAX_ADVENTURE_CREDIT
+    refreshInterval = ADVENTURE_CREDIT_REFRESH - 5 // 오차는 0.005초로 잡음
   }
   const creditRef = firebase.ref(`users/${uid}/${creditRefPath}`)
   const lastRef = firebase.ref(`users/${uid}/${lastRefPath}`)
-  return lastRef.set(new Date().getTime())
+  return lastRef.once('value')
+  .then(snapshot => {
+    const now = new Date().getTime()
+    const lastUpdate = snapshot.val()
+    const interval = now - lastUpdate
+    if (interval < refreshInterval) {
+      return Promise.reject(interval) // 브라우저 여러개로 동시 수정시 정합성 체크
+    } else {
+      return lastRef.set(now)
+    }
+  })
   .then(() => {
-    return creditRef.transaction(credit => {
-      let newCredit = credit + number
-      if (newCredit > max) newCredit = max
-      return newCredit
+    return creditRef.once('value')
+  })
+  .then(snapshot => {
+    const oldCredit = snapshot.val()
+    let newCredit = oldCredit + number
+    if (newCredit > max) newCredit = max
+    return creditRef.set(newCredit) // transaction으로 하지 않는 이유는 브라우저 여러개가 동시에 수정시에 덮어쓰게 하려고
+  })
+}
+
+export const getUserRanking = (firebase, type, page, prevPoint, prevKey) => {
+  const limitToLast = page * 24
+  const orderByChild = type === 'collection' ? 'colPoint' : 'leaguePoint'
+  let ref = firebase.ref('users').orderByChild(orderByChild)
+  if (prevPoint && prevKey) ref = ref.endAt(prevPoint, prevKey)
+  return ref.limitToLast(limitToLast).once('value')
+  .then(snapshot => {
+    const result = []
+    snapshot.forEach(child => {
+      const user = child.val()
+      user.id = child.key
+      result.push(user)
     })
+    return Promise.resolve(_.reverse(result))
   })
 }
 

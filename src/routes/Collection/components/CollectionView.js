@@ -139,22 +139,18 @@ class CollectionView extends React.Component {
     if (pickMonInfo && pickMonInfo.mixCols) this.setState({ mode: 'mix' })
   }
   shouldComponentUpdate (nextProps, nextState) {
-    console.log('this.state.quantity', this.state.quantity)
-    console.log('nextState.quantity', nextState.quantity)
-    console.log('shouldComponentUpdate', !is(fromJS(nextState), fromJS(this.state)))
     return !is(fromJS(nextProps), fromJS(this.props)) || !is(fromJS(nextState), fromJS(this.state))
   }
   componentWillUpdate (nextProps, nextState) {
-    if (nextProps.pickMonInfo && !this.props.pickMonInfo && nextProps.pickMonInfo.mixCols) {
+    if (nextProps.pickMonInfo && nextProps.pickMonInfo.mixCols.length === 1) {
       this.setState({ mode: 'mix' })
     }
   }
   componentDidUpdate (prevProps, prevState) {
-    console.log('component updated')
     if (!fromJS(prevProps.mons).equals(fromJS(this.props.mons))) {
       this._initCollectionState()
     }
-    if (this.props.pickMonInfo && !prevProps.pickMonInfo && this.props.pickMonInfo.mixCols) {
+    if (this.props.pickMonInfo && this.props.pickMonInfo.mixCols.length === 1) {
       this._initMixMode()
     }
   }
@@ -269,7 +265,7 @@ class CollectionView extends React.Component {
       cancelButtonText: '아니오'
     })
     .then(() => {
-      this.context.router.push('/pick-mon')
+      this.context.router.push(`/pick-mon`)
     })
     .catch(() => {
       receivePickMonInfo(Object.assign({}, pickMonInfo, { mixCols: asisMixCols }))
@@ -504,9 +500,9 @@ class CollectionView extends React.Component {
       if (!quantity) return null
       const grades = Object.keys(quantity)
       return grades.map((grade, idx) => {
-        const barColor = grade === 'b' ? colors.amber : grade === 'r' ? colors.green : grade === 's' ? colors.lightBlue : grade === 'sr' ? colors.purple : grade === 'e' ? colors.pink : grade === 'l' ? colors.orange : ''
+        const barColor = grade === 'b' ? colors.amber : grade === 'r' ? colors.green : grade === 's' ? colors.lightBlue : grade === 'sr' ? colors.deepPurple : grade === 'e' ? colors.pink : grade === 'l' ? colors.orange : ''
         return (
-          <PieChart sub={quantity[grade].has} total={quantity[grade].total} key={idx} trackColor={colors.lightgray} barColor={barColor}
+          <PieChart sub={quantity[grade].has} total={quantity[grade].total} key={idx} trackColor={colors.lightGray} barColor={barColor}
             label={grade === 'b' ? 'BASIC' : grade === 'r' ? 'RARE' : grade === 's' ? 'SPECIAL' : grade === 'sr' ? 'S.RARE' : grade === 'e' ? 'ELITE' : grade === 'l' ? 'LEGEND' : ''}
           />
         )

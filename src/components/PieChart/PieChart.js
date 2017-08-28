@@ -12,7 +12,7 @@ class PieChart extends React.Component {
     const $ = window.$
 
     function easyPieChart (id, trackColor, scaleColor, barColor, lineWidth, lineCap, size) {
-      $('#'+id).easyPieChart({
+      $('#' + id).easyPieChart({
         trackColor: trackColor,
         scaleColor: scaleColor,
         barColor: barColor,
@@ -21,7 +21,7 @@ class PieChart extends React.Component {
         size: size
       })
     }
-    
+
     easyPieChart(this.state.key, this.props.trackColor, false, this.props.barColor, 2, 'butt', 100)
   }
   shouldUpdateComponent (nextProps, nextState) {

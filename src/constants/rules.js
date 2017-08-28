@@ -50,6 +50,8 @@ export const getMixGrades = (mixCols) => {
     return ['b', 'r', 'e']
   } else if (mixCols[0].mon[mixCols[0].monId].grade === mixCols[0].mon[mixCols[0].monId].grade === 'e') {
     return ['r', 'e', 'l']
+  } else if (mixCols[0].mon[mixCols[0].monId].grade === mixCols[0].mon[mixCols[0].monId].grade === 'l') {
+    return ['l']
   } else {
     return ['b', 'r']
   }

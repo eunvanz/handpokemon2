@@ -48,11 +48,8 @@ export const getNextMons = (firebase, evoluteCol) => {
   return firebase.ref('mons').once('value')
   .then(snapshot => {
     const mons = snapshot.val()
-    console.log('mons', mons)
     const nextMons = nextIds.map(nextId => Object.assign({}, mons[nextId], { id: nextId }))
-    console.log('nextMons', nextMons)
     const nextCols = _.shuffle(nextMons.map(nextMon => convertMonToCol(nextMon)))
-    console.log('nextCols', nextCols)
     return Promise.resolve(nextCols)
   })
 }

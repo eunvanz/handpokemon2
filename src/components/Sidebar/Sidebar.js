@@ -99,6 +99,7 @@ class Sidebar extends React.Component {
   _increaseCredit (type) {
     const { firebase, auth } = this.props
     increaseCredit(firebase, auth.uid, 1, type)
+    .catch(() => {})
   }
   _startCreditTimer (type, interval) {
     const timer = setInterval(() => {
@@ -133,7 +134,7 @@ class Sidebar extends React.Component {
               { user &&
                 <ul className='main-menu'>
                   <li className='text-center'>
-                    <i className='fa fa-quote-left c-blue' /> {user.introduce} <i className='fa fa-quote-right c-blue' />
+                    <i className='fa fa-quote-left c-blue' /> {user.introduce === '' ? '자기소개가 없습니다.' : user.introduce} <i className='fa fa-quote-right c-blue' />
                   </li>
                 </ul>
               }
@@ -190,7 +191,7 @@ class Sidebar extends React.Component {
                 <a style={{ cursor: 'pointer' }}
                   data-ma-action='submenu-toggle'><i className='fa fa-trophy' style={{ fontSize: '22px' }} /> 랭킹</a>
                 <ul style={{ display: 'none' }}>
-                  <li><Link to='/'>콜렉션 랭킹</Link></li>
+                  <li><Link to='/ranking/collection'>콜렉션 랭킹</Link></li>
                   <li><Link to='/'>시합 랭킹</Link></li>
                 </ul>
               </li>

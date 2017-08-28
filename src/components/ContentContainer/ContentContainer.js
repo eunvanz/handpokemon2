@@ -10,11 +10,6 @@ class ContentContainer extends React.Component {
   shouldComponentUpdate (nextProps, nextState) {
     return !is(fromJS(nextProps), fromJS(this.props))
   }
-  componentDidUpdate (prevProps, prevState) {
-    console.log('prevProps', prevProps)
-    console.log('this.props', this.props)
-    console.log('container updated')
-  }
   render () {
     return (
       <div className='container container-alt' style={{ padding: isScreenSize.sm() || isScreenSize.xs() ? '0px' : '0px 15px' }}>

@@ -50,3 +50,5 @@ export const creditBadgeStyle = Object.assign({}, badgeStyle, {
   width: 'auto',
   minWidth: '25px'
 })
+
+export const nullContainerHeight = window.innerHeight - 280

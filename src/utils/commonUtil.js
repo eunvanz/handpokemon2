@@ -18,6 +18,11 @@ export const isScreenSize = {
   }
 }
 
+export const isIE = () => {
+  const agent = navigator.userAgent.toLowerCase()
+  return agent.indexOf('Trident') !== -1 || agent.indexOf('msie') !== -1
+}
+
 export const isMobile = {
   Android: () => {
     return navigator.userAgent.match(/Android/i)
@@ -117,4 +122,18 @@ export const dataURItoBlob = dataURI => {
   }
 
   return new Blob([ia], { type: mimeString })
+}
+
+export const getSeqPromise = proms => { // promise array를 순차적으로 실행하여 결과를 반환
+  const results = []
+  return proms.reduce((prev, prom) => prev.then(() => {
+    return prom()
+      .then(result => {
+        results.push(result)
+        return Promise.resolve()
+      })
+  }), Promise.resolve())
+  .then(() => {
+    return Promise.resolve(results)
+  })
 }

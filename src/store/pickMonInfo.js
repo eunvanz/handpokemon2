@@ -20,6 +20,18 @@ export function clearPickMonInfo (pickMonInfo = null) {
   }
 }
 
+// export const updatePickMonInfo = ({ dispatch }) => {
+//   console.log('dispatch', dispatch)
+//   return (pickMonInfo) => dispatch(receivePickMonInfo(pickMonInfo))
+// }
+
+// export const updatePickMonInfo = (pickMonInfo = null) => {
+//   return dispatch => {
+//     console.log('dispatch', dispatch)
+//     return dispatch(receivePickMonInfo(pickMonInfo))
+//   }
+// }
+
 // ------------------------------------
 // Reducer
 // ------------------------------------

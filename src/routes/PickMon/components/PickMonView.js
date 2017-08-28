@@ -18,6 +18,7 @@ import { PICK_MON_ROULETTE_DELAY, getMixGrades } from 'constants/rules'
 import { attrs as allAttrs } from 'constants/data'
 
 import { mergePickResults } from 'utils/monUtil'
+import { showAlert } from 'utils/commonUtil'
 
 class PickMonView extends React.Component {
   constructor (props) {
@@ -36,22 +37,48 @@ class PickMonView extends React.Component {
   componentDidMount () {
     const { pickMonInfo, auth } = this.props
     if (!auth) return this.context.router.push('sign-in')
-    console.log('pickMonInfo @ cdm in PickMonView', pickMonInfo)
     if (!pickMonInfo) return this.context.router.push('pick-district')
     this._initPick()
   }
   shouldComponentUpdate (nextProps, nextState) {
     return !is(fromJS(nextProps), fromJS(this.props)) || !is(fromJS(nextState), fromJS(this.state))
   }
+  // componentWillUpdate (nextProps, nextState) {
+  //   if (nextProps.location.query.f !== this.props.location.query.f) {
+  //     this.setState({
+  //       pickedIdx: -1,
+  //       picks: null,
+  //       mode: null,
+  //       multiPicks: null,
+  //       stop: false,
+  //       result: null
+  //     })
+  //     this._initPick()
+  //   }
+  // }
   componentDidUpdate (prevProps, prevState) {
-    if (prevProps.location.query.f !== this.props.location.query.f) this._initPick()
+    if (prevProps.location.query.f !== this.props.location.query.f) {
+      this.setState({
+        pickedIdx: -1,
+        picks: null,
+        mode: null,
+        multiPicks: null,
+        stop: false,
+        result: null
+      })
+      this._initPick()
+    }
   }
   componentWillUnmount () {
-    this.props.clearPickMonInfo()
+    console.log('pickMonInfo @ componentWillUnmount in PickMonView', this.props.pickMonInfo)
+    const isClickedMix = this.props.pickMonInfo && this.props.pickMonInfo.mixCols && this.props.pickMonInfo.mixCols.length === 1
+    if (isClickedMix) return // 채집 결과의 MonModal에서 교배하기 버튼 눌렀을 경우 예외처리
+    else this.props.clearPickMonInfo()
   }
   _initPick () {
     const { pickMonInfo, firebase, auth, user } = this.props
     const { quantity, attrs, grades, evoluteCol, mixCols } = pickMonInfo
+    console.log('pickMonInfo', pickMonInfo)
     if (!evoluteCol && !mixCols && quantity > user.pickCredit) {  // 유저의 크레딧보다 더 많은 포켓몬을 채집하는 경우
       this.context.router.push('pick-district')
       return
@@ -60,10 +87,14 @@ class PickMonView extends React.Component {
     let pickedMons = []
     const pickFuncArr = []
     if (!evoluteCol && !mixCols) { // 채집일때
+      console.log('채집', pickMonInfo)
       for (let i = 0; i < quantity; i++) {
         pickFuncArr.push(getPickMons(firebase, attrs, grades))
       }
-      Promise.all(pickFuncArr)
+      return decreaseCredit(firebase, auth.uid, quantity, 'pick')
+      .then(() => {
+        return Promise.all(pickFuncArr)
+      })
       .then(pickedMonsArr => {
         pickedMons = pickedMonsArr
         if (quantity === 1) {
@@ -92,9 +123,12 @@ class PickMonView extends React.Component {
           })
         }
       })
-      .then(() => {
-        // 유저의 채집 크레딧 감소
-        return decreaseCredit(firebase, auth.uid, quantity, 'pick')
+      .catch(msg => {
+        console.log('msg', msg)
+        showAlert(msg)
+        .then(() => {
+          this.context.router.push('/pick-district')
+        })
       })
     } else if (mixCols) { // 교배일때
       getPickMons(firebase, allAttrs, getMixGrades(mixCols), mixCols) // 마지막 파라미터는 특정 포켓몬 교배 처리를 위함
@@ -106,9 +140,18 @@ class PickMonView extends React.Component {
           return Promise.resolve()
         })
       })
+      .catch(msg => {
+        console.log('msg', msg)
+        showAlert(msg)
+          .then(() => {
+            this.context.router.push('/pick-district')
+          })
+      })
     } else if (evoluteCol) { // 진화일때
+      console.log('진화', pickMonInfo)
       getNextMons(firebase, evoluteCol)
       .then(nextMons => {
+        console.log('nextMons', nextMons)
         const picks = _.compact(nextMons)
         if (picks.length > 1) { // 진화체가 여러개일 경우 단건채집과 같은방식으로 진행
           const pickedIdx = _.random(0, picks.length - 1)
@@ -125,6 +168,12 @@ class PickMonView extends React.Component {
             return Promise.resolve()
           })
         }
+      })
+      .catch(msg => {
+        showAlert(msg)
+        .then(() => {
+          this.context.router.push('/pick-district')
+        })
       })
     }
   }

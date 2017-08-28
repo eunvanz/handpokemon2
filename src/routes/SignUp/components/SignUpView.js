@@ -9,10 +9,11 @@ import ContentContainer from 'components/ContentContainer'
 import LabelInput from 'components/LabelInput'
 import Button from 'components/Button'
 import TextArea from 'components/TextArea'
-import ImageInput from 'components/ImageInput'
+// import ImageInput from 'components/ImageInput'
 import MonCard from 'components/MonCard'
 import Loading from 'components/Loading'
 import AvatarImgInput from 'components/AvatarImgInput'
+import WarningText from 'components/WarningText'
 
 import { isDupEmail, isDupNickname, signUp, getUserIdByEmail } from 'services/UserService'
 import { getStartPick } from 'services/MonService'
@@ -21,7 +22,7 @@ import { postCollection } from 'services/CollectionService'
 
 import { DEFAULT_PROFILE_IMAGE_URL, PROFILE_IMAGE_ROOT } from 'constants/urls'
 
-import { showAlert, dataURItoBlob } from 'utils/commonUtil'
+import { showAlert, dataURItoBlob, isIE, getSeqPromise } from 'utils/commonUtil'
 
 import User from 'models/user'
 
@@ -213,8 +214,8 @@ class SignUpView extends React.Component {
       console.log('userId', userId)
       const { startPick } = this.state
       console.log('startPick', startPick)
-      const promArr = startPick.map(col => postCollection(firebase, userId, col))
-      return Promise.all(promArr)
+      const promArr = startPick.map(col => () => postCollection(firebase, userId, col))
+      return getSeqPromise(promArr)
     })
     .then(() => {
       showAlert({
@@ -370,7 +371,8 @@ class SignUpView extends React.Component {
             <p className='col-sm-offset-3 col-sm-6 f-700'>프로필사진</p>
             <div className='col-sm-offset-3 col-sm-6'>
               {/*<ImageInput id='profileImage' />*/}
-              <AvatarImgInput />
+              {!isIE() && <AvatarImgInput />}
+              {isIE() && <WarningText text='익스플로러에서는 지원하지 않습니다.' />}
             </div>
           </div>
         )

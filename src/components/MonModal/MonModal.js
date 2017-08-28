@@ -16,8 +16,10 @@ import { colors } from 'constants/colors'
 
 import { receivePickMonInfo } from 'store/pickMonInfo'
 
-const mapDispatchToProps = {
-  receivePickMonInfo
+const mapDispatchToProps = dispatch => {
+  return {
+    updatePickMonInfo: pickMonInfo => dispatch(receivePickMonInfo(pickMonInfo))
+  }
 }
 
 const mapStateToProps = (state) => {
@@ -37,27 +39,33 @@ class MonModal extends React.Component {
     return !is(fromJS(nextProps), fromJS(this.props)) || !is(fromJS(nextState), fromJS(this.state))
   }
   _handleOnClickEvolution () {
-    const { mon, receivePickMonInfo, close } = this.props
+    const { mon, updatePickMonInfo, close } = this.props
     const pickMonInfo = {
       quantity: 1,
       evoluteCol: mon.tobe
     }
-    receivePickMonInfo(pickMonInfo)
+    updatePickMonInfo(pickMonInfo)
     close()
     this.context.router.push(`/pick-mon?f=${keygen._()}`)
   }
   _handleOnClickMix () {
-    const { mon, receivePickMonInfo, close } = this.props
+    const { mon, updatePickMonInfo, close } = this.props
     const pickMonInfo = {
       quantity: 1,
       mixCols: [mon.tobe]
     }
-    receivePickMonInfo(pickMonInfo)
+    updatePickMonInfo(pickMonInfo)
+    // .then(() => {
+    //   close()
+    //   this.context.router.push(`/collection/${mon.tobe.userId}`)
+    // })
+    // updatePickMonInfo(pickMonInfo)
     close()
-    this.context.router.push(`/collection/${mon.tobe.userId}`)
+    setTimeout(() => this.context.router.push(`/collection/${mon.tobe.userId}`), 100)
+    // this.context.router.push(`/collection/${mon.tobe.userId}`)
   }
   render () {
-    const { mon, show, close, type, receivePickMonInfo, ...restProps } = this.props
+    const { mon, show, close, type, updatePickMonInfo, ...restProps } = this.props
     const tobeMon = mon.tobe
     const renderLevel = () => {
       if (mon.asis) {
@@ -135,8 +143,8 @@ MonModal.propTypes = {
   show: PropTypes.bool.isRequired,
   close: PropTypes.func,
   type: PropTypes.string,
-  receivePickMonInfo: PropTypes.func.isRequired,
-  location: PropTypes.object
+  location: PropTypes.object,
+  updatePickMonInfo: PropTypes.func.isRequired
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(MonModal)
