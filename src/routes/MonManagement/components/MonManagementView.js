@@ -8,6 +8,7 @@ import Mon from 'models/mon'
 
 import { attrs, generations } from 'constants/data'
 import { MON_IMAGE_ROOT } from 'constants/urls'
+import { getStandardCost } from 'constants/rules'
 
 import { showAlert, convertEmptyStringToNullInObj } from 'utils/commonUtil'
 
@@ -100,6 +101,11 @@ class MonManagementView extends React.Component {
     if (['hp', 'power', 'armor', 'sPower', 'sArmor', 'dex'].indexOf(id) > -1) {
       const { hp, power, armor, sPower, sArmor, dex } = newFormData
       const total = hp + power + armor + sPower + sArmor + dex
+      if (formData.grade) {
+        console.log('formData.grade', formData.grade)
+        const cost = getStandardCost(formData.grade, total)
+        newFormData = Object.assign({}, newFormData, { cost })
+      }
       newFormData = Object.assign({}, newFormData, { total })
     }
     this.setState({ formData: newFormData })

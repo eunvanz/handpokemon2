@@ -12,10 +12,10 @@ class UserRankingCard extends React.Component {
     return !is(fromJS(nextProps), fromJS(this.props)) || !is(fromJS(nextState), fromJS(this.state))
   }
   render () {
-    const { user, rank } = this.props
+    const { user, rank, isMyself } = this.props
     return (
       <div className='col-md-2 col-sm-3 col-xs-6'>
-        <div className='c-item'>
+        <div className='c-item' style={{ borderColor: isMyself ? colors.amber : '#e2e2e2' }}>
           <div style={Object.assign({}, levelBadgeStyle, { position: 'absolute', top: '0px', margin: '0px -1px', borderRadius: '0px 0px 2px 0px', backgroundColor: colors.lightBlue })}>{rank}위</div>
           <div className='ci-avatar'>
             <Img src={user.profileImage} />
@@ -36,7 +36,8 @@ UserRankingCard.contextTypes = {
 
 UserRankingCard.propTypes = {
   user: PropTypes.object.isRequired,
-  rank: PropTypes.number.isRequired
+  rank: PropTypes.number.isRequired,
+  isMyself: PropTypes.bool
 }
 
 export default UserRankingCard

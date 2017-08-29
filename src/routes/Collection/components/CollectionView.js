@@ -196,14 +196,14 @@ class CollectionView extends React.Component {
     const { filter } = this.state
     this._applyFilter(filter)
   }
-  _applyFilter (filter) {
+  _applyFilter (filter, colId) { // 두번째 파라미터는 옵션 (교배시 교배대상 첫번째 포켓몬 제외용)
     const { collections } = this.state
     const filteredCollections = collections.filter(col => {
       const mon = col.mon ? col.mon[col.monId] : col
       return filter.has[col.mon ? 'yes' : 'no'] &&
         filter.isEvolutable[(col.mon && col.mon[col.monId].evoLv !== 0 && (col.level >= col.mon[col.monId].evoLv)) ? 'yes' : 'no'] &&
         filter.grade[mon.grade] && filter.mainAttr[mon.mainAttr] &&
-        filter.subAttr[!mon.subAttr ? '없음' : mon.subAttr] && filter.cost[mon.cost] && filter.generation[mon.generation]
+        filter.subAttr[!mon.subAttr ? '없음' : mon.subAttr] && filter.cost[mon.cost] && filter.generation[mon.generation] && (colId ? col.id !== colId : true)
     })
     this.setState({ showFilterModal: false, filteredCollections })
   }
@@ -238,11 +238,13 @@ class CollectionView extends React.Component {
     this.setState({ filter: newFilter })
   }
   _initMixMode () {
+    const { filteredCollection } = this.state
+    const { pickMonInfo } = this.props
     const filter = Object.assign({}, this.state.filter, { has: { yes: true, no: false } })
     this.setState({
       filter
     })
-    this._applyFilter(filter)
+    this._applyFilter(filter, pickMonInfo.mixCols[0].id)
   }
   _handleOnSelectMon (col) {
     // 교배 후 상대 포켓몬 선택시

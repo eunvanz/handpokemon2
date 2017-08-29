@@ -187,6 +187,26 @@ export const getUserRanking = (firebase, type, page, prevPoint, prevKey) => {
   })
 }
 
+export const getUserRankingByUserId = (firebase, type, userId) => {
+  const orderByChild = type === 'collection' ? 'colPoint' : 'leaguePoint'
+  let ref = firebase.ref('users').orderByChild(orderByChild)
+  return ref.once('value')
+  .then(snapshot => {
+    let result = []
+    let userRank = 0
+    snapshot.forEach(child => {
+      const user = child.val()
+      user.id = child.key
+      result.push(user)
+    })
+    const reversed = _.reverse(result)
+    for (let i = 0; i < reversed.length; i++) {
+      if (reversed[i].id === userId) userRank = i + 1
+    }
+    return Promise.resolve(userRank)
+  })
+}
+
 export const signIn = (firebase, data) => {
   // return new Promise((resolve, reject) => {
   //   setTimeout(() => {

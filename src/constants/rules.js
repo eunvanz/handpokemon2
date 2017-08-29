@@ -56,3 +56,19 @@ export const getMixGrades = (mixCols) => {
     return ['b', 'r']
   }
 }
+
+export const getStandardCost = (grade, total) => {
+  let base = [180, 228, 276, 324, 372, 420, 468, 516, 564, 612, 660]
+  if (grade === 'r' || grade === 'sr') {
+    base = base.map(elem => elem + 20)
+  } else if (grade === 'e') {
+    base = base.map(elem => elem + 40)
+  } else if (grade === 'l') {
+    base = base.map(elem => elem + 60)
+  }
+  console.log('base', base)
+  for (let i = 0; i < base.length; i++) {
+    if (total <= base[i]) return i
+  }
+  return 10
+}
