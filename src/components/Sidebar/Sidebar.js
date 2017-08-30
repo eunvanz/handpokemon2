@@ -30,35 +30,40 @@ const mapDispatchToProps = {
   receiveCreditInfo
 }
 
-const timeouts = {}
-const intervals = {}
-
 class Sidebar extends React.Component {
   constructor (props) {
     super(props)
     this._refreshUserCredits = this._refreshUserCredits.bind(this)
     this._handleCredit = this._handleCredit.bind(this)
     this._increaseCredit = this._increaseCredit.bind(this)
+    this.state = {
+      pickCreditTimer: null,
+      battleCreditTimer: null,
+      adventureCreditTimer: null
+    }
+    this.timeouts = {}
+    this.intervals = {}
   }
   shouldComponentUpdate (nextProps, nextState) {
     return !is(fromJS(this.pros), fromJS(nextProps))
   }
   componentDidUpdate (prevProps, prevState) {
     const { user } = this.props
+    const { timeouts } = this
     if (!prevProps.user && user) { // user가 로그인 했을경우 크레딧을 리프레시해서 가져옴
       this._refreshUserCredits()
     } else if (prevProps.user && user) { // 크레딧에 변화가 있을 경우 다시 시간 계산해서 interval 및 timeout 실행
       if (prevProps.user.pickCredit !== user.pickCredit) {
         clearTimeout(timeouts.pick)
-        clearInterval(intervals.pick)
+        // clearInterval(intervals.pick)
         this._handleCredit(user, 'pick')
       } else if (prevProps.user.battleCredit !== user.battleCredit) {
         clearTimeout(timeouts.battle)
-        clearInterval(intervals.battle)
+        // clearInterval(intervals.battle)
         this._handleCredit(user, 'battle')
       } else if (prevProps.user.adventureCredit !== user.adventureCredit) {
         clearTimeout(timeouts.adventure)
-        clearInterval(intervals.adventure)
+        // clearInterval(intervals.adventure)
         this._handleCredit(user, 'adventure')
       }
     }
@@ -77,6 +82,7 @@ class Sidebar extends React.Component {
   _handleCredit (creditInfo, type) {
     const { pickCredit, lastPick, battleCredit, lastLeague, adventureCredit, lastAdventure } = creditInfo
     const { receiveCreditInfo } = this.props
+    const { timeouts } = this
     const handleByType = type => { // type = 'pick', 'battle', 'adventure'
       const currentTime = new Date().getTime()
       const interval = () => {
@@ -94,8 +100,10 @@ class Sidebar extends React.Component {
         else if (type === 'battle') return battleCredit
         else if (type === 'adventure') return adventureCredit
       }
-      if (credit() === 0) this._startCreditTimer(type, interval()) // 크레딧이 0인경우 타이머 실행
-      else if (credit() < max()) { // 크레딧이 1부터 max사이인 경우 state에 세팅 후 interval후에 크레딧 증가로직 시작
+      if (credit() === 0) {
+        receiveCreditInfo({ [`${type}Credit`]: 0 })
+        this._startCreditTimer(type, interval()) // 크레딧이 0인경우 타이머 실행
+      } else if (credit() < max()) { // 크레딧이 1부터 max사이인 경우 state에 세팅 후 interval후에 크레딧 증가로직 시작
         receiveCreditInfo({ [`${type}CreditTimer`]: null, [`${type}Credit`]: credit() })
         timeouts[type] = setTimeout(() => this._increaseCredit(type, credit()), interval())
       } else receiveCreditInfo({ [`${type}CreditTimer`]: null, [`${type}Credit`]: credit() }) // 크레딧이 max인 경우는 그냥 세팅
@@ -103,6 +111,10 @@ class Sidebar extends React.Component {
     handleByType(type)
   }
   _increaseCredit (type, asisCredit) { // UI상으로면 크레딧을 업데이트
+    const { intervals } = this
+    console.log('intervals[type]', intervals[type])
+    if (intervals[type]) clearInterval(intervals[type])
+    console.log('intervals[type]', intervals[type])
     const { receiveCreditInfo } = this.props
     let interval
     let max
@@ -118,6 +130,8 @@ class Sidebar extends React.Component {
     }
     let i = 1
     const increaseStateCredit = () => {
+      console.log('i', i)
+      console.log('asisCredit', asisCredit)
       receiveCreditInfo({ [`${type}Credit`]: asisCredit + i })
       i++
     }
@@ -128,21 +142,21 @@ class Sidebar extends React.Component {
     }, interval)
   }
   _startCreditTimer (type, interval) {
-    const { receiveCreditInfo } = this.props
     const timer = setInterval(() => {
       const timeString = convertTimeToMMSS(interval)
-      receiveCreditInfo({ [`${type}CreditTimer`]: timeString })
+      this.setState({ [`${type}CreditTimer`]: timeString })
       interval = interval - 1000
       if (interval < 0) {
         setTimeout(() => this._increaseCredit(type, 0), interval) // 1초에서 0초로 바뀔 때 화면의 크레딧을 1로 만듦
-        receiveCreditInfo({ [`${type}CreditTimer`]: null })
+        this.setState({ [`${type}CreditTimer`]: null })
         clearInterval(timer)
       }
     }, 1000)
   }
   render () {
     const { user, auth } = this.props
-    const { pickCreditTimer, battleCreditTimer, adventureCreditTimer, pickCredit, battleCredit, adventureCredit } = this.props.creditInfo
+    const { pickCreditTimer, battleCreditTimer, adventureCreditTimer } = this.state
+    const { pickCredit, battleCredit, adventureCredit } = this.props.creditInfo
     return (
       <aside id='sidebar' className='sidebar c-overflow mCustomScrollbar _mCS_1 mCS-autoHide'
         style={{ overflow: 'visible' }}>

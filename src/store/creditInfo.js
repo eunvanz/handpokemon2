@@ -4,9 +4,6 @@
 export const RECEIVE_CREDIT_INFO = 'RECEIVE_CREDIT_INFO'
 
 const initialState = {
-  pickCreditTimer: null,
-  battleCreditTimer: null,
-  adventureCreditTimer: null,
   pickCredit: null,
   battleCredit: null,
   adventureCredit: null

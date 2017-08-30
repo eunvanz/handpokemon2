@@ -38,6 +38,7 @@ class PickDistrictView extends React.Component {
   }
   render () {
     const { creditInfo } = this.props
+    console.log('creditInfo @ pickDistrictView', creditInfo)
     const renderAttrBadges = attrs => {
       return attrs.map(attr =>
         <AttrBadge
@@ -72,7 +73,7 @@ class PickDistrictView extends React.Component {
                 {
                   creditInfo && creditInfo.pickCredit < 1 &&
                   <div className='text-center c-gray f-13'>
-                    <WarningText text={`${creditInfo.pickCreditTimer} 후에 채집 가능`} />
+                    <WarningText text='채집 크레딧이 부족합니다.' />
                   </div>
                 }
               </div>
