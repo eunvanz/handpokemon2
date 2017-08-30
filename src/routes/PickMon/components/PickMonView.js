@@ -12,7 +12,7 @@ import Button from 'components/Button'
 
 import { getPickMons, getNextMons } from 'services/MonService'
 import { postCollection } from 'services/CollectionService'
-import { decreaseCredit } from 'services/UserService'
+import { decreaseCredit, refreshUserCredits } from 'services/UserService'
 
 import { PICK_MON_ROULETTE_DELAY, getMixGrades } from 'constants/rules'
 import { attrs as allAttrs } from 'constants/data'
@@ -91,7 +91,10 @@ class PickMonView extends React.Component {
       for (let i = 0; i < quantity; i++) {
         pickFuncArr.push(getPickMons(firebase, attrs, grades))
       }
-      return decreaseCredit(firebase, auth.uid, quantity, 'pick')
+      return refreshUserCredits(firebase, auth.uid, user)
+      .then(() => {
+        return decreaseCredit(firebase, auth.uid, quantity, 'pick')
+      })
       .then(() => {
         return Promise.all(pickFuncArr)
       })

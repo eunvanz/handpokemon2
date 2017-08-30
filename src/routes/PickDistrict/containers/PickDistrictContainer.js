@@ -1,4 +1,5 @@
 import { connect } from 'react-redux'
+import { firebaseConnect } from 'react-redux-firebase'
 
 import PickDistrictView from '../components/PickDistrictView'
 
@@ -13,8 +14,12 @@ const mapDispatchToProps = {
 const mapStateToProps = (state) => {
   return {
     ...getAuthUserFromFirebase(state),
-    pickMonInfo: state.pickMonInfo
+    pickMonInfo: state.pickMonInfo,
+    creditInfo: state.creditInfo
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(PickDistrictView)
+const wrappedPickDistrictView = firebaseConnect([
+])(PickDistrictView)
+
+export default connect(mapStateToProps, mapDispatchToProps)(wrappedPickDistrictView)

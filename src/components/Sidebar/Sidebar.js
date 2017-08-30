@@ -13,57 +13,62 @@ import { PICK_CREDIT_REFRESH, BATTLE_CREDIT_REFRESH, ADVENTURE_CREDIT_REFRESH,
 
 import Badge from 'components/Badge'
 
-import { refreshUserCredits, increaseCredit } from 'services/UserService'
+import { refreshUserCredits } from 'services/UserService'
 
 import { convertTimeToMMSS, getAuthUserFromFirebase } from 'utils/commonUtil'
 
+import { receiveCreditInfo } from 'store/creditInfo'
+
 const mapStateToProps = (state) => {
   return {
-    ...getAuthUserFromFirebase(state)
+    ...getAuthUserFromFirebase(state),
+    creditInfo: state.creditInfo
   }
 }
 
 const mapDispatchToProps = {
+  receiveCreditInfo
 }
 
 const timeouts = {}
+const intervals = {}
 
 class Sidebar extends React.Component {
   constructor (props) {
     super(props)
-    this.state = {
-      pickCreditTimer: null,
-      battleCreditTimer: null,
-      adventureCreditTimer: null
-    }
     this._refreshUserCredits = this._refreshUserCredits.bind(this)
     this._handleCredit = this._handleCredit.bind(this)
     this._increaseCredit = this._increaseCredit.bind(this)
   }
   shouldComponentUpdate (nextProps, nextState) {
-    return !is(fromJS(this.pros), fromJS(nextProps)) || !is(fromJS(this.state), fromJS(nextState))
+    return !is(fromJS(this.pros), fromJS(nextProps))
   }
   componentDidUpdate (prevProps, prevState) {
     const { user } = this.props
-    if (!prevProps.user && user) {
+    if (!prevProps.user && user) { // user가 로그인 했을경우 크레딧을 리프레시해서 가져옴
       this._refreshUserCredits()
-    } else if (prevProps.user && user) {
+    } else if (prevProps.user && user) { // 크레딧에 변화가 있을 경우 다시 시간 계산해서 interval 및 timeout 실행
       if (prevProps.user.pickCredit !== user.pickCredit) {
         clearTimeout(timeouts.pick)
+        clearInterval(intervals.pick)
         this._handleCredit(user, 'pick')
       } else if (prevProps.user.battleCredit !== user.battleCredit) {
         clearTimeout(timeouts.battle)
+        clearInterval(intervals.battle)
         this._handleCredit(user, 'battle')
       } else if (prevProps.user.adventureCredit !== user.adventureCredit) {
         clearTimeout(timeouts.adventure)
+        clearInterval(intervals.adventure)
         this._handleCredit(user, 'adventure')
       }
     }
   }
   _refreshUserCredits () {
-    const { firebase, auth, user } = this.props
+    const { firebase, auth, user, receiveCreditInfo } = this.props
     refreshUserCredits(firebase, auth.uid, user)
     .then(creditInfo => {
+      const { pickCredit, battleCredit, adventureCredit } = creditInfo
+      receiveCreditInfo({ pickCredit, battleCredit, adventureCredit })
       this._handleCredit(creditInfo, 'pick')
       this._handleCredit(creditInfo, 'battle')
       this._handleCredit(creditInfo, 'adventure')
@@ -71,6 +76,7 @@ class Sidebar extends React.Component {
   }
   _handleCredit (creditInfo, type) {
     const { pickCredit, lastPick, battleCredit, lastLeague, adventureCredit, lastAdventure } = creditInfo
+    const { receiveCreditInfo } = this.props
     const handleByType = type => { // type = 'pick', 'battle', 'adventure'
       const currentTime = new Date().getTime()
       const interval = () => {
@@ -88,33 +94,55 @@ class Sidebar extends React.Component {
         else if (type === 'battle') return battleCredit
         else if (type === 'adventure') return adventureCredit
       }
-      if (credit() === 0) this._startCreditTimer(type, interval())
-      else if (credit() < max()) {
-        this.setState({ [`${type}CreditTimer`]: null })
-        timeouts[type] = setTimeout(() => this._increaseCredit(type), interval())
-      } else this.setState({ [`${type}CreditTimer`]: null })
+      if (credit() === 0) this._startCreditTimer(type, interval()) // 크레딧이 0인경우 타이머 실행
+      else if (credit() < max()) { // 크레딧이 1부터 max사이인 경우 state에 세팅 후 interval후에 크레딧 증가로직 시작
+        receiveCreditInfo({ [`${type}CreditTimer`]: null, [`${type}Credit`]: credit() })
+        timeouts[type] = setTimeout(() => this._increaseCredit(type, credit()), interval())
+      } else receiveCreditInfo({ [`${type}CreditTimer`]: null, [`${type}Credit`]: credit() }) // 크레딧이 max인 경우는 그냥 세팅
     }
     handleByType(type)
   }
-  _increaseCredit (type) {
-    const { firebase, auth } = this.props
-    increaseCredit(firebase, auth.uid, 1, type)
-    .catch(() => {})
+  _increaseCredit (type, asisCredit) { // UI상으로면 크레딧을 업데이트
+    const { receiveCreditInfo } = this.props
+    let interval
+    let max
+    if (type === 'pick') {
+      interval = PICK_CREDIT_REFRESH
+      max = MAX_PICK_CREDIT
+    } else if (type === 'battle') {
+      interval = BATTLE_CREDIT_REFRESH
+      max = MAX_BATTLE_CREDIT
+    } else {
+      interval = ADVENTURE_CREDIT_REFRESH
+      max = MAX_ADVENTURE_CREDIT
+    }
+    let i = 1
+    const increaseStateCredit = () => {
+      receiveCreditInfo({ [`${type}Credit`]: asisCredit + i })
+      i++
+    }
+    increaseStateCredit()
+    intervals[type] = setInterval(() => {
+      increaseStateCredit() // 정해진 interval로 1씩 증가시킴
+      if (max < asisCredit + i) clearInterval(intervals[type]) // max값에 도달했을 때 timer 중단
+    }, interval)
   }
   _startCreditTimer (type, interval) {
+    const { receiveCreditInfo } = this.props
     const timer = setInterval(() => {
       const timeString = convertTimeToMMSS(interval)
-      this.setState({ [`${type}CreditTimer`]: timeString })
+      receiveCreditInfo({ [`${type}CreditTimer`]: timeString })
       interval = interval - 1000
-      if (interval < 1000) {
-        setTimeout(() => this._increaseCredit(type), interval)
+      if (interval < 0) {
+        setTimeout(() => this._increaseCredit(type, 0), interval) // 1초에서 0초로 바뀔 때 화면의 크레딧을 1로 만듦
+        receiveCreditInfo({ [`${type}CreditTimer`]: null })
         clearInterval(timer)
       }
     }, 1000)
   }
   render () {
     const { user, auth } = this.props
-    const { pickCreditTimer, battleCreditTimer, adventureCreditTimer } = this.state
+    const { pickCreditTimer, battleCreditTimer, adventureCreditTimer, pickCredit, battleCredit, adventureCredit } = this.props.creditInfo
     return (
       <aside id='sidebar' className='sidebar c-overflow mCustomScrollbar _mCS_1 mCS-autoHide'
         style={{ overflow: 'visible' }}>
@@ -156,8 +184,8 @@ class Sidebar extends React.Component {
                 <Link to='/pick-district' onClick={() => $('.ma-backdrop').click()}>
                   <i className='fa fa-paw' style={{ fontSize: '22px' }} /> 포켓몬 채집
                   {
-                    user && (user.pickCredit !== 0 || pickCreditTimer) &&
-                    <Badge color={pickCreditTimer ? 'red' : 'lightblue'} text={`${pickCreditTimer || user.pickCredit}`} />
+                    user && (pickCredit !== 0 || pickCreditTimer) &&
+                    <Badge color={pickCreditTimer ? 'red' : 'lightblue'} text={`${pickCreditTimer || pickCredit}`} />
                   }
                 </Link>
               </li>
@@ -165,8 +193,8 @@ class Sidebar extends React.Component {
                 <Link to='/'>
                   <i className='fa fa-map-o' style={{ fontSize: '22px' }} /> 포켓몬 탐험
                   {
-                    user && (user.adventureCredit !== 0 || adventureCreditTimer) &&
-                    <Badge color={adventureCreditTimer ? 'red' : 'lightblue'} text={`${adventureCreditTimer || user.adventureCredit}`} />
+                    user && (adventureCredit !== 0 || adventureCreditTimer) &&
+                    <Badge color={adventureCreditTimer ? 'red' : 'lightblue'} text={`${adventureCreditTimer || adventureCredit}`} />
                   }
                 </Link>
               </li>
@@ -174,8 +202,8 @@ class Sidebar extends React.Component {
                 <Link to='/'>
                   <i className='fa fa-gamepad' style={{ fontSize: '22px' }} /> 포켓몬 시합
                   {
-                    user && (user.battleCredit !== 0 || battleCreditTimer) &&
-                    <Badge color={battleCreditTimer ? 'red' : 'lightblue'} text={`${battleCreditTimer || user.battleCredit}`} />
+                    user && (battleCredit !== 0 || battleCreditTimer) &&
+                    <Badge color={battleCreditTimer ? 'red' : 'lightblue'} text={`${battleCreditTimer || battleCredit}`} />
                   }
                 </Link>
               </li>
@@ -227,7 +255,9 @@ Sidebar.contextTypes = {
 Sidebar.propTypes = {
   user: PropTypes.object,
   firebase: PropTypes.object.isRequired,
-  auth: PropTypes.object
+  auth: PropTypes.object,
+  creditInfo: PropTypes.object,
+  receiveCreditInfo: PropTypes.func.isRequired
 }
 
 const wrappedSidebar = firebaseConnect([

@@ -28,7 +28,7 @@ class PieChart extends React.Component {
     return !is(fromJS(nextProps), fromJS(this.props)) || !is(fromJS(nextState), fromJS(this.state))
   }
   render () {
-    const { sub, total, label, ...rest } = this.props
+    const { sub, total, label, trackColor, barColor, ...rest } = this.props
     return (
       <div className='col-md-2 col-sm-3 col-xs-6 text-center m-b-30' {...rest}>
         <div className='easy-pie sub-pie-1' id={this.state.key} data-percent={sub * 100 / total}>

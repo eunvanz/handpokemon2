@@ -12,13 +12,16 @@ import { districts } from 'constants/data'
 
 import { isScreenSize } from 'utils/commonUtil'
 
+import { refreshUserCredits } from 'services/UserService'
+
 class PickDistrictView extends React.Component {
   constructor (props) {
     super(props)
     this._handleOnClickPick = this._handleOnClickPick.bind(this)
   }
   componentDidMount () {
-    const { user } = this.props
+    const { user, firebase, auth } = this.props
+    refreshUserCredits(firebase, auth.uid, user)
     if (!user) this.context.router.push('sign-in')
   }
   shouldComponentUpdate (nextProps, nextState) {
@@ -34,7 +37,7 @@ class PickDistrictView extends React.Component {
     this.context.router.push(`pick-mon?f=${keygen._()}`)
   }
   render () {
-    const { user } = this.props
+    const { creditInfo } = this.props
     const renderAttrBadges = attrs => {
       return attrs.map(attr =>
         <AttrBadge
@@ -56,20 +59,20 @@ class PickDistrictView extends React.Component {
                   {district.name === '중앙던전' ? '모든 속성의 포켓몬' : renderAttrBadges(district.attrs)}
                 </p>
                 {
-                  user && user.pickCredit > 0 &&
+                  creditInfo && creditInfo.pickCredit > 0 &&
                   <div className='text-center'>
                     <Button className='m-r-5' text='채집 X 1' onClick={() => this._handleOnClickPick(district, 1)} />
                     {
-                      user.pickCredit > 1 &&
-                      <Button text={`채집 X ${user.pickCredit > 6 ? 6 : user.pickCredit}`}
-                        onClick={() => this._handleOnClickPick(district, user.pickCredit > 6 ? 6 : user.pickCredit)} />
+                      creditInfo.pickCredit > 1 &&
+                      <Button text={`채집 X ${creditInfo.pickCredit > 6 ? 6 : creditInfo.pickCredit}`}
+                        onClick={() => this._handleOnClickPick(district, creditInfo.pickCredit > 6 ? 6 : creditInfo.pickCredit)} />
                     }
                   </div>
                 }
                 {
-                  user && user.pickCredit < 1 &&
+                  creditInfo && creditInfo.pickCredit < 1 &&
                   <div className='text-center c-gray f-13'>
-                    <WarningText text='채집크레딧이 부족합니다.' />
+                    <WarningText text={`${creditInfo.pickCreditTimer} 후에 채집 가능`} />
                   </div>
                 }
               </div>
@@ -95,7 +98,10 @@ PickDistrictView.contextTypes = {
 
 PickDistrictView.propTypes = {
   receivePickMonInfo: PropTypes.func.isRequired,
-  user: PropTypes.object
+  user: PropTypes.object,
+  auth: PropTypes.object,
+  firebase: PropTypes.object.isRequired,
+  creditInfo: PropTypes.object
 }
 
 export default PickDistrictView
