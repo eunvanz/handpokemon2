@@ -23,7 +23,9 @@ const mapDispatchToProps = dispatch => {
 }
 
 const mapStateToProps = (state) => {
-  return {}
+  return {
+    pickMonInfo: state.pickMonInfo
+  }
 }
 
 class MonModal extends React.Component {
@@ -46,7 +48,9 @@ class MonModal extends React.Component {
     }
     updatePickMonInfo(pickMonInfo)
     close()
-    this.context.router.push(`/pick-mon?f=${keygen._()}`)
+    setTimeout(() => {
+      this.context.router.push(`/pick-mon?f=${keygen._()}`)
+    }, 200)
   }
   _handleOnClickMix () {
     const { mon, updatePickMonInfo, close } = this.props
@@ -55,14 +59,10 @@ class MonModal extends React.Component {
       mixCols: [mon.tobe]
     }
     updatePickMonInfo(pickMonInfo)
-    // .then(() => {
-    //   close()
-    //   this.context.router.push(`/collection/${mon.tobe.userId}`)
-    // })
-    // updatePickMonInfo(pickMonInfo)
     close()
-    setTimeout(() => this.context.router.push(`/collection/${mon.tobe.userId}`), 100)
-    // this.context.router.push(`/collection/${mon.tobe.userId}`)
+    setTimeout(() => {
+      this.context.router.push(`/collection/${mon.tobe.userId}`)
+    }, 200)
   }
   render () {
     const { mon, show, close, type, updatePickMonInfo, ...restProps } = this.props
@@ -144,7 +144,8 @@ MonModal.propTypes = {
   close: PropTypes.func,
   type: PropTypes.string,
   location: PropTypes.object,
-  updatePickMonInfo: PropTypes.func.isRequired
+  updatePickMonInfo: PropTypes.func.isRequired,
+  pickMonInfo: PropTypes.object
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(MonModal)

@@ -25,7 +25,7 @@ export const grades = [
   'b', 'r', 's', 'sr', 'e', 'l'
 ]
 
-export const generations = ['1', '2', '3', '4', '5', '6']
+export const generations = ['1', '2', '3', '4', '5', '6', '7']
 
 export const districts = [
   {

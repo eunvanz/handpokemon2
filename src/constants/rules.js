@@ -46,11 +46,14 @@ export const MAX_BATTLE_CREDIT = 12
 export const MAX_ADVENTURE_CREDIT = 10
 
 export const getMixGrades = (mixCols) => {
-  if (mixCols[0].mon[mixCols[0].monId].grade === mixCols[0].mon[mixCols[0].monId].grade === 'r') {
+  if (mixCols[0].mon[mixCols[0].monId].grade === mixCols[0].mon[mixCols[0].monId].grade &&
+    mixCols[0].mon[mixCols[0].monId].grade === 'r') {
     return ['b', 'r', 'e']
-  } else if (mixCols[0].mon[mixCols[0].monId].grade === mixCols[0].mon[mixCols[0].monId].grade === 'e') {
+  } else if (mixCols[0].mon[mixCols[0].monId].grade === mixCols[0].mon[mixCols[0].monId].grade &&
+    mixCols[0].mon[mixCols[0].monId].grade === 'e') {
     return ['r', 'e', 'l']
-  } else if (mixCols[0].mon[mixCols[0].monId].grade === mixCols[0].mon[mixCols[0].monId].grade === 'l') {
+  } else if (mixCols[0].mon[mixCols[0].monId].grade === mixCols[0].mon[mixCols[0].monId].grade &&
+    mixCols[0].mon[mixCols[0].monId].grade === 'l') {
     return ['l']
   } else {
     return ['b', 'r']

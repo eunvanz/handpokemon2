@@ -29,7 +29,7 @@ class CollectionView extends React.Component {
       mode: 'view',
       collections: null,
       filteredCollections: null,
-      isMixMode: false,
+      isInitializedMixMode: false,
       openFloatMenu: false,
       showFilterModal: false,
       quantity: null,
@@ -136,22 +136,48 @@ class CollectionView extends React.Component {
   componentDidMount () {
     const { pickMonInfo } = this.props
     this._initCollectionState()
-    if (pickMonInfo && pickMonInfo.mixCols) this.setState({ mode: 'mix' })
+    .then(() => {
+      if (pickMonInfo && pickMonInfo.mixCols) this.setState({ mode: 'mix' })
+    })
   }
   shouldComponentUpdate (nextProps, nextState) {
     return !is(fromJS(nextProps), fromJS(this.props)) || !is(fromJS(nextState), fromJS(this.state))
   }
   componentWillUpdate (nextProps, nextState) {
-    if (nextProps.pickMonInfo && nextProps.pickMonInfo.mixCols.length === 1) {
+    if (nextProps.pickMonInfo && nextProps.pickMonInfo.mixCols && nextProps.pickMonInfo.mixCols.length === 1) {
       this.setState({ mode: 'mix' })
     }
   }
   componentDidUpdate (prevProps, prevState) {
-    if (!fromJS(prevProps.mons).equals(fromJS(this.props.mons))) {
+    if (!this.state.collections || !fromJS(prevProps.mons).equals(fromJS(this.props.mons))) {
       this._initCollectionState()
     }
-    if (this.props.pickMonInfo && this.props.pickMonInfo.mixCols.length === 1) {
-      this._initMixMode()
+    if (!this.state.isInitializedMixMode && this.props.pickMonInfo && this.props.pickMonInfo.mixCols && this.props.pickMonInfo.mixCols.length === 1) {
+      if (!this.state.collections) {
+        this._initCollectionState().then(() => this._initMixMode())
+      } else {
+        this._initMixMode()
+      }
+    }
+    // 교배시 두번째 대상 포켓몬까지 선택한 경우
+    if (this.props.pickMonInfo && this.props.pickMonInfo.mixCols &&
+      this.props.pickMonInfo.mixCols.length === 2 && prevProps.pickMonInfo.mixCols.length === 1) {
+      const { receivePickMonInfo, pickMonInfo } = this.props
+      const { mixCols } = pickMonInfo
+      const asisMixCols = prevProps.pickMonInfo.mixCols
+      showAlert({
+        title: `<span class='c-lightblue f-700'>${mixCols[0].mon[mixCols[0].monId].name}</span>와(과) <span class='c-lightblue f-700'>${mixCols[1].mon[mixCols[1].monId].name}</span>을(를) 교배 하시겠습니까?`,
+        text: '교배하는 포켓몬의 레벨이 1 하락하고, 레벨 1의 포켓몬의 경우 영원히 사라집니다.',
+        showCancelButton: true,
+        confirmButtonText: '예',
+        cancelButtonText: '아니오'
+      })
+      .then(() => {
+        this.context.router.push(`/pick-mon`)
+      })
+      .catch(() => {
+        receivePickMonInfo(Object.assign({}, pickMonInfo, { mixCols: asisMixCols }))
+      })
     }
   }
   componentWillUnmount () {
@@ -170,7 +196,7 @@ class CollectionView extends React.Component {
       e: { has: 0, total: 0 },
       l: { has: 0, total: 0 }
     }
-    getCollectionsByUserId(firebase, userId)
+    return getCollectionsByUserId(firebase, userId)
     .then(cols => {
       mons.forEach(mon => {
         const monId = mon.id
@@ -187,6 +213,7 @@ class CollectionView extends React.Component {
       const orederdCollections = _.orderBy(collections, (e) => { return e.no || e.mon[e.monId].no }, ['asc'])
       console.log('quantity', quantity)
       this.setState({ collections: orederdCollections, filteredCollections: orederdCollections, quantity })
+      return Promise.resolve()
     })
   }
   _handleOnClickFilter () {
@@ -238,11 +265,11 @@ class CollectionView extends React.Component {
     this.setState({ filter: newFilter })
   }
   _initMixMode () {
-    const { filteredCollection } = this.state
     const { pickMonInfo } = this.props
     const filter = Object.assign({}, this.state.filter, { has: { yes: true, no: false } })
     this.setState({
-      filter
+      filter,
+      isInitializedMixMode: true
     })
     this._applyFilter(filter, pickMonInfo.mixCols[0].id)
   }
@@ -259,26 +286,14 @@ class CollectionView extends React.Component {
     console.log('mixCols', mixCols)
     const newPickMonInfo = Object.assign({}, pickMonInfo, { mixCols })
     receivePickMonInfo(newPickMonInfo)
-    showAlert({
-      title: `<span class='c-lightblue f-700'>${mixCols[0].mon[mixCols[0].monId].name}</span>와(과) <span class='c-lightblue f-700'>${mixCols[1].mon[mixCols[1].monId].name}</span>을(를) 교배 하시겠습니까?`,
-      text: '교배하는 포켓몬의 레벨이 1 하락하고, 레벨 1의 포켓몬의 경우 영원히 사라집니다.',
-      showCancelButton: true,
-      confirmButtonText: '예',
-      cancelButtonText: '아니오'
-    })
-    .then(() => {
-      this.context.router.push(`/pick-mon`)
-    })
-    .catch(() => {
-      receivePickMonInfo(Object.assign({}, pickMonInfo, { mixCols: asisMixCols }))
-    })
   }
   _cancelMix () {
     this.props.receivePickMonInfo(null)
     const filter = Object.assign({}, this.state.filter, { has: { yes: true, no: true } })
     this.setState({
       filter,
-      mode: 'view'
+      mode: 'view',
+      isInitializedMixMode: false
     })
     this._applyFilter(filter)
   }

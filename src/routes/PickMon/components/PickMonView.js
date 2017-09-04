@@ -134,6 +134,7 @@ class PickMonView extends React.Component {
         })
       })
     } else if (mixCols) { // 교배일때
+      console.log('getMixGrades', getMixGrades(mixCols))
       getPickMons(firebase, allAttrs, getMixGrades(mixCols), mixCols) // 마지막 파라미터는 특정 포켓몬 교배 처리를 위함
       .then(picks => {
         const pickedIdx = _.random(0, picks.length - 1)
