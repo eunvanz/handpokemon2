@@ -25,12 +25,14 @@ export function clearPickMonInfo (pickMonInfo = null) {
 //   return (pickMonInfo) => dispatch(receivePickMonInfo(pickMonInfo))
 // }
 
-// export const updatePickMonInfo = (pickMonInfo = null) => {
-//   return dispatch => {
-//     console.log('dispatch', dispatch)
-//     return dispatch(receivePickMonInfo(pickMonInfo))
-//   }
-// }
+export const updatePickMonInfo = (pickMonInfo = null) => {
+  return dispatch => {
+    return new Promise(resolve => {
+      dispatch(receivePickMonInfo(pickMonInfo))
+      resolve()
+    })
+  }
+}
 
 // ------------------------------------
 // Reducer

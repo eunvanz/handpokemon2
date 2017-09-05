@@ -182,17 +182,21 @@ class PickMonView extends React.Component {
     }
   }
   _handleOnClickContinue () {
-    const { pickMonInfo, user, receivePickMonInfo } = this.props
+    const { pickMonInfo, user, updatePickMonInfo } = this.props
     this.setState({ multiPicks: null })
+    let pickMonInfoUpdater = () => Promise.resolve()
     if (this.state.mode === 'multi') {
       const newPickMonInfo = {
         quantity: user.pickCredit < pickMonInfo.quantity ? user.pickCredit : pickMonInfo.quantity,
         attrs: pickMonInfo.attrs,
         grades: ['b']
       }
-      receivePickMonInfo(newPickMonInfo)
+      pickMonInfoUpdater = () => updatePickMonInfo(newPickMonInfo)
     }
-    this.context.router.push(`pick-mon?f=${keygen._()}`)
+    pickMonInfoUpdater()
+    .then(() => {
+      this.context.router.push(`pick-mon?f=${keygen._()}`)
+    })
   }
   render () {
     const { mode } = this.state
@@ -290,7 +294,7 @@ PickMonView.propTypes = {
   user: PropTypes.object,
   auth: PropTypes.object,
   location: PropTypes.object,
-  receivePickMonInfo: PropTypes.func.isRequired,
+  updatePickMonInfo: PropTypes.func.isRequired,
   clearPickMonInfo: PropTypes.func.isRequired
 }
 

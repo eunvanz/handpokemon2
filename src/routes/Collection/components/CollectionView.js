@@ -162,7 +162,7 @@ class CollectionView extends React.Component {
     // 교배시 두번째 대상 포켓몬까지 선택한 경우
     if (this.props.pickMonInfo && this.props.pickMonInfo.mixCols &&
       this.props.pickMonInfo.mixCols.length === 2 && prevProps.pickMonInfo.mixCols.length === 1) {
-      const { receivePickMonInfo, pickMonInfo } = this.props
+      const { updatePickMonInfo, pickMonInfo } = this.props
       const { mixCols } = pickMonInfo
       const asisMixCols = prevProps.pickMonInfo.mixCols
       showAlert({
@@ -176,13 +176,13 @@ class CollectionView extends React.Component {
         this.context.router.push(`/pick-mon`)
       })
       .catch(() => {
-        receivePickMonInfo(Object.assign({}, pickMonInfo, { mixCols: asisMixCols }))
+        updatePickMonInfo(Object.assign({}, pickMonInfo, { mixCols: asisMixCols }))
       })
     }
   }
   componentWillUnmount () {
-    const { pickMonInfo, receivePickMonInfo } = this.props
-    if (pickMonInfo && pickMonInfo.mixCols && pickMonInfo.mixCols.length === 1) receivePickMonInfo(null)
+    const { pickMonInfo, updatePickMonInfo } = this.props
+    if (pickMonInfo && pickMonInfo.mixCols && pickMonInfo.mixCols.length === 1) updatePickMonInfo(null)
   }
   _initCollectionState () {
     const { params, firebase, mons } = this.props
@@ -276,7 +276,7 @@ class CollectionView extends React.Component {
   _handleOnSelectMon (col) {
     // 교배 후 상대 포켓몬 선택시
     console.log('col', col)
-    const { pickMonInfo, receivePickMonInfo } = this.props
+    const { pickMonInfo, updatePickMonInfo } = this.props
     if (col.id === pickMonInfo.mixCols[0].id) {
       showAlert('같은 포켓몬은 선택할 수 없습니다.')
       return false
@@ -285,10 +285,10 @@ class CollectionView extends React.Component {
     const mixCols = _.concat(asisMixCols, col)
     console.log('mixCols', mixCols)
     const newPickMonInfo = Object.assign({}, pickMonInfo, { mixCols })
-    receivePickMonInfo(newPickMonInfo)
+    updatePickMonInfo(newPickMonInfo)
   }
   _cancelMix () {
-    this.props.receivePickMonInfo(null)
+    this.props.updatePickMonInfo(null)
     const filter = Object.assign({}, this.state.filter, { has: { yes: true, no: true } })
     this.setState({
       filter,
@@ -530,7 +530,7 @@ class CollectionView extends React.Component {
         return (<div>
           <h2><span className='c-lightblue f-700'>{pickMonInfo.mixCols[0].mon[pickMonInfo.mixCols[0].monId].name}</span>와(과) 교배할 포켓몬을 선택해주세요.</h2>
           <ul className='actions' style={{ right: '20px' }}>
-            <li><Button icon='zmdi zmdi-long-arrow-left' text='취소' link onClick={this._cancelMix} /></li>
+            <li><Button icon='zmdi zmdi-close' text='취소' link onClick={this._cancelMix} /></li>
           </ul>
         </div>)
       }
@@ -561,7 +561,7 @@ CollectionView.propTypes = {
   auth: PropTypes.object,
   user: PropTypes.object,
   mons: PropTypes.array,
-  receivePickMonInfo: PropTypes.func.isRequired,
+  updatePickMonInfo: PropTypes.func.isRequired,
   pickMonInfo: PropTypes.object,
   showUserModal: PropTypes.func.isRequired,
   userModal: PropTypes.object.isRequired

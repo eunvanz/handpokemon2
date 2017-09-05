@@ -33,8 +33,10 @@ class PickDistrictView extends React.Component {
       attrs: district.attrs,
       grades: ['b']
     }
-    this.props.receivePickMonInfo(pickMonInfo)
-    this.context.router.push(`pick-mon?f=${keygen._()}`)
+    this.props.updatePickMonInfo(pickMonInfo)
+    .then(() => {
+      this.context.router.push(`pick-mon?f=${keygen._()}`)
+    })
   }
   render () {
     const { creditInfo } = this.props
@@ -98,7 +100,7 @@ PickDistrictView.contextTypes = {
 }
 
 PickDistrictView.propTypes = {
-  receivePickMonInfo: PropTypes.func.isRequired,
+  updatePickMonInfo: PropTypes.func.isRequired,
   user: PropTypes.object,
   auth: PropTypes.object,
   firebase: PropTypes.object.isRequired,

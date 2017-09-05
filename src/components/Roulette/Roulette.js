@@ -11,12 +11,14 @@ import LabelBadge from 'components/LabelBadge'
 
 import { colors } from 'constants/colors'
 
-import { receivePickMonInfo } from 'store/pickMonInfo'
+import { updatePickMonInfo } from 'store/pickMonInfo'
 
 import bg from './assets/unloader.png'
 
-const mapDispatchToProps = {
-  receivePickMonInfo
+const mapDispatchToProps = dispatch => {
+  return {
+    updatePickMonInfo: pickMonInfo => dispatch(updatePickMonInfo(pickMonInfo))
+  }
 }
 
 const mapStateToProps = (state) => {
@@ -58,14 +60,26 @@ class Roulette extends React.Component {
     this._startRoulette()
   }
   _handleOnClickEvolution (mon) {
-    const { receivePickMonInfo } = this.props
+    const { updatePickMonInfo } = this.props
     const pickMonInfo = {
       quantity: 1,
       evoluteCol: mon
     }
-    receivePickMonInfo(pickMonInfo)
-    close()
-    this.context.router.push(`pick-mon?f=${keygen._()}`)
+    updatePickMonInfo(pickMonInfo)
+    .then(() => {
+      this.context.router.push(`pick-mon?f=${keygen._()}`)
+    })
+  }
+  _handleOnClickMix (mon) {
+    const { updatePickMonInfo } = this.props
+    const pickMonInfo = {
+      quantity: 1,
+      mixCols: [mon]
+    }
+    updatePickMonInfo(pickMonInfo)
+    .then(() => {
+      this.context.router.push(`/collection/${mon.userId}`)
+    })
   }
   _startRoulette () {
     const $ = window.$
@@ -99,11 +113,12 @@ class Roulette extends React.Component {
         // 레벨 업 시
         return <div className='text-center m-b-20'>
           <MonLevel level={mon.asis.level} style={{ backgroundColor: colors.gray }} /> <i className='fa fa-long-arrow-right c-gray' /> <MonLevel level={mon.tobe.level} style={{ fontSize: 'medium'}} />
-          {mon.tobe.mon[mon.tobe.monId].evoLv !== 0 && mon.tobe.level >= mon.tobe.mon[mon.tobe.monId].evoLv &&
-            <div className='m-t-15'>
-              <Button text='진화하기' color='deeporange' onClick={() => this._handleOnClickEvolution(mon.tobe)} />
-            </div>
-          }
+          <div className='m-t-15'>
+            {mon.tobe.mon[mon.tobe.monId].evoLv !== 0 && mon.tobe.level >= mon.tobe.mon[mon.tobe.monId].evoLv &&
+              <Button text='진화하기' color='deeporange' className='m-r-5' onClick={() => this._handleOnClickEvolution(mon.tobe)} />
+            }
+            <Button text='교배하기' color='orange' onClick={() => this._handleOnClickMix(mon.tobe)} />
+          </div>
         </div>
       } else {
         // 새로운 포켓몬
@@ -152,7 +167,7 @@ Roulette.propTypes = {
   innerSize: PropTypes.number,
   mon: PropTypes.object,
   btnComponent: PropTypes.element,
-  receivePickMonInfo: PropTypes.func.isRequired
+  updatePickMonInfo: PropTypes.func.isRequired
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Roulette)

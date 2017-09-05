@@ -14,11 +14,12 @@ import { getMonImage } from 'utils/monUtil'
 
 import { colors } from 'constants/colors'
 
-import { receivePickMonInfo } from 'store/pickMonInfo'
+import { updatePickMonInfo } from 'store/pickMonInfo'
 
 const mapDispatchToProps = dispatch => {
   return {
-    updatePickMonInfo: pickMonInfo => dispatch(receivePickMonInfo(pickMonInfo))
+    // updatePickMonInfo: pickMonInfo => dispatch(receivePickMonInfo(pickMonInfo))
+    updatePickMonInfo: pickMonInfo => dispatch(updatePickMonInfo(pickMonInfo))
   }
 }
 
@@ -47,10 +48,10 @@ class MonModal extends React.Component {
       evoluteCol: mon.tobe
     }
     updatePickMonInfo(pickMonInfo)
-    close()
-    setTimeout(() => {
+    .then(() => {
+      close()
       this.context.router.push(`/pick-mon?f=${keygen._()}`)
-    }, 200)
+    })
   }
   _handleOnClickMix () {
     const { mon, updatePickMonInfo, close } = this.props
@@ -59,10 +60,10 @@ class MonModal extends React.Component {
       mixCols: [mon.tobe]
     }
     updatePickMonInfo(pickMonInfo)
-    close()
-    setTimeout(() => {
+    .then(() => {
+      close()
       this.context.router.push(`/collection/${mon.tobe.userId}`)
-    }, 200)
+    })
   }
   render () {
     const { mon, show, close, type, updatePickMonInfo, ...restProps } = this.props

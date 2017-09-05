@@ -5,12 +5,14 @@ import CollectionView from '../components/CollectionView'
 
 import { getAuthUserFromFirebase, convertMapToArr } from 'utils/commonUtil'
 
-import { receivePickMonInfo } from 'store/pickMonInfo'
+import { updatePickMonInfo } from 'store/pickMonInfo'
 import { showUserModal } from 'store/userModal'
 
-const mapDispatchToProps = {
-  receivePickMonInfo,
-  showUserModal
+const mapDispatchToProps = dispatch => {
+  return {
+    updatePickMonInfo: pickMonInfo => dispatch(updatePickMonInfo(pickMonInfo)),
+    showUserModal: userModal => dispatch(showUserModal(userModal))
+  }
 }
 
 const mapStateToProps = (state) => {

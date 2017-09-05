@@ -3,13 +3,15 @@ import { firebaseConnect } from 'react-redux-firebase'
 
 import PickMonView from '../components/PickMonView'
 
-import { receivePickMonInfo, clearPickMonInfo } from 'store/pickMonInfo'
+import { updatePickMonInfo, clearPickMonInfo } from 'store/pickMonInfo'
 
 import { getAuthUserFromFirebase } from 'utils/commonUtil'
 
-const mapDispatchToProps = {
-  receivePickMonInfo,
-  clearPickMonInfo
+const mapDispatchToProps = dispatch => {
+  return {
+    updatePickMonInfo: pickMonInfo => dispatch(updatePickMonInfo(pickMonInfo)),
+    clearPickMonInfo
+  }
 }
 
 const mapStateToProps = (state) => {
