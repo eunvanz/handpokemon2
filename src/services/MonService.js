@@ -57,7 +57,8 @@ export const getNextMons = (firebase, evoluteCol) => {
 export const postMon = (firebase, mon) => {
   const id = firebase.ref().push('mons').key
   mon.id = id
-  firebase.ref(`mons/${id}`).update(mon)
+  return firebase.ref(`mons/${id}`).update(mon)
+  .then(() => Promise.resolve(mon))
 }
 
 export const updateMon = (firebase, mon) => {

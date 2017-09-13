@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import keygen from 'keygenerator'
-import { fromJS, is } from 'immutable'
+import shallowCompare from 'react-addons-shallow-compare'
 
 import Card from 'components/Card'
 import Button from 'components/Button'
@@ -21,11 +21,11 @@ class PickDistrictView extends React.Component {
   }
   componentDidMount () {
     const { user, firebase, auth } = this.props
+    if (!user) return this.context.router.push('sign-in')
     refreshUserCredits(firebase, auth.uid, user)
-    if (!user) this.context.router.push('sign-in')
   }
   shouldComponentUpdate (nextProps, nextState) {
-    return !is(fromJS(nextProps), fromJS(this.props))
+    return shallowCompare(this, nextProps, nextState)
   }
   _handleOnClickPick (district, quantity) {
     const pickMonInfo = {

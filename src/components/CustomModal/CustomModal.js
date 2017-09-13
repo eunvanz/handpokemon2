@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Modal } from 'react-bootstrap'
 import $ from 'jquery'
-import { fromJS, is } from 'immutable'
+import shallowCompare from 'react-addons-shallow-compare'
 
 class CustomModal extends React.Component {
   constructor (props) {
@@ -13,7 +13,7 @@ class CustomModal extends React.Component {
     }
   }
   shouldComponentUpdate (nextProps, nextState) {
-    return !is(fromJS(nextProps), fromJS(this.props)) || !is(fromJS(nextState), fromJS(this.state))
+    return shallowCompare(this, nextProps, nextState)
   }
   componentWillReceiveProps (nextProps) {
     this.setState({ showModal: nextProps.show })

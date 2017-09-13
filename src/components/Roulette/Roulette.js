@@ -130,7 +130,7 @@ class Roulette extends React.Component {
     }
     return (
       <div className='m-t-20'>
-        <div style={Object.assign({}, { width: `${size}px`, height: `${size}px`, border: `3px solid ${colors.lightGray}`, backgroundImage: `url(${bg})`  }, style)}>
+        <div style={Object.assign({}, { width: `${size}px`, height: `${size}px`, border: `3px solid ${colors.lightGray}`, backgroundImage: `url(${bg})`, borderRadius: '20px' }, style)}>
           <div id={id} style={{ display: 'none', height: `${innerSize || size}px`, margin: `${innerSize ? (size - 6 - innerSize) / 2 : 0}px` }}>
             {renderImages()}
           </div>

@@ -135,9 +135,9 @@ class MonManagementView extends React.Component {
       if (editMode === 'write') return postMon(firebase, mon)
       return updateMon(firebase, mon)
     })
-    .then(snapshot => { // 진화 전 포켓몬 선택했을경우 처리
+    .then(mon => { // 진화 전 포켓몬 선택했을경우 처리, postMon의 경우 post결과 mon을 파라미터로 가져옴
       if (formData.prev) {
-        const monId = snapshot ? snapshot.key : formData.id
+        const monId = mon ? mon.id : formData.id
         console.log('formData.prev', formData.prev)
         let nextOfPrev = mons.filter(mon => mon.id === formData.prev)[0].next
         console.log('nextOfPrev1', nextOfPrev)

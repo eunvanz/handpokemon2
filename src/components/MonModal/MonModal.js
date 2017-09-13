@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import keygen from 'keygenerator'
-import { fromJS, is } from 'immutable'
+import shallowCompare from 'react-addons-shallow-compare'
 
 import CustomModal from 'components/CustomModal'
 import Button from 'components/Button'
@@ -39,7 +39,7 @@ class MonModal extends React.Component {
     this._handleOnClickMix = this._handleOnClickMix.bind(this)
   }
   shouldComponentUpdate (nextProps, nextState) {
-    return !is(fromJS(nextProps), fromJS(this.props)) || !is(fromJS(nextState), fromJS(this.state))
+    return shallowCompare(this, nextProps, nextState)
   }
   _handleOnClickEvolution () {
     const { mon, updatePickMonInfo, close } = this.props
@@ -66,7 +66,7 @@ class MonModal extends React.Component {
     })
   }
   render () {
-    const { mon, show, close, type, updatePickMonInfo, ...restProps } = this.props
+    const { mon, show, close, type, updatePickMonInfo, pickMonInfo, ...restProps } = this.props
     const tobeMon = mon.tobe
     const renderLevel = () => {
       if (mon.asis) {

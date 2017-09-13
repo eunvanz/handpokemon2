@@ -2,6 +2,7 @@ import { RANK } from 'constants/rules'
 import collection from 'models/collection'
 
 import _ from 'lodash'
+import { fromJS, toJS, } from 'immutable'
 
 export const getMonImage = mon => {
   if (mon.mon && mon.mon[mon.monId]) {
@@ -91,23 +92,20 @@ export const convertNextMonToCol = (nextMon, evoluteCol) => {
 }
 
 export const levelUpCollection = col => {
-  // console.log('levelup param col', col)
-  // console.log('point', col.mon.point)
-  const updateObj = Object.assign({}, col)
+  let updateObj = fromJS(col)
   for (let i = 0; i < col.mon[col.monId].point; i++) {
     const idx = _.random(1, 6)
 
-    if (idx === 1) updateObj.addedHp = updateObj.addedHp + 1
-    else if (idx === 2) updateObj.addedPower = updateObj.addedPower + 1
-    else if (idx === 3) updateObj.addedArmor = updateObj.addedArmor + 1
-    else if (idx === 4) updateObj.addedSPower = updateObj.addedSPower + 1
-    else if (idx === 5) updateObj.addedSArmor = updateObj.addedSArmor + 1
-    else updateObj.addedDex = updateObj.addedDex + 1
+    if (idx === 1) updateObj = updateObj.update('addedHp', val => val + 1)
+    else if (idx === 2) updateObj = updateObj.update('addedPower', val => val + 1)
+    else if (idx === 3) updateObj = updateObj.update('addedArmor', val => val + 1)
+    else if (idx === 4) updateObj = updateObj.update('addedSPower', val => val + 1)
+    else if (idx === 5) updateObj = updateObj.update('addedSArmor', val => val + 1)
+    else updateObj = updateObj.update('addedDex', val => val + 1)
   }
-  updateObj.level = col.level + 1
-  updateObj.addedTotal = col.mon[col.monId].point
-  // console.log('updateObj', updateObj)
-  return updateObj
+  updateObj = updateObj.update('level', val => val + 1)
+  updateObj = updateObj.update('addedTotal', val => val + col.mon[col.monId].point)
+  return updateObj.toJS()
 }
 
 export const levelDownCollection = (col, levelToDown) => {

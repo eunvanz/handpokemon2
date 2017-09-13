@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { fromJS, is } from 'immutable'
+import { fromJS } from 'immutable'
+import shallowCompare from 'react-addons-shallow-compare'
 import _ from 'lodash'
 import { Collapse } from 'react-bootstrap'
 
@@ -141,7 +142,7 @@ class CollectionView extends React.Component {
     })
   }
   shouldComponentUpdate (nextProps, nextState) {
-    return !is(fromJS(nextProps), fromJS(this.props)) || !is(fromJS(nextState), fromJS(this.state))
+    return shallowCompare(this, nextProps, nextState)
   }
   componentWillUpdate (nextProps, nextState) {
     if (nextProps.pickMonInfo && nextProps.pickMonInfo.mixCols && nextProps.pickMonInfo.mixCols.length === 1) {
@@ -528,9 +529,9 @@ class CollectionView extends React.Component {
     const renderHeader = () => {
       if (mode === 'mix') {
         return (<div>
-          <h2><span className='c-lightblue f-700'>{pickMonInfo.mixCols[0].mon[pickMonInfo.mixCols[0].monId].name}</span>와(과) 교배할 포켓몬을 선택해주세요.</h2>
+          <h2 style={{ paddingRight: '60px' }}><span className='c-lightblue f-700'>{pickMonInfo.mixCols[0].mon[pickMonInfo.mixCols[0].monId].name}</span>와(과) 교배할 포켓몬을 선택해주세요.</h2>
           <ul className='actions' style={{ right: '20px' }}>
-            <li><Button icon='zmdi zmdi-close' text='취소' link onClick={this._cancelMix} /></li>
+            <li><Button icon='zmdi zmdi-close' text='취소' color='deeporange' onClick={this._cancelMix} /></li>
           </ul>
         </div>)
       }

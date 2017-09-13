@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { fromJS, is } from 'immutable'
+import shallowCompare from 'react-addons-shallow-compare'
 
 import CustomModal from '../CustomModal'
 import Button from '../Button'
@@ -11,7 +11,7 @@ class MessageModal extends React.Component {
     this.displayName = 'MessageModal'
   }
   shouldComponentUpdate (nextProps, nextState) {
-    return !is(fromJS(nextProps), fromJS(this.props))
+    return shallowCompare(this, nextProps, nextState)
   }
   componentWillReceiveProps (nextProps) {
     this.setState({ showModal: nextProps.show })

@@ -1,11 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { StickyContainer, Sticky } from 'react-sticky'
-import { fromJS, is } from 'immutable'
+import shallowCompare from 'react-addons-shallow-compare'
 
 class Card extends React.Component {
   shouldComponentUpdate (nextProps, nextState) {
-    return !is(fromJS(nextProps), fromJS(this.props))
+    return shallowCompare(this, nextProps, nextState)
   }
   render () {
     const { header, body, headerBgColor, headerTextColor, clearPadding, stickyHeader, ...restProps } = this.props
@@ -20,7 +20,7 @@ class Card extends React.Component {
               {
                 ({ style, isSticky }) => {
                   const newStyle = Object.assign({}, style, { marginTop: isSticky ? '70px' : '0px' })
-                  return <div className='card-header' style={Object.assign({}, { borderBottom: '1px solid #eeeeee', backgroundColor: headerBgColor || 'white', color: headerTextColor || '#333', zIndex: '10' }, newStyle)}>{header}</div>
+                  return <div className='card-header' style={Object.assign({}, { borderBottom: '1px solid #eeeeee', backgroundColor: headerBgColor || 'white', color: headerTextColor || '#333', zIndex: '9' }, newStyle)}>{header}</div>
                 }
               }
             </Sticky>

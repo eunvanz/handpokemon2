@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { fromJS, is } from 'immutable'
+import shallowCompare from 'react-addons-shallow-compare'
 
 import MonCost from '../MonCost'
 import MonAttr from '../MonAttr'
@@ -26,7 +26,7 @@ class MonCard extends React.Component {
     this._handleOnUnselect = this._handleOnUnselect.bind(this)
   }
   shouldComponentUpdate (nextProps, nextState) {
-    return !is(fromJS(nextProps), fromJS(this.props)) || !is(fromJS(nextState), fromJS(this.state))
+    return shallowCompare(this, nextProps, nextState)
   }
   _showMonModal () {
     this.setState({ showMonModal: true })

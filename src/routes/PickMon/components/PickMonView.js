@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
 import keygen from 'keygenerator'
-import { fromJS, is } from 'immutable'
+import shallowCompare from 'react-addons-shallow-compare'
 
 import ContentContainer from 'components/ContentContainer'
 import Roulette from 'components/Roulette'
@@ -41,7 +41,7 @@ class PickMonView extends React.Component {
     this._initPick()
   }
   shouldComponentUpdate (nextProps, nextState) {
-    return !is(fromJS(nextProps), fromJS(this.props)) || !is(fromJS(nextState), fromJS(this.state))
+    return shallowCompare(this, nextProps, nextState)
   }
   // componentWillUpdate (nextProps, nextState) {
   //   if (nextProps.location.query.f !== this.props.location.query.f) {
@@ -57,6 +57,7 @@ class PickMonView extends React.Component {
   //   }
   // }
   componentDidUpdate (prevProps, prevState) {
+    if (!this.props.auth) return this.context.router.push('sign-in')
     if (prevProps.location.query.f !== this.props.location.query.f) {
       this.setState({
         pickedIdx: -1,

@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { fromJS, is } from 'immutable'
+import shallowCompare from 'react-addons-shallow-compare'
 
 import { gradesColors, attrColors } from 'constants/colors'
 import { badgeStyle } from 'constants/styles'
@@ -9,7 +9,7 @@ import { isScreenSize } from 'utils/commonUtil'
 
 class MonAttr extends React.Component {
   shouldComponentUpdate (nextProps, nextState) {
-    return !is(fromJS(nextProps), fromJS(this.props)) || !is(fromJS(nextState), fromJS(this.state))
+    return shallowCompare(this, nextProps, nextState)
   }
   render () {
     const { grade, mainAttr, subAttr, point, ...restProps } = this.props

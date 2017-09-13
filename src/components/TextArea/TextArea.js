@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import shallowCompare from 'react-addons-shallow-compare'
 
 class TextArea extends React.Component {
   componentDidMount () {
@@ -10,7 +11,7 @@ class TextArea extends React.Component {
   }
   shouldComponentUpdate (nextProps, nextState) {
     if (nextProps.value.length > this.props.maxLength) return false
-    else return true
+    else return shallowCompare(this, nextProps, nextState)
   }
   render () {
     const autoSizeStyle = () => {

@@ -10,7 +10,7 @@ import { getAuthUserFromFirebase } from 'utils/commonUtil'
 const mapDispatchToProps = dispatch => {
   return {
     updatePickMonInfo: pickMonInfo => dispatch(updatePickMonInfo(pickMonInfo)),
-    clearPickMonInfo
+    clearPickMonInfo: () => dispatch(clearPickMonInfo())
   }
 }
 

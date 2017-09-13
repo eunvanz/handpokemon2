@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import numeral from 'numeral'
 import { firebaseConnect } from 'react-redux-firebase'
 import $ from 'jquery'
-import { fromJS, is } from 'immutable'
+import shallowCompare from 'react-addons-shallow-compare'
 
 import { DEFAULT_PROFILE_IMAGE_URL } from 'constants/urls'
 import { PICK_CREDIT_REFRESH, BATTLE_CREDIT_REFRESH, ADVENTURE_CREDIT_REFRESH,
@@ -45,7 +45,7 @@ class Sidebar extends React.Component {
     this.intervals = {}
   }
   shouldComponentUpdate (nextProps, nextState) {
-    return !is(fromJS(this.pros), fromJS(nextProps))
+    return shallowCompare(this, nextProps, nextState)
   }
   componentDidUpdate (prevProps, prevState) {
     const { user } = this.props
@@ -130,16 +130,20 @@ class Sidebar extends React.Component {
     }
     let i = 1
     const increaseStateCredit = () => {
-      console.log('i', i)
-      console.log('asisCredit', asisCredit)
       receiveCreditInfo({ [`${type}Credit`]: asisCredit + i })
       i++
     }
     increaseStateCredit()
-    intervals[type] = setInterval(() => {
-      increaseStateCredit() // 정해진 interval로 1씩 증가시킴
-      if (max < asisCredit + i) clearInterval(intervals[type]) // max값에 도달했을 때 timer 중단
-    }, interval)
+    if (max > asisCredit + i) {
+      intervals[type] = setInterval(() => {
+        increaseStateCredit() // 정해진 interval로 1씩 증가시킴
+        console.log('intervals[type]', intervals[type])
+        console.log('asisCredit', asisCredit)
+        console.log('i', i)
+        console.log('max', max)
+        if (max < asisCredit + i) clearInterval(intervals[type]) // max값에 도달했을 때 timer 중단
+      }, interval)
+    }
   }
   _startCreditTimer (type, interval) {
     const timer = setInterval(() => {

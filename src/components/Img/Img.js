@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import { node, oneOfType, string, array } from 'prop-types'
-import unloader from './assets/unloader.png'
-import loader from './assets/loader.png'
-import { fromJS, is } from 'immutable'
+import unloaderImage from './assets/unloader.png'
+import loaderImage from './assets/loader.png'
+import shallowCompare from 'react-addons-shallow-compare'
 
 const cache = {}
 class Img extends Component {
@@ -13,8 +13,8 @@ class Img extends Component {
   }
 
   static defaultProps = {
-    loader: <img src={loader} style={{ width: '100%' }} />,
-    unloader: <img src={unloader} style={{ width: '100%' }} />,
+    loader: <img src={loaderImage} style={{ width: '100%' }} />,
+    unloader: <img src={unloaderImage} style={{ width: '100%' }} />,
     src: []
   }
 
@@ -23,7 +23,7 @@ class Img extends Component {
 
     this.sourceList = this.srcToArray(this.props.src)
 
-    // // check cache to decide at which index to start
+    // check cache to decide at which index to start
     // for (let i = 0; i < this.sourceList.length; i++) {
     //   // if we've never seen this image before, the cache wont help.
     //   // no need to look further, just start loading
@@ -111,7 +111,7 @@ class Img extends Component {
   }
 
   shouldComponentUpdate (nextProps, nextState) {
-    return !is(fromJS(nextProps), fromJS(this.props)) || !is(fromJS(nextState), fromJS(this.state))
+    return shallowCompare(this, nextProps, nextState)
   }
 
   componentWillUnmount () {
@@ -138,7 +138,7 @@ class Img extends Component {
 
   render () {
     // console.log('cache', cache)
-    const { src, ...rest } = this.props
+    const { src, loader, unloader, ...rest } = this.props
     // if we have loaded, show img
     if (this.state.isLoaded) {
       // clear non img props
@@ -148,12 +148,12 @@ class Img extends Component {
 
     // if we are still trying to load, show img and a loader if requested
     // if (!this.state.isLoaded && this.state.isLoading) return this.props.loader ? this.props.loader : null
-    if (!this.state.isLoaded && this.state.isLoading) return <img src={loader} {...rest} />
+    if (!this.state.isLoaded && this.state.isLoading) return <img src={loaderImage} {...rest} />
 
     // if we have given up on loading, show a place holder if requested, or nothing
     /* istanbul ignore else */
     // if (!this.state.isLoaded && !this.state.isLoading) return this.props.unloader ? this.props.unloader : null
-    if (!this.state.isLoaded && !this.state.isLoading) return <img src={unloader} {...rest} />
+    if (!this.state.isLoaded && !this.state.isLoading) return <img src={unloaderImage} {...rest} />
 
   }
 }

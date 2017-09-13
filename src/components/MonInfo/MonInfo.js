@@ -26,6 +26,25 @@ class MonInfo extends React.Component {
     let monToView = type === 'collection' ? mon.mon[mon.monId] : mon
     const colClassName = forModal ? 'col-sm-8 col-xs-12 text-left' : 'col-sm-4 col-sm-offset-4 text-left'
     const renderInfo = () => {
+      const renderTotal = () => {
+        if (type === 'collection') {
+          if (asisMon) {
+            return (
+              <div className='col-xs-9 f-700'>
+                <span className='c-blue'>{mon.total + mon.addedTotal}</span> (<span className='c-gray'>{asisMon.total}</span>{asisMon.addedTotal > 0 && <span className='c-orange'> +{asisMon.addedTotal}</span>}<span className='c-lightblue'> +{mon.addedTotal - asisMon.addedTotal}</span>)
+              </div>
+            )
+          } else {
+            return (
+              <div className='col-xs-9 f-700'>
+                <span className='c-blue'>{mon.total + mon.addedTotal}</span> {mon.addedTotal > 0 && <span>(<span className='c-gray'>{mon.total}</span><span className='c-orange'> +{mon.addedTotal}</span>)</span>}
+              </div>
+            )
+          }
+        } else {
+          return <div className='col-xs-9 c-blue f-700'>{mon.total}</div>
+        }
+      }
       return (
         <div className='m-b-20'>
           {
@@ -53,7 +72,7 @@ class MonInfo extends React.Component {
               </div>
               <div className='row' style={{ marginBottom: '15px' }}>
                 <div className='col-xs-3 f-700'>전투력</div>
-                <div className='col-xs-9 c-blue f-700'>{mon.total}</div>
+                {renderTotal()}
               </div>
               <div className='row' style={{ marginBottom: '15px' }}>
                 <div className='col-xs-3 f-700'>피지컬</div>

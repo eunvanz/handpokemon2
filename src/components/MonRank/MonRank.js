@@ -1,12 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { fromJS, is } from 'immutable'
+import shallowCompare from 'react-addons-shallow-compare'
 
 import { rankBadgeStyle } from 'constants/styles'
 
 class MonRank extends React.Component {
   shouldComponentUpdate (nextProps, nextState) {
-    return !is(fromJS(nextProps), fromJS(this.props))
+    return shallowCompare(this, nextProps, nextState)
   }
   render () {
     const { rank, style } = this.props
