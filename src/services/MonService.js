@@ -4,7 +4,6 @@ import { convertMonToCol } from 'utils/monUtil'
 import _ from 'lodash'
 
 export const getStartPick = firebase => {
-  console.log('여기안오냐')
   const monsRef = firebase.ref('mons')
   return monsRef.orderByChild('grade').equalTo('b').once('value')
   .then(snapshot => {
@@ -12,11 +11,9 @@ export const getStartPick = firebase => {
     snapshot.forEach(snap => {
       const monId = snap.key
       const mon = snap.val()
-      console.log('monId', monId)
       mon.id = monId
       basicMons[monId] = mon
     })
-    console.log('basicMons', basicMons)
     const keys = Object.keys(basicMons)
     const idxSet = new Set()
     const qtyToPick = 3
@@ -55,7 +52,7 @@ export const getNextMons = (firebase, evoluteCol) => {
 }
 
 export const postMon = (firebase, mon) => {
-  const id = firebase.ref().push('mons').key
+  const id = firebase.ref('mons').push().key
   mon.id = id
   return firebase.ref(`mons/${id}`).update(mon)
   .then(() => Promise.resolve(mon))
@@ -100,6 +97,7 @@ export const updateMon = (firebase, mon) => {
     merge.forEach(elem => {
       updateObj[elem] = tobeMon
     })
+    console.log('updateObj', updateObj)
     return firebase.ref().update(updateObj)
   })
 }

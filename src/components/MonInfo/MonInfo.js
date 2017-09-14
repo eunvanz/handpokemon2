@@ -42,7 +42,7 @@ class MonInfo extends React.Component {
             )
           }
         } else {
-          return <div className='col-xs-9 c-blue f-700'>{mon.total}</div>
+          return <div className='col-xs-9'>평균 <span className='c-blue f-700'>{mon.total}</span></div>
         }
       }
       return (

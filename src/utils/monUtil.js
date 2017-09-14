@@ -2,7 +2,7 @@ import { RANK } from 'constants/rules'
 import collection from 'models/collection'
 
 import _ from 'lodash'
-import { fromJS, toJS, } from 'immutable'
+import { fromJS } from 'immutable'
 
 export const getMonImage = mon => {
   if (mon.mon && mon.mon[mon.monId]) {
@@ -115,6 +115,7 @@ export const levelDownCollection = (col, levelToDown) => {
     const stat = ['addedHp', 'addedPower', 'addedArmor', 'addedSPower', 'addedSArmor', 'addedDex']
     if (updateObj[stat[idx]] > 0) {
       updateObj[stat[idx]] = updateObj[stat[idx]] - 1
+      updateObj.addedTotal -= 1
     } else {
       i = i - 1
     }

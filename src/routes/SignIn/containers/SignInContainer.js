@@ -14,8 +14,6 @@ const mapStateToProps = (state) => {
   })
 }
 
-const wrappedSignInView = firebaseConnect([
-  '/users'
-])(SignInView)
+const wrappedSignInView = firebaseConnect()(SignInView)
 
 export default connect(mapStateToProps, mapDispatchToProps)(wrappedSignInView)

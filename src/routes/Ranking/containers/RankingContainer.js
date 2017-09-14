@@ -14,7 +14,6 @@ const mapStateToProps = (state) => {
   }
 }
 
-const wrappedRankingView = firebaseConnect([
-])(RankingView)
+const wrappedRankingView = firebaseConnect()(RankingView)
 
 export default connect(mapStateToProps, mapDispatchToProps)(wrappedRankingView)

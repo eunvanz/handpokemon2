@@ -21,7 +21,6 @@ const mapStateToProps = (state) => {
   }
 }
 
-const wrappedPickDistrictView = firebaseConnect([
-])(PickDistrictView)
+const wrappedPickDistrictView = firebaseConnect()(PickDistrictView)
 
 export default connect(mapStateToProps, mapDispatchToProps)(wrappedPickDistrictView)

@@ -273,7 +273,7 @@ class SignUpView extends React.Component {
   render () {
     const renderPickedMon = () => {
       const { startPick, loading } = this.state
-      if (loading) return <Loading height={249} />
+      if (loading) return <Loading height={242} />
       else if (!startPick) return null
       let seq = 0
       return startPick.map(mon => {

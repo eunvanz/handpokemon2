@@ -108,8 +108,6 @@ Header.propTypes = {
   auth: PropTypes.object
 }
 
-const wrappedHeader = firebaseConnect([
-  '/'
-])(Header)
+const wrappedHeader = firebaseConnect()(Header)
 
 export default connect(mapStateToProps, mapDispatchToProps)(wrappedHeader)

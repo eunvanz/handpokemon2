@@ -14,7 +14,6 @@ const mapDispatchToProps = dispatch => {
     showUserModal: userModal => dispatch(showUserModal(userModal))
   }
 }
-
 const mapStateToProps = (state) => {
   return {
     ...getAuthUserFromFirebase(state),
@@ -23,9 +22,6 @@ const mapStateToProps = (state) => {
     userModal: state.userModal
   }
 }
-
-const wrappedCollectionView = firebaseConnect([
-  'collections'
-])(CollectionView)
+const wrappedCollectionView = firebaseConnect()(CollectionView)
 
 export default connect(mapStateToProps, mapDispatchToProps)(wrappedCollectionView)

@@ -3,8 +3,6 @@ import { firebaseConnect } from 'react-redux-firebase'
 
 import SignUpView from '../components/SignUpView'
 
-import { PROFILE_IMAGE_ROOT } from 'constants/urls'
-
 import { receiveUser } from 'store/user'
 
 const mapDispatchToProps = {
@@ -15,8 +13,6 @@ const mapStateToProps = (state) => ({
   user: state.user
 })
 
-const wrappedSignUpView = firebaseConnect([
-  PROFILE_IMAGE_ROOT
-])(SignUpView)
+const wrappedSignUpView = firebaseConnect()(SignUpView)
 
 export default connect(mapStateToProps, mapDispatchToProps)(wrappedSignUpView)

@@ -278,7 +278,6 @@ Sidebar.propTypes = {
   receiveCreditInfo: PropTypes.func.isRequired
 }
 
-const wrappedSidebar = firebaseConnect([
-])(Sidebar)
+const wrappedSidebar = firebaseConnect(['/'])(Sidebar)
 
 export default connect(mapStateToProps, mapDispatchToProps)(wrappedSidebar)
