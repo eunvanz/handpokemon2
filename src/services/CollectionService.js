@@ -86,25 +86,12 @@ export const postCollection = (firebase, userId, collection, type, srcCols) => {
   let asis = null
   let tobe = null
   let resultPoint
-  // let checkCredit
-  // if (type === 'pick') {
-  //   checkCredit = () => {
-  //     return firebase.ref(`users/${userId}/pickCredit`).once('value')
-  //     .then(snapshot => {
-  //       if (snapshot.val() < 1) return Promise.reject('채집 크레딧이 부족합니다.')
-  //       else return Promise.resolve()
-  //     })
-  //   }
-  // } else checkCredit = Promise.resolve()
-  // return checkCredit()
-  // .then(() => {
-  //   return firebase.ref(`users/${userId}/colPoint`).once('value')
-  // })
   let checkSrcCols
   let isError = false
   if (type === 'evolution' || type === 'mix') {
     const proms = srcCols.map(srcCol => {
-      return firebase.ref(`collections/${srcCol.id}/level`).transaction(asisLevel => {
+      console.log('srcCol', srcCol)
+      return () => firebase.ref(`collections/${srcCol.id}/level`).transaction(asisLevel => {
         console.log('type', type)
         console.log('asisLevel', asisLevel)
         const numberToMinus = type === 'evolution' ? srcCol.mon[srcCol.monId].evoLv : 1

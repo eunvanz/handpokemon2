@@ -97,7 +97,7 @@ export const convertTimeToMMSS = time => {
 export const getAuthUserFromFirebase = state => {
   const auth = pathToJS(state.firebase, 'auth')
   return {
-    user: auth ? dataToJS(state.firebase, `users/${pathToJS(state.firebase, 'auth').uid}`) : null,
+    user: auth ? pathToJS(state.firebase, 'profile') : null,
     auth
   }
 }

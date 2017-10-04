@@ -21,6 +21,6 @@ const mapStateToProps = (state) => {
   }
 }
 
-const wrappedPickMonView = firebaseConnect()(PickMonView)
+const wrappedPickMonView = firebaseConnect(['/mons'])(PickMonView)
 
 export default connect(mapStateToProps, mapDispatchToProps)(wrappedPickMonView)

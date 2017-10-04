@@ -22,6 +22,8 @@ const mapStateToProps = (state) => {
     userModal: state.userModal
   }
 }
-const wrappedCollectionView = firebaseConnect()(CollectionView)
+const wrappedCollectionView = firebaseConnect((props) => {
+  return [`/userCollections/${props.params.userId}`, '/mons']
+})(CollectionView)
 
 export default connect(mapStateToProps, mapDispatchToProps)(wrappedCollectionView)

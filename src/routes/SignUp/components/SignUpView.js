@@ -245,7 +245,6 @@ class SignUpView extends React.Component {
     } else if (step === 3) {
       this._processSignUp()
     } else if (step === 2) {
-      // this.setState({ profileImageFile: document.getElementById('profileImage').files[0] })
       if (window.editor) {
         const dataURI = window.editor.getImageScaledToCanvas().toDataURL()
         if (dataURI) {

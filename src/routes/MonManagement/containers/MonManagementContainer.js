@@ -14,7 +14,7 @@ const mapStateToProps = (state) => ({
 })
 
 const wrappedMonManagementView = firebaseConnect([
-  'mons'
+  '/mons'
 ])(MonManagementView)
 
 export default connect(mapStateToProps, mapDispatchToProps)(wrappedMonManagementView)

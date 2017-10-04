@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { Link } from 'react-router'
 import { connect } from 'react-redux'
 import numeral from 'numeral'
-import { firebaseConnect } from 'react-redux-firebase'
+import { firebaseConnect, pathToJS } from 'react-redux-firebase'
 import $ from 'jquery'
 import shallowCompare from 'react-addons-shallow-compare'
 
@@ -278,6 +278,9 @@ Sidebar.propTypes = {
   receiveCreditInfo: PropTypes.func.isRequired
 }
 
-const wrappedSidebar = firebaseConnect(['/'])(Sidebar)
+const authConnected = connect(({ firebase }) => ({ auth: pathToJS(firebase, 'auth') }))(Sidebar)
+
+const wrappedSidebar = firebaseConnect(({ auth }) =>
+  (auth ? [`/userCollections/${auth.uid}`, '/mons'] : null))(authConnected)
 
 export default connect(mapStateToProps, mapDispatchToProps)(wrappedSidebar)
