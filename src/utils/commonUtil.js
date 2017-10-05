@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import numeral from 'numeral'
-import { pathToJS, dataToJS } from 'react-redux-firebase'
+import { pathToJS } from 'react-redux-firebase'
 
 export const isScreenSize = {
   xs: () => window.innerWidth < 768,
@@ -136,4 +136,16 @@ export const getSeqPromise = proms => { // promise array를 순차적으로 실�
   .then(() => {
     return Promise.resolve(results)
   })
+}
+
+export const isStringLength = str => {
+  let strLength = 0
+  for (let i = 0; i < str.length; i++) {
+    let code = str.charCodeAt(i)
+    let ch = str.substr(i, 1).toUpperCase()
+    code = parseInt(code)
+    if ((ch < '0' || ch > '9') && (ch < 'A' || ch > 'Z') && ((code > 255) || (code < 0))) strLength = strLength + 2
+    else strLength = strLength + 1
+  }
+  return strLength
 }

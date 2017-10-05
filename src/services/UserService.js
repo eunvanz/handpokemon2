@@ -171,7 +171,7 @@ export const increaseCredit = (firebase, uid, number, type) => {
 }
 
 export const getUserRanking = (firebase, type, page, prevPoint, prevKey) => {
-  const limitToLast = page * 24
+  const limitToLast = page * 20
   const orderByChild = type === 'collection' ? 'colPoint' : 'leaguePoint'
   let ref = firebase.ref('users').orderByChild(orderByChild)
   if (prevPoint && prevKey) ref = ref.endAt(prevPoint, prevKey)

@@ -1,13 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { fromJS, is } from 'immutable'
-import WayPoint from 'react-waypoint'
-import keygen from 'keygenerator'
+import _ from 'lodash'
+import shallowCompare from 'react-addons-shallow-compare'
 
 import ContentContainer from 'components/ContentContainer'
 import Loading from 'components/Loading'
-import UserRankingCard from 'components/UserRankingCard'
-import _ from 'lodash'
+import ListContainer from 'components/ListContainer'
+import RankingElement from 'components/RankingElement'
+import RankingHeader from 'components/RankingHeader'
 
 import { getUserRanking, getUserRankingByUserId } from 'services/UserService'
 
@@ -27,8 +27,8 @@ class RankingView extends React.Component {
     }
     this._loadMoreItems = this._loadMoreItems.bind(this)
   }
-  shouldUpdateComponent (nextProps, nextState) {
-    return !is(fromJS(nextProps), fromJS(this.props)) || !is(fromJS(nextState), fromJS(this.state))
+  shouldComponentUpdate (nextProps, nextState) {
+    return shallowCompare(this, nextProps, nextState)
   }
   componentDidMount () {
     const { firebase, params, auth } = this.props
@@ -48,13 +48,14 @@ class RankingView extends React.Component {
     })
   }
   _loadMoreItems () {
+    const { page, lastColPoint, lastUserId, userList, lastRank, isLastPage } = this.state
+    if (isLastPage) return
     this.setState({ isLoading: true })
     const { firebase, params } = this.props
-    const { page, lastColPoint, lastUserId, userList, lastRank } = this.state
     getUserRanking(firebase, params.type, page + 1, lastColPoint, lastUserId)
     .then(userListToAdd => {
       if (userListToAdd[0].id === userList[0].id) {
-        this.setState({ isLastPage: true })
+        this.setState({ isLastPage: true, isLoading: false })
         return
       }
       const lastUser = userListToAdd[userListToAdd.length - 1]
@@ -69,38 +70,36 @@ class RankingView extends React.Component {
     })
   }
   render () {
-    const { user } = this.props
     const { type } = this.props.params
+    const { user } = this.props
     const { userList, isLoading, isLastPage, userRank } = this.state
-    const renderWayPoint = () => {
-      return (
-        <div className='col-xs-12'>
-          { !isLoading && !isLastPage &&
-            <WayPoint onEnter={this._loadMoreItems} />
-          }
-          {!isLastPage && isLoading && <Loading height={50} />}
-        </div>
-      )
+    const renderElements = () => {
+      if (!userList) return null
+      const returnComponent = []
+      if (userRank) {
+        returnComponent.push(
+          <RankingElement user={user} rank={userRank} key={-1} type={type} isMine />
+        )
+      }
+      return returnComponent.concat(userList.map((user, seq) => {
+        return (
+          <RankingElement user={user} rank={seq + 1} key={seq} type={type} />
+        )
+      }))
     }
-    const renderPage = () => {
-      return (
-        <div>
-          { userRank && <UserRankingCard user={user} rank={userRank} isMyself /> }
-          {
-            userList.map((rankUser, idx) => {
-              return <UserRankingCard key={keygen._()} user={rankUser} rank={1 + idx} />
-            })
-          }
-        </div>
-      )
+    const renderHeader = () => {
+      return <RankingHeader type={type} />
     }
     const renderBody = () => {
       if (userList) {
         return (
-          <div className='contacts clearfix row'>
-            {renderPage()}
-            {renderWayPoint()}
-          </div>
+          <ListContainer
+            elements={renderElements()}
+            isLoading={isLoading}
+            onLoad={this._loadMoreItems}
+            isLastPage={isLastPage}
+            header={renderHeader()}
+          />
         )
       } else {
         return <Loading text='랭킹목록을 불러오는 중...' height={nullContainerHeight} />
@@ -110,6 +109,7 @@ class RankingView extends React.Component {
       <ContentContainer
         title={`${type === 'collection' ? '콜렉션' : '시합'} 랭킹`}
         body={renderBody()}
+        clearPadding
       />
     )
   }

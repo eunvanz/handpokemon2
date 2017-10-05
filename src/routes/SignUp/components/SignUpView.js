@@ -9,7 +9,6 @@ import ContentContainer from 'components/ContentContainer'
 import LabelInput from 'components/LabelInput'
 import Button from 'components/Button'
 import TextArea from 'components/TextArea'
-// import ImageInput from 'components/ImageInput'
 import MonCard from 'components/MonCard'
 import Loading from 'components/Loading'
 import AvatarImgInput from 'components/AvatarImgInput'
@@ -22,7 +21,7 @@ import { postCollection } from 'services/CollectionService'
 
 import { DEFAULT_PROFILE_IMAGE_URL, PROFILE_IMAGE_ROOT } from 'constants/urls'
 
-import { showAlert, dataURItoBlob, isIE, getSeqPromise } from 'utils/commonUtil'
+import { showAlert, dataURItoBlob, isIE, getSeqPromise, isStringLength } from 'utils/commonUtil'
 
 import User from 'models/user'
 
@@ -111,7 +110,7 @@ class SignUpView extends React.Component {
     let nickname = this.state.formData.nickname
     let message = ''
     if (validator.isEmpty(nickname)) message = '닉네임을 입력해주세요.'
-    else if (!validator.isLength(nickname, { min: 1, max: 8 })) message = '8자 이하의 닉네임을 사용해주세요.'
+    else if (isStringLength(nickname) > 16) message = '한글 8자, 영문 16자 이하의 닉네임을 사용해주세요.'
     if (message !== '') {
       this._setValidAndHelper('nickname', message, 'error')
       return false
@@ -339,7 +338,7 @@ class SignUpView extends React.Component {
               id='nickname'
               name='nickname'
               type='text'
-              placeholder='8자 이하의 한글, 영문 혹은 숫자 및 특수문자'
+              placeholder='8자 이하의 한글, 16자 이하의 영문 및 숫자'
               onChange={this._handleOnChangeInput}
               value={this.state.formData.nickname}
               has={this._getHas('nickname')}
