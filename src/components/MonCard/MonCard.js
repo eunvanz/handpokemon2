@@ -41,7 +41,7 @@ class MonCard extends React.Component {
     this.props.onUnselect()
   }
   render () {
-    const { mon, pick, className, type, isSelectable, onUnselect, ...restProps } = this.props
+    const { mon, pick, className, type, isSelectable, onUnselect, isNotMine, ...restProps } = this.props
     const tobeMon = mon.tobe
     const renderLevelUpInfo = () => {
       if (mon.asis) {
@@ -92,7 +92,7 @@ class MonCard extends React.Component {
           pick &&
           renderLevelUpInfo()
         }
-        <MonModal mon={mon} type={this.props.type} show={this.state.showMonModal}
+        <MonModal mon={mon} type={this.props.type} show={this.state.showMonModal} isNotMine={isNotMine}
           close={() => this.setState({ showMonModal: false })} />
       </div>
     )
@@ -106,7 +106,8 @@ MonCard.propTypes = {
   pick: PropTypes.bool, // 채집시
   isSelectable: PropTypes.bool,
   onSelect: PropTypes.func,
-  onUnselect: PropTypes.func
+  onUnselect: PropTypes.func,
+  isNotMine: PropTypes.bool
 }
 
 export default MonCard

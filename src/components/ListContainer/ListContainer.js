@@ -5,6 +5,7 @@ import Infinite from 'react-infinite'
 
 import Loading from 'components/Loading'
 
+// ContentContainer 의 body에 들어가야 함
 class ListContainer extends React.Component {
   shouldUpdateComponent (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
@@ -26,7 +27,7 @@ class ListContainer extends React.Component {
       )
     }
     return (
-      <div className='list-group lg-odd-black'>
+      <div className='list-group lg-even-black'>
         {header}
         {renderElements()}
       </div>

@@ -237,8 +237,8 @@ class Sidebar extends React.Component {
                 <a style={{ cursor: 'pointer' }}
                   data-ma-action='submenu-toggle'><i className='fa fa-trophy' style={{ fontSize: '22px' }} /> 랭킹</a>
                 <ul style={{ display: 'none' }}>
-                  <li><Link to='/ranking/collection'>콜렉션 랭킹</Link></li>
-                  <li><Link to='/'>시합 랭킹</Link></li>
+                  <li><Link to='/ranking/collection' onClick={() => $('.ma-backdrop').click()}>콜렉션 랭킹</Link></li>
+                  <li><Link to='/ranking/battle' onClick={() => $('.ma-backdrop').click()}>시합 랭킹</Link></li>
                 </ul>
               </li>
               <li className='sub-menu f-700'>

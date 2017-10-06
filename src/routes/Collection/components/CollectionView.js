@@ -34,6 +34,7 @@ class CollectionView extends React.Component {
       openFloatMenu: false,
       showFilterModal: false,
       quantity: null,
+      userToView: null,
       filter: {
         has: {
           yes: true,
@@ -150,7 +151,7 @@ class CollectionView extends React.Component {
     }
   }
   componentDidUpdate (prevProps, prevState) {
-    if (!this.state.collections || !fromJS(prevProps.mons).equals(fromJS(this.props.mons))) {
+    if (!this.state.collections || !fromJS(prevProps.mons).equals(fromJS(this.props.mons)) || this.props.params.userId !== prevProps.params.userId) {
       this._initCollectionState()
     }
     if (!this.state.isInitializedMixMode && this.props.pickMonInfo && this.props.pickMonInfo.mixCols && this.props.pickMonInfo.mixCols.length === 1) {
@@ -212,9 +213,14 @@ class CollectionView extends React.Component {
         }
       })
       const orederdCollections = _.orderBy(collections, (e) => { return e.no || e.mon[e.monId].no }, ['asc'])
-      console.log('quantity', quantity)
       this.setState({ collections: orederdCollections, filteredCollections: orederdCollections, quantity })
       return Promise.resolve()
+    })
+    .then(() => {
+      return getUserByUserId(firebase, userId)
+    })
+    .then(userToView => {
+      this.setState({ userToView })
     })
   }
   _handleOnClickFilter () {
@@ -304,23 +310,20 @@ class CollectionView extends React.Component {
   }
   _handleOnClickTrainerInfo () {
     const { userId } = this.props.params
-    const { showUserModal, firebase, auth } = this.props
-    showUserModal({ user: null, isLoading: true })
-    getUserByUserId(firebase, userId)
-    .then(userToView => {
-      showUserModal({ user: userToView, isMyself: auth.uid === userId, isLoading: false })
-    })
+    const { showUserModal, auth } = this.props
+    const { userToView } = this.state
+    showUserModal({ user: userToView, isMyself: auth.uid === userId, isLoading: false })
   }
   render () {
-    const { collections, filter, filteredCollections, filterCollapse, openFloatMenu, mode } = this.state
-    const { pickMonInfo } = this.props
+    const { filter, filteredCollections, filterCollapse, openFloatMenu, mode, userToView } = this.state
+    const { pickMonInfo, auth } = this.props
     const renderCollections = () => {
       if (filteredCollections.length === 0) {
         return <div className='text-center'><WarningText text='조건에 맞는 포켓몬이 없습니다.' /></div>
       }
       return filteredCollections.map((col, idx) => {
         return <MonCard isSelectable={this.state.mode === 'mix'} onSelect={() => this._handleOnSelectMon(col)}
-          onUnselect={() => {}}
+          onUnselect={() => {}} isNotMine={userToView.id !== auth.uid}
           key={idx} mon={{ asis: null, tobe: col }} type={col.mon ? 'collection' : 'mon'} />
       })
     }
@@ -477,7 +480,7 @@ class CollectionView extends React.Component {
       )
     }
     const renderBody = () => {
-      if (!collections) return <Loading text='콜렉션을 불러오는 중...' height={window.innerHeight - 280} />
+      if (!userToView) return <Loading text='콜렉션을 불러오는 중...' height={window.innerHeight - 280} />
       else {
         return (
           <div className='row'>
@@ -543,9 +546,10 @@ class CollectionView extends React.Component {
     }
     return (
       <ContentContainer
+        key={this.props.params.userId}
         header={renderHeader()}
         stickyHeader={mode === 'mix'}
-        title='내 콜렉션'
+        title={userToView ? `${this.props.auth && this.props.auth.uid === this.props.params.userId ? '내' : `${userToView.nickname}님의`} 콜렉션` : ''}
         body={renderBody()}
       />
     )

@@ -66,13 +66,15 @@ class MonModal extends React.Component {
     })
   }
   render () {
-    const { mon, show, close, type, updatePickMonInfo, pickMonInfo, ...restProps } = this.props
+    const { mon, show, close, type, updatePickMonInfo, pickMonInfo, isNotMine, ...restProps } = this.props
     const tobeMon = mon.tobe
     const renderLevel = () => {
       if (mon.asis) {
         return (
           <div className='text-center m-b-30' style={{ height: '60px' }}>
             <MonLevel level={mon.asis.level} style={{ backgroundColor: colors.gray }} /> <i className='fa fa-long-arrow-right c-gray' /> <MonLevel level={mon.tobe.level} style={{ fontSize: 'small' }} />
+            {
+            !isNotMine &&
             <div className='m-t-15'>
               {
                 tobeMon.mon[tobeMon.monId].evoLv !== 0 && tobeMon.level >= tobeMon.mon[tobeMon.monId].evoLv &&
@@ -80,19 +82,23 @@ class MonModal extends React.Component {
               }
               <Button text='교배하기' color='orange' size='xs' onClick={this._handleOnClickMix} />
             </div>
+            }
           </div>
         )
       }
       return (
         <div>
           <MonLevel level={tobeMon.level} />
-          <div className='m-t-15'>
-            {
-              tobeMon.mon[tobeMon.monId].evoLv !== 0 && tobeMon.level >= tobeMon.mon[tobeMon.monId].evoLv &&
-              <Button text='진화하기' color='deeporange' size='xs' className='m-r-5' onClick={this._handleOnClickEvolution} />
-            }
-            <Button text='교배하기' color='orange' size='xs' onClick={this._handleOnClickMix} />
-          </div>
+          {
+            !isNotMine &&
+            <div className='m-t-15'>
+              {
+                tobeMon.mon[tobeMon.monId].evoLv !== 0 && tobeMon.level >= tobeMon.mon[tobeMon.monId].evoLv &&
+                <Button text='진화하기' color='deeporange' size='xs' className='m-r-5' onClick={this._handleOnClickEvolution} />
+              }
+              <Button text='교배하기' color='orange' size='xs' onClick={this._handleOnClickMix} />
+            </div>
+          }
         </div>
       )
     }
@@ -146,7 +152,8 @@ MonModal.propTypes = {
   type: PropTypes.string,
   location: PropTypes.object,
   updatePickMonInfo: PropTypes.func.isRequired,
-  pickMonInfo: PropTypes.object
+  pickMonInfo: PropTypes.object,
+  isNotMine: PropTypes.bool
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(MonModal)

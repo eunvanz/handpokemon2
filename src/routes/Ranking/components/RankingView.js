@@ -7,7 +7,6 @@ import ContentContainer from 'components/ContentContainer'
 import Loading from 'components/Loading'
 import ListContainer from 'components/ListContainer'
 import RankingElement from 'components/RankingElement'
-import RankingHeader from 'components/RankingHeader'
 
 import { getUserRanking, getUserRankingByUserId } from 'services/UserService'
 
@@ -88,7 +87,7 @@ class RankingView extends React.Component {
       }))
     }
     const renderHeader = () => {
-      return <RankingHeader type={type} />
+      return <RankingElement isHeader type={type} />
     }
     const renderBody = () => {
       if (userList) {
