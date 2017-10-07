@@ -1,5 +1,6 @@
 import { levelUpCollection, levelDownCollection } from 'utils/monUtil'
 import { convertMapToArr, updater } from 'utils/commonUtil'
+import numeral from 'numeral'
 
 const getCollectionsRefUserIdAndMonId = (firebase, userId, monId) => {
   return firebase.ref(`userCollections/${userId}`).once('value') // 사용자의 콜렉션 가져옴
@@ -35,21 +36,25 @@ export const updateCollection = (firebase, col) => {
 }
 
 export const getDeleteColObj = (firebase, col) => {
-  return firebase.ref(`users/${col.userId}/colPoint`).once('value')
+  return firebase.ref(`users/${col.userId}`).once('value')
     .then(snapshot => {
-      const asisPoint = snapshot.val()
+      const user = snapshot.val()
+      const asisPoint = user.colPoint
+      const leaguePoint = user.leaguePoint
       const tobePoint = asisPoint - col.mon[col.monId].point
       const updateObj = {
         [`collections/${col.id}`]: null,
         [`userCollections/${col.userId}/${col.id}`]: null,
         [`monCollections/${col.monId}/${col.id}`]: null,
-        [`users/${col.userId}/colPoint`]: tobePoint
+        [`users/${col.userId}/colPoint`]: tobePoint,
+        [`users/${col.userId}/colPoint_leaguePoint`]: `${numeral(tobePoint).format('0000000000')}_${numeral(leaguePoint).format('0000000000')}`,
+        [`users/${col.userId}/leaguePoint_colPoint`]: `${numeral(leaguePoint).format('0000000000')}_${numeral(tobePoint).format('0000000000')}`
       }
       return Promise.resolve(updateObj)
     })
 }
 
-const getResolveLevelDownObj = (firebase, srcCol, type, asisPoint) => {
+const getResolveLevelDownObj = (firebase, srcCol, type, asisPoint, leaguePoint) => {
   // let isError = false
   // firebase.ref(`collections/${srcCol.id}/level`).transaction(asisLevel => {
   //   if (asisLevel - srcCol.mon[srcCol.monId].evoLv < 0) {
@@ -70,7 +75,9 @@ const getResolveLevelDownObj = (firebase, srcCol, type, asisPoint) => {
       [`collections/${srcCol.id}`]: null,
       [`userCollections/${srcCol.userId}/${srcCol.id}`]: null,
       [`monCollections/${srcCol.monId}/${srcCol.id}`]: null,
-      [`users/${srcCol.userId}/colPoint`]: tobePoint
+      [`users/${srcCol.userId}/colPoint`]: tobePoint,
+      [`users/${srcCol.userId}/colPoint_leaguePoint`]: `${numeral(tobePoint).format('0000000000')}_${numeral(leaguePoint).format('0000000000')}`,
+      [`users/${srcCol.userId}/leaguePoint_colPoint`]: `${numeral(leaguePoint).format('0000000000')}_${numeral(tobePoint).format('0000000000')}`
     }
     console.log('교배/진화 포켓몬 삭제', updateSrcColObj)
     return Promise.resolve(updateSrcColObj)
@@ -86,6 +93,7 @@ export const postCollection = (firebase, userId, collection, type, srcCols) => {
   let asis = null
   let tobe = null
   let resultPoint
+  let leaguePoint
   let checkSrcCols
   let isError = false
   if (type === 'evolution' || type === 'mix') {
@@ -109,16 +117,22 @@ export const postCollection = (firebase, userId, collection, type, srcCols) => {
   .then(() => {
     if (isError) return Promise.reject('콜렉션이 존재하지 않습니다.')
     console.log('소스콜렉션 정합성 체크 OK')
-    return firebase.ref(`users/${userId}/colPoint`).once('value')
+    return firebase.ref(`users/${userId}`).once('value')
   })
   .then(snapshot => {
-    resultPoint = snapshot.val()
+    const user = snapshot.val()
+    resultPoint = user.colPoint
+    leaguePoint = user.leaguePoint
     return getCollectionsRefUserIdAndMonId(firebase, userId, collection.monId) // userId와 monId로 콜렉션을 가져옴
   })
   .then(snapshot => {
     if (!snapshot.val()) { // mon이 user에게 없을경우
       resultPoint += collectionMon.point
-      updateObj[`users/${userId}/colPoint`] = resultPoint
+      updateObj = {
+        [`users/${userId}/colPoint`]: resultPoint,
+        [`users/${userId}/colPoint_leaguePoint`]: `${numeral(resultPoint).format('0000000000')}_${numeral(leaguePoint).format('0000000000')}`,
+        [`users/${userId}/leaguePoint_colPoint`]: `${numeral(leaguePoint).format('0000000000')}_${numeral(resultPoint).format('0000000000')}`
+      }
       // 콜렉션을 생성함
       tobe = Object.assign({}, collection, { userId }) // 콜렉션
       const newCollectionKey = firebase.push('collections').key // collections에 추가
@@ -157,7 +171,7 @@ export const postCollection = (firebase, userId, collection, type, srcCols) => {
       return Promise.resolve()
     } else if (type === 'evolution') { // 진화의 경우 이전콜렉션에 대한 레벨 다운 혹은 삭제
       const srcCol = srcCols[0]
-      return getResolveLevelDownObj(firebase, srcCol, type, resultPoint)
+      return getResolveLevelDownObj(firebase, srcCol, type, resultPoint, leaguePoint)
       .then(updateSrcColObj => {
         updateObj = Object.assign({}, updateObj, updateSrcColObj)
         console.log('진화 포켓몬에 대한 처리 OK', updateObj)
@@ -165,7 +179,7 @@ export const postCollection = (firebase, userId, collection, type, srcCols) => {
       })
     } else if (type === 'mix') {
       // srcCols에 대해 levelDown처리
-      const promArr = srcCols.map(srcCol => getResolveLevelDownObj(firebase, srcCol, type, resultPoint))
+      const promArr = srcCols.map(srcCol => getResolveLevelDownObj(firebase, srcCol, type, resultPoint, leaguePoint))
       console.log('promArr', promArr)
       return Promise.all(promArr)
       .then(result => {

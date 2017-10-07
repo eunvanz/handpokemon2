@@ -50,7 +50,7 @@ class Sidebar extends React.Component {
   componentDidUpdate (prevProps, prevState) {
     const { user } = this.props
     const { timeouts } = this
-    if (!prevProps.user && user) { // user가 로그인 했을경우 크레딧을 리프레시해서 가져옴
+    if (prevProps.user && !prevProps.user.nickname && user && user.nickname) { // user가 로그인 했을경우 크레딧을 리프레시해서 가져옴
       this._refreshUserCredits()
     } else if (prevProps.user && user) { // 크레딧에 변화가 있을 경우 다시 시간 계산해서 interval 및 timeout 실행
       if (prevProps.user.pickCredit !== user.pickCredit) {
@@ -202,7 +202,7 @@ class Sidebar extends React.Component {
                 <Link to='/pick-district' onClick={() => $('.ma-backdrop').click()}>
                   <i className='fa fa-paw' style={{ fontSize: '22px' }} /> 포켓몬 채집
                   {
-                    user && (pickCredit !== 0 || pickCreditTimer) &&
+                    user && pickCredit && (pickCredit !== 0 || pickCreditTimer) &&
                     <Badge color={pickCreditTimer ? 'red' : 'lightblue'} text={`${pickCreditTimer || pickCredit}`} />
                   }
                 </Link>
@@ -211,7 +211,7 @@ class Sidebar extends React.Component {
                 <Link to='/'>
                   <i className='fa fa-map-o' style={{ fontSize: '22px' }} /> 포켓몬 탐험
                   {
-                    user && (adventureCredit !== 0 || adventureCreditTimer) &&
+                    user && adventureCredit && (adventureCredit !== 0 || adventureCreditTimer) &&
                     <Badge color={adventureCreditTimer ? 'red' : 'lightblue'} text={`${adventureCreditTimer || adventureCredit}`} />
                   }
                 </Link>
@@ -220,7 +220,7 @@ class Sidebar extends React.Component {
                 <Link to='/'>
                   <i className='fa fa-gamepad' style={{ fontSize: '22px' }} /> 포켓몬 시합
                   {
-                    user && (battleCredit !== 0 || battleCreditTimer) &&
+                    user && battleCredit && (battleCredit !== 0 || battleCreditTimer) &&
                     <Badge color={battleCreditTimer ? 'red' : 'lightblue'} text={`${battleCreditTimer || battleCredit}`} />
                   }
                 </Link>

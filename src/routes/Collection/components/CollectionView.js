@@ -316,14 +316,15 @@ class CollectionView extends React.Component {
   }
   render () {
     const { filter, filteredCollections, filterCollapse, openFloatMenu, mode, userToView } = this.state
-    const { pickMonInfo, auth } = this.props
+    const { pickMonInfo, auth, params } = this.props
+    const { userId } = params
     const renderCollections = () => {
       if (filteredCollections.length === 0) {
         return <div className='text-center'><WarningText text='조건에 맞는 포켓몬이 없습니다.' /></div>
       }
       return filteredCollections.map((col, idx) => {
         return <MonCard isSelectable={this.state.mode === 'mix'} onSelect={() => this._handleOnSelectMon(col)}
-          onUnselect={() => {}} isNotMine={userToView.id !== auth.uid}
+          onUnselect={() => {}} isNotMine={userId !== auth.uid}
           key={idx} mon={{ asis: null, tobe: col }} type={col.mon ? 'collection' : 'mon'} />
       })
     }
