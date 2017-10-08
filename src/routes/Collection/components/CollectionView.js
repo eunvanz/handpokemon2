@@ -16,7 +16,7 @@ import WarningText from 'components/WarningText'
 import PieChart from 'components/PieChart'
 
 import { getCollectionsByUserId } from 'services/CollectionService'
-import { getUserByUserId } from 'services/UserService'
+import { getUserByUserId, getUserRankingByUserId } from 'services/UserService'
 
 import { attrs } from 'constants/data'
 import { colors } from 'constants/colors'
@@ -217,7 +217,9 @@ class CollectionView extends React.Component {
       return Promise.resolve()
     })
     .then(() => {
-      return getUserByUserId(firebase, userId)
+      return getUserRankingByUserId(firebase, 'collection', userId) // 랭킹 업데이트 후 유저정보가져옴
+      .then(() => getUserRankingByUserId(firebase, 'battle', userId))
+      .then(() => getUserByUserId(firebase, userId))
     })
     .then(userToView => {
       this.setState({ userToView })

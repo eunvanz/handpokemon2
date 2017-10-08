@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { fromJS, is } from 'immutable'
 import keygen from 'keygenerator'
 import shallowCompare from 'react-addons-shallow-compare'
 
@@ -11,7 +10,7 @@ class PieChart extends React.Component {
     this._initialize = this._initialize.bind(this)
   }
   componentDidMount () {
-    setTimeout(() => this._initialize(), 100)
+    setTimeout(() => this._initialize(), 500)
   }
   shouldUpdateComponent (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
@@ -19,7 +18,7 @@ class PieChart extends React.Component {
   _initialize () {
     const $ = window.$
 
-    function easyPieChart(id, trackColor, scaleColor, barColor, lineWidth, lineCap, size) {
+    function easyPieChart (id, trackColor, scaleColor, barColor, lineWidth, lineCap, size) {
       $('#' + id).easyPieChart({
         trackColor: trackColor,
         scaleColor: scaleColor,

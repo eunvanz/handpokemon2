@@ -149,3 +149,14 @@ export const isStringLength = str => {
   }
   return strLength
 }
+
+export const convertNumberToStringForIndex = (numArr, digit = 10) => {
+  let result = ''
+  let format = ''
+  for (let i = 0; i < digit; i++) format += '0'
+  numArr.forEach((num, idx) => {
+    if (idx !== 0) result += '_'
+    result += numeral(num).format(format)
+  })
+  return result
+}

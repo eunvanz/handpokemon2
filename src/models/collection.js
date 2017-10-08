@@ -20,7 +20,9 @@ export const collection = {
   total: 0,
   addedTotal: 0,
   height: 0,
-  weight: 0
+  weight: 0,
+  isDefender: false,
+  isFavorite: false
 }
 
 export default collection

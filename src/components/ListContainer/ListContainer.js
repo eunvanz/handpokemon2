@@ -19,7 +19,7 @@ class ListContainer extends React.Component {
           useWindowAsScrollContainer
           infiniteLoadBeginEdgeOffset={isLastPage ? undefined : 200}
           onInfiniteLoad={onLoad}
-          loadingSpinnerDelegate={<Loading height={50} />}
+          loadingSpinnerDelegate={<Loading height={70} />}
           isInfiniteLoading={isLoading}
         >
           {elements}

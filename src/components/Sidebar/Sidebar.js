@@ -13,7 +13,7 @@ import { PICK_CREDIT_REFRESH, BATTLE_CREDIT_REFRESH, ADVENTURE_CREDIT_REFRESH,
 
 import Badge from 'components/Badge'
 
-import { refreshUserCredits } from 'services/UserService'
+import { refreshUserCredits, updateUserIndexes } from 'services/UserService'
 
 import { convertTimeToMMSS, getAuthUserFromFirebase } from 'utils/commonUtil'
 
@@ -257,6 +257,9 @@ class Sidebar extends React.Component {
               </li>
               <li className='f-700'>
                 <Link to='/forbidden-area'><i className='fa fa-lock' style={{ fontSize: '22px' }} /> 포켓몬관리</Link>
+              </li>
+              <li className='f-700'>
+                <a onClick={() => updateUserIndexes(this.props.firebase)}><i className='fa fa-lock' style={{ fontSize: '22px' }} /> 일회용</a>
               </li>
             </ul>
           </div>

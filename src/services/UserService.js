@@ -1,12 +1,9 @@
-// import { SECRET_KEY } from 'constants/security'
-//
-// import crypto from 'crypto-js'
-// import cookie from 'cookie'
-
 import _ from 'lodash'
 
 import { PICK_CREDIT_REFRESH, BATTLE_CREDIT_REFRESH, ADVENTURE_CREDIT_REFRESH,
 MAX_ADVENTURE_CREDIT, MAX_BATTLE_CREDIT, MAX_PICK_CREDIT } from 'constants/rules'
+
+import { updater, convertNumberToStringForIndex } from 'utils/commonUtil'
 
 export const isDupEmail = (firebase, email) => {
   const ref = firebase.ref('/users')
@@ -73,8 +70,6 @@ export const refreshUserCredits = (firebase, uid, user) => {
   updateObj.adventureCredit =
     adventureCredit + adventureCreditToAdd > MAX_ADVENTURE_CREDIT
     ? MAX_ADVENTURE_CREDIT : adventureCredit + adventureCreditToAdd
-  console.log('pickRest', pickRest)
-  console.log('updateObj', updateObj)
   return ref.update(updateObj).then(() => Promise.resolve(updateObj))
 }
 
@@ -171,10 +166,13 @@ export const increaseCredit = (firebase, uid, number, type) => {
 }
 
 export const getUserRanking = (firebase, type, page, prevPoint, prevKey) => {
-  const limitToLast = page * 20
-  const orderByChild = type === 'collection' ? 'colPoint' : 'leaguePoint'
+  let limitToLast = page * 20
+  const orderByChild = type === 'collection' ? 'colPoint_leaguePoint' : 'leaguePoint_colPoint'
   let ref = firebase.ref('users').orderByChild(orderByChild)
-  if (prevPoint && prevKey) ref = ref.endAt(prevPoint, prevKey)
+  if (prevPoint && prevKey) {
+    ref = ref.endAt(prevPoint, prevKey)
+    limitToLast++ // 이 전 페이지의 마지막 아이템까지 포함하므로 limit를 1 추가
+  }
   return ref.limitToLast(limitToLast).once('value')
   .then(snapshot => {
     const result = []
@@ -183,12 +181,12 @@ export const getUserRanking = (firebase, type, page, prevPoint, prevKey) => {
       user.id = child.key
       result.push(user)
     })
-    return Promise.resolve(_.reverse(result))
+    return Promise.resolve(_.reverse(result.slice(prevKey ? 0 : undefined, prevKey ? -1 : undefined)))
   })
 }
 
-export const getUserRankingByUserId = (firebase, type, userId) => {
-  const orderByChild = type === 'collection' ? 'colPoint' : 'leaguePoint'
+export const getUserRankingByUserId = (firebase, type, userId) => { // update겸용 : update하려면 어차피 ranking계산 로직이 필요하기 때문
+  const orderByChild = type === 'collection' ? 'colPoint_leaguePoint' : 'leaguePoint_colPoint'
   let ref = firebase.ref('users').orderByChild(orderByChild)
   return ref.once('value')
   .then(snapshot => {
@@ -203,48 +201,36 @@ export const getUserRankingByUserId = (firebase, type, userId) => {
     for (let i = 0; i < reversed.length; i++) {
       if (reversed[i].id === userId) userRank = i + 1
     }
-    return Promise.resolve(userRank)
+    return updateUserRanking(firebase, type, userId, userRank).then(() => Promise.resolve(userRank))
   })
 }
 
 export const signIn = (firebase, data) => {
-  // return new Promise((resolve, reject) => {
-  //   setTimeout(() => {
-  //     // 이메일과 비밀번호로 authUser를 얻어온다.
-  //     const validUserArr = allUsers.filter(user => data.email === user.email && data.password === user.password)
-  //     if (validUserArr.length === 0) return reject('등록되지 않은 이메일이거나 비밀번호가 틀렸습니다.')
-  //     const authUser = auth.filter(authInfo => validUserArr[0].id)[0]
-  //
-  //     // 아이디를 기억해야할 경우 authUser를 쿠키에 저장한다. (기본은 24시간 로그인)
-  //     const maxAge = data.remember ? 60 * 60 * 24 * 180 : 60 * 60 * 24
-  //     const authUserString = JSON.stringify(authUser)
-  //     const encAuthUserString = crypto.AES.encrypt(authUserString, SECRET_KEY).toString()
-  //     document.cookie = `authUser=${encAuthUserString}; max-age=${maxAge}; path=/;`
-  //
-  //     // authUser의 id로 로그인 유저 정보를 얻어온다.
-  //     const signInUser = getUserById(authUser.id)
-  //     return resolve(signInUser)
-  //   }, 1000)
-  // })
   return firebase.login(data)
 }
-
-// export const getSessionUser = () => {
-//   const cookies = cookie.parse(document.cookie)
-//   let authUser = null
-//   if (cookies.authUser && cookies.authUser.length > 0) { // 세션이 존재할경우
-//     const decAuthUser = crypto.AES.decrypt(cookies.authUser, SECRET_KEY).toString(crypto.enc.Utf8)
-//     authUser = JSON.parse(decAuthUser)
-//   }
-//   return authUser
-// }
 
 export const logout = (firebase) => {
   return firebase.logout()
 }
 
-// export const expireSessionUser = () => {
-//   const expireDate = new Date()
-//   expireDate.setDate(expireDate.getDate() - 1)
-//   document.cookie = `authUser=; expires=${expireDate.toGMTString()}; path=/;`
-// }
+export const updateUserRanking = (firebase, type, userId, rank) => {
+  const rankPath = type === 'collection' ? 'colRank' : 'leagueRank'
+  return firebase.ref(`/users/${userId}/${rankPath}`).set(rank)
+}
+
+// 일회용 함수: 콜렉션점수&시합점수 인덱스 필드 생성
+export const updateUserIndexes = firebase => {
+  const usersRef = firebase.ref('/users')
+  usersRef.once('value', snapshot => {
+    const users = snapshot.val()
+    const keys = Object.keys(users)
+    const updateObj = {}
+    keys.forEach(key => {
+      const colPoint = users[key].colPoint
+      const leaguePoint = users[key].leaguePoint
+      updateObj[`users/${key}/colPoint_leaguePoint`] = convertNumberToStringForIndex([colPoint, leaguePoint])
+      updateObj[`users/${key}/leaguePoint_colPoint`] = convertNumberToStringForIndex([leaguePoint, colPoint])
+    })
+    return updater(firebase, updateObj)
+  })
+}

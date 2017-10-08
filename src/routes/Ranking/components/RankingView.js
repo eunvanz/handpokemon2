@@ -18,7 +18,7 @@ class RankingView extends React.Component {
     this.state = {
       userList: null,
       page: 1,
-      lastColPoint: null,
+      lastPoint: null,
       lastUserId: null,
       isLoading: true,
       isLastPage: false,
@@ -31,10 +31,16 @@ class RankingView extends React.Component {
   }
   componentDidMount () {
     const { firebase, params, auth } = this.props
-    getUserRanking(firebase, params.type, 1)
+    const { type } = params
+    getUserRanking(firebase, type, 1)
     .then(userList => {
       const lastUser = userList[userList.length - 1]
-      this.setState({ userList, lastColPoint: lastUser.colPoint, lastUserId: lastUser.id, isLoading: false })
+      this.setState({
+        userList,
+        lastPoint: type === 'collection' ? lastUser.colPoint_leaguePoint : lastUser.leaguePoint_colPoint,
+        lastUserId: lastUser.id,
+        isLoading: false
+      })
       return Promise.resolve()
     })
     .then(() => {
@@ -47,13 +53,14 @@ class RankingView extends React.Component {
     })
   }
   _loadMoreItems () {
-    const { page, lastColPoint, lastUserId, userList, lastRank, isLastPage } = this.state
+    const { page, lastPoint, lastUserId, userList, lastRank, isLastPage } = this.state
     if (isLastPage) return
     this.setState({ isLoading: true })
     const { firebase, params } = this.props
-    getUserRanking(firebase, params.type, page + 1, lastColPoint, lastUserId)
+    const { type } = params
+    getUserRanking(firebase, type, page + 1, lastPoint, lastUserId)
     .then(userListToAdd => {
-      if (userListToAdd[0].id === userList[0].id) {
+      if (userListToAdd.length === 0) {
         this.setState({ isLastPage: true, isLoading: false })
         return
       }
@@ -63,7 +70,7 @@ class RankingView extends React.Component {
         lastRank: lastRank + userListToAdd.length,
         userList: _.concat(userList, userListToAdd),
         isLoading: false,
-        lastColPoint: lastUser.colPoint,
+        lastPoint: type === 'collection' ? lastUser.colPoint_leaguePoint : lastUser.leaguePoint_colPoint,
         lastUserId: lastUser.id
       })
     })
