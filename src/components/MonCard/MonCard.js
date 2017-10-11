@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import shallowCompare from 'react-addons-shallow-compare'
+import { firebaseConnect } from 'react-redux-firebase'
 
 import MonCost from '../MonCost'
 import MonAttr from '../MonAttr'
@@ -9,21 +10,29 @@ import MonRank from '../MonRank'
 import MonLevel from '../MonLevel'
 import Img from '../Img'
 import LabelBadge from '../LabelBadge'
+import StatusBadge from '../StatusBadge'
 
 import { getMonImage } from 'utils/monUtil'
+
+import { toggleFavorite } from 'services/CollectionService'
 
 import { colors } from 'constants/colors'
 
 class MonCard extends React.Component {
   constructor (props) {
     super(props)
+    const { mon } = props
+    const tobeMon = mon.tobe
     this.state = {
       showMonModal: false,
-      isSelected: false
+      isSelected: false,
+      isFavorite: tobeMon ? tobeMon.isFavorite : false
     }
     this._showMonModal = this._showMonModal.bind(this)
     this._handleOnSelect = this._handleOnSelect.bind(this)
     this._handleOnUnselect = this._handleOnUnselect.bind(this)
+    this._handleOnClickFavorite = this._handleOnClickFavorite.bind(this)
+    this._handleOnClickSheld = this._handleOnClickSheld.bind(this)
   }
   shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
@@ -40,8 +49,21 @@ class MonCard extends React.Component {
     this.setState({ isSelected: false })
     this.props.onUnselect()
   }
+  _handleOnClickFavorite (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    const { firebase, mon } = this.props
+    const isFavoriteToSet = !this.state.isFavorite
+    toggleFavorite(firebase, mon.tobe, isFavoriteToSet)
+    .then(() => {
+      this.setState({ isFavorite: isFavoriteToSet })
+    })
+  }
+  _handleOnClickSheld () {
+
+  }
   render () {
-    const { mon, pick, className, type, isSelectable, onUnselect, isNotMine, ...restProps } = this.props
+    const { mon, pick, className, type, isSelectable, onUnselect, isNotMine, firebase, showStatusBadge, ...restProps } = this.props
     const tobeMon = mon.tobe
     const renderLevelUpInfo = () => {
       if (mon.asis) {
@@ -79,7 +101,15 @@ class MonCard extends React.Component {
           <a className='ci-avatar'>
             <Img src={type === 'collection' ? getMonImage(tobeMon).url : 'hidden'} width='100%' style={{ border: '1px dotted #e2e2e2' }} />
           </a>
-          <div className='c-info text-center' style={{ margin: '5px 0px' }}>
+          <div className='c-info text-center' style={{ margin: '5px 0px', position: 'relative' }}>
+            {
+              showStatusBadge &&
+              <StatusBadge icon='zmdi zmdi-shield-check' side='left' isActive={tobeMon.isDefender} activeColor={colors.teal} onClick={this._handleOnClickSheld} />
+            }
+            {
+              showStatusBadge &&
+              <StatusBadge icon='fa fa-heart' side='right' isActive={this.state.isFavorite} activeColor={colors.pink} onClick={this._handleOnClickFavorite} />
+            }
             <MonCost cost={type === 'collection' ? tobeMon.mon[tobeMon.monId].cost : tobeMon.cost}
               style={{ marginBottom: '5px' }} />
             <MonAttr grade={type === 'collection' ? tobeMon.mon[tobeMon.monId].grade : tobeMon.grade}
@@ -107,7 +137,9 @@ MonCard.propTypes = {
   isSelectable: PropTypes.bool,
   onSelect: PropTypes.func,
   onUnselect: PropTypes.func,
-  isNotMine: PropTypes.bool
+  isNotMine: PropTypes.bool,
+  firebase: PropTypes.object.isRequired,
+  showStatusBadge: PropTypes.bool
 }
 
-export default MonCard
+export default firebaseConnect()(MonCard)

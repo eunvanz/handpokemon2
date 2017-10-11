@@ -207,3 +207,12 @@ export const postCollection = (firebase, userId, collection, type, srcCols) => {
     return Promise.reject(msg)
   })
 }
+
+export const toggleFavorite = (firebase, col, isFavorite) => {
+  const updateObj = {
+    [`collections/${col.id}/isFavorite`]: isFavorite,
+    [`userCollections/${col.userId}/${col.id}/isFavorite`]: isFavorite,
+    [`monCollections/${col.monId}/${col.id}/isFavorite`]: isFavorite
+  }
+  return updater(firebase, updateObj)
+}

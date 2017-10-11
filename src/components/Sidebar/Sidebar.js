@@ -161,6 +161,23 @@ class Sidebar extends React.Component {
     const { user, auth } = this.props
     const { pickCreditTimer, battleCreditTimer, adventureCreditTimer } = this.state
     const { pickCredit, battleCredit, adventureCredit } = this.props.creditInfo
+    const renderCreditBadge = type => {
+      let credit
+      let creditTimer
+      if (type === 'pick') {
+        credit = pickCredit
+        creditTimer = pickCreditTimer
+      } else if (type === 'adventure') {
+        credit = adventureCredit
+        creditTimer = adventureCreditTimer
+      } else if (type === 'battle') {
+        credit = battleCredit
+        creditTimer = battleCreditTimer
+      }
+      if (user && credit !== null && (credit !== 0 || creditTimer)) {
+        return <Badge color={creditTimer ? 'red' : 'lightblue'} text={`${creditTimer || credit}`} />
+      }
+    }
     return (
       <aside id='sidebar' className='sidebar c-overflow mCustomScrollbar _mCS_1 mCS-autoHide'
         style={{ overflow: 'visible' }}>
@@ -201,28 +218,19 @@ class Sidebar extends React.Component {
               <li className='f-700'>
                 <Link to='/pick-district' onClick={() => $('.ma-backdrop').click()}>
                   <i className='fa fa-paw' style={{ fontSize: '22px' }} /> 포켓몬 채집
-                  {
-                    user && pickCredit && (pickCredit !== 0 || pickCreditTimer) &&
-                    <Badge color={pickCreditTimer ? 'red' : 'lightblue'} text={`${pickCreditTimer || pickCredit}`} />
-                  }
+                  {renderCreditBadge('pick')}
                 </Link>
               </li>
               <li className='f-700'>
                 <Link to='/'>
                   <i className='fa fa-map-o' style={{ fontSize: '22px' }} /> 포켓몬 탐험
-                  {
-                    user && adventureCredit && (adventureCredit !== 0 || adventureCreditTimer) &&
-                    <Badge color={adventureCreditTimer ? 'red' : 'lightblue'} text={`${adventureCreditTimer || adventureCredit}`} />
-                  }
+                  {renderCreditBadge('adventure')}
                 </Link>
               </li>
               <li className='f-700'>
                 <Link to='/'>
                   <i className='fa fa-gamepad' style={{ fontSize: '22px' }} /> 포켓몬 시합
-                  {
-                    user && battleCredit && (battleCredit !== 0 || battleCreditTimer) &&
-                    <Badge color={battleCreditTimer ? 'red' : 'lightblue'} text={`${battleCreditTimer || battleCredit}`} />
-                  }
+                  {renderCreditBadge('battle')}
                 </Link>
               </li>
               <li className='f-700'>

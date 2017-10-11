@@ -284,7 +284,6 @@ class CollectionView extends React.Component {
   }
   _handleOnSelectMon (col) {
     // 교배 후 상대 포켓몬 선택시
-    console.log('col', col)
     const { pickMonInfo, updatePickMonInfo } = this.props
     if (col.id === pickMonInfo.mixCols[0].id) {
       showAlert('같은 포켓몬은 선택할 수 없습니다.')
@@ -292,7 +291,6 @@ class CollectionView extends React.Component {
     }
     const asisMixCols = pickMonInfo.mixCols
     const mixCols = _.concat(asisMixCols, col)
-    console.log('mixCols', mixCols)
     const newPickMonInfo = Object.assign({}, pickMonInfo, { mixCols })
     updatePickMonInfo(newPickMonInfo)
   }
@@ -320,13 +318,14 @@ class CollectionView extends React.Component {
     const { filter, filteredCollections, filterCollapse, openFloatMenu, mode, userToView } = this.state
     const { pickMonInfo, auth, params } = this.props
     const { userId } = params
+    const isMine = userId === auth.uid
     const renderCollections = () => {
       if (filteredCollections.length === 0) {
         return <div className='text-center'><WarningText text='조건에 맞는 포켓몬이 없습니다.' /></div>
       }
       return filteredCollections.map((col, idx) => {
         return <MonCard isSelectable={this.state.mode === 'mix'} onSelect={() => this._handleOnSelectMon(col)}
-          onUnselect={() => {}} isNotMine={userId !== auth.uid}
+          onUnselect={() => {}} isNotMine={!isMine} showStatusBadge={isMine}
           key={idx} mon={{ asis: null, tobe: col }} type={col.mon ? 'collection' : 'mon'} />
       })
     }
