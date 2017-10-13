@@ -1,0 +1,184 @@
+import React from 'react'
+import PropTypes from 'prop-types'
+import shallowCompare from 'react-addons-shallow-compare'
+import { fromJS, is } from 'immutable'
+import numeral from 'numeral'
+
+import CustomModal from '../CustomModal'
+import MonCard from '../MonCard'
+import Button from '../Button'
+
+class DefenderModal extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      asis: props.defenders,
+      tobe: props.defenders,
+      totalCost: props.defenders.reduce((accm, defender) => accm + defender.mon[defender.monId].cost, 0),
+      totalBattle: props.defenders.reduce((accm, defender) => accm + defender.total, 0)
+    }
+    this._handleOnClickApply = this._handleOnClickApply.bind(this)
+    this._handleOnClickSetDefender = this._handleOnClickSetDefender.bind(this)
+    this._handleOnClickCancel = this._handleOnClickCancel.bind(this)
+    this._initState = this._initState.bind(this)
+    this._isInTobe = this._isInTobe.bind(this)
+    this._isJustForCheck = this._isJustForCheck.bind(this)
+    this._updateInfos = this._updateInfos.bind(this)
+  }
+  shouldUpdateComponent (nextProps, nextState) {
+    return shallowCompare(this, nextProps, nextState)
+  }
+  componentDidUpdate (prevProps, prevState) {
+    if (!is(fromJS(prevProps.defenders), fromJS(this.props.defenders))) this._initState()
+    if (!is(fromJS(prevState.tobe), fromJS(this.state.tobe))) this._updateInfos()
+  }
+  _initState () {
+    const { defenders } = this.props
+    this.setState({
+      asis: defenders,
+      tobe: defenders,
+      totalCost: defenders.reduce((accm, defender) => accm + defender.mon[defender.monId].cost, 0),
+      totalBattle: defenders.reduce((accm, defender) => accm + defender.total, 0)
+    })
+  }
+  _updateInfos () {
+    const { tobe } = this.state
+    this.setState({
+      totalCost: tobe.reduce((accm, defender) => accm + defender.mon[defender.monId].cost, 0),
+      totalBattle: tobe.reduce((accm, defender) => accm + defender.total, 0)
+    })
+  }
+  _handleOnClickApply () {
+    const { onClickApply } = this.props
+    onClickApply(this.state)
+  }
+  _handleOnClickSetDefender (e, idx) {
+    e.preventDefault()
+    e.stopPropagation()
+    const { asis } = this.state
+    const { currentCol } = this.props
+    const tobe = asis.slice()
+    tobe[idx] = currentCol
+    this.setState({ tobe })
+  }
+  _handleOnClickCancel () {
+    const { close } = this.props
+    this.setState({ tobe: this.state.asis })
+    close()
+  }
+  _isInTobe (col) {
+    const { tobe } = this.state
+    return tobe.filter(defender => defender.id === col.id).length > 0
+  }
+  _isInAsis (col) {
+    const { asis } = this.state
+    return asis.filter(defender => defender.id === col.id).length > 0
+  }
+  _isJustForCheck () {
+    const { currentCol } = this.props
+    return currentCol && this._isInAsis(currentCol)
+  }
+  render () {
+    const { show, close, isLoading, currentCol } = this.props
+    const { tobe } = this.state
+    const renderMonCards = () => {
+      const result = []
+      let occupied = 0
+      result.push(tobe.map((col, idx) => {
+        occupied++
+        return (
+          <MonCard
+            mon={{ asis: null, tobe: col }}
+            type={this._isJustForCheck() ? 'collection' : 'defender'}
+            onClickSetDefenderBtn={(e) => this._handleOnClickSetDefender(e, idx)}
+            className={`col-md-4 col-sm-4 col-xs-6`}
+            isCustomSize
+            key={idx}
+          />
+        )
+      }
+      ))
+      for (let i = occupied; i < 3; i++) {
+        result.push(
+          <MonCard
+            isDummy
+            type={currentCol && this._isInAsis(currentCol) ? 'collection' : 'defender'}
+            onClickSetDefenderBtn={(e) => this._handleOnClickSetDefender(e, i)}
+            className={`col-md-4 col-sm-4 col-xs-6`}
+            isCustomSize
+            key={i}
+          />
+        )
+      }
+      return result
+    }
+    const renderBody = () => {
+      return (
+        <div className='row'>
+          {
+            currentCol && !this._isJustForCheck() &&
+            <div className='col-xs-12 m-b-20'>
+              <span className='c-lightblue f-700'>{currentCol.mon[currentCol.monId].name} LV.{currentCol.level}</span>을(를) 배치할 위치를 선택해주세요.
+            </div>
+          }
+          {renderMonCards()}
+          <div className='col-xs-12 m-t-20'>
+            <div>
+              총 코스트: <span className='c-lightblue f-700'>{this.state.totalCost}</span>
+            </div>
+            <div>
+              총 전투력: <span className='c-lightblue f-700'>{numeral(this.state.totalBattle).format('0,0')}</span>
+            </div>
+          </div>
+        </div>
+      )
+    }
+    const renderFooter = () => {
+      return (
+        <div className='text-right'>
+          {
+            !this._isJustForCheck() &&
+            <Button link text='취소' onClick={this._handleOnClickCancel} />
+          }
+          {
+            !this._isJustForCheck() &&
+            <Button text='적용하기' icon='fa fa-check' loading={isLoading}
+              onClick={this._handleOnClickApply} />
+          }
+          {
+            this._isJustForCheck() &&
+            <Button text='확인' icon='fa fa-check'
+              onClick={close} />
+          }
+        </div>
+      )
+    }
+    return (
+      <CustomModal
+        title='수비 포켓몬 배치'
+        bodyComponent={renderBody()}
+        footerComponent={renderFooter()}
+        show={show}
+        close={close}
+        backdrop
+        width={500}
+        id='defender-modal'
+      />
+    )
+  }
+}
+
+DefenderModal.contextTypes = {
+  router: PropTypes.object.isRequired
+}
+
+DefenderModal.propTypes = {
+  show: PropTypes.bool.isRequired,
+  close: PropTypes.func.isRequired,
+  onClickApply: PropTypes.func.isRequired,
+  defenders: PropTypes.array.isRequired,
+  isLoading: PropTypes.bool,
+  currentCol: PropTypes.object
+}
+
+export default DefenderModal

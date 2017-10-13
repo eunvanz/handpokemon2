@@ -14,8 +14,9 @@ import Button from 'components/Button'
 import Checkbox from 'components/Checkbox'
 import WarningText from 'components/WarningText'
 import PieChart from 'components/PieChart'
+import DefenderModal from 'components/DefenderModal'
 
-import { getCollectionsByUserId } from 'services/CollectionService'
+import { getCollectionsByUserId, updateIsDefender } from 'services/CollectionService'
 import { getUserByUserId, getUserRankingByUserId } from 'services/UserService'
 
 import { attrs } from 'constants/data'
@@ -35,6 +36,10 @@ class CollectionView extends React.Component {
       showFilterModal: false,
       quantity: null,
       userToView: null,
+      showDefenderModal: false,
+      defenders: [],
+      isLoading: false,
+      currentCol: null,
       filter: {
         has: {
           yes: true,
@@ -134,6 +139,7 @@ class CollectionView extends React.Component {
     this._applyFilter = this._applyFilter.bind(this)
     this._cancelMix = this._cancelMix.bind(this)
     this._handleOnClickTrainerInfo = this._handleOnClickTrainerInfo.bind(this)
+    this._handleOnClickApplyDefender = this._handleOnClickApplyDefender.bind(this)
   }
   componentDidMount () {
     const { pickMonInfo } = this.props
@@ -200,9 +206,11 @@ class CollectionView extends React.Component {
     }
     return getCollectionsByUserId(firebase, userId)
     .then(cols => {
+      let defenders
       mons.forEach(mon => {
         const monId = mon.id
         const has = cols.filter(col => col.monId === monId)[0]
+        defenders = cols.filter(col => col.isDefender)
         if (has) {
           quantity[mon.grade].has++
           quantity[mon.grade].total++
@@ -213,7 +221,7 @@ class CollectionView extends React.Component {
         }
       })
       const orederdCollections = _.orderBy(collections, (e) => { return e.no || e.mon[e.monId].no }, ['asc'])
-      this.setState({ collections: orederdCollections, filteredCollections: orederdCollections, quantity })
+      this.setState({ collections: orederdCollections, filteredCollections: orederdCollections, quantity, defenders })
       return Promise.resolve()
     })
     .then(() => {
@@ -242,6 +250,27 @@ class CollectionView extends React.Component {
         filter.subAttr[!mon.subAttr ? '없음' : mon.subAttr] && filter.cost[mon.cost] && filter.generation[mon.generation] && (colId ? col.id !== colId : true)
     })
     this.setState({ showFilterModal: false, filteredCollections })
+  }
+  _handleOnClickApplyDefender (defenders) { // defenders.asis, defenders.tobe
+    // TODO: 총 전투력 제한 및 코스트 체크로직 들어가야함
+    this.setState({ isLoading: true })
+    const { firebase } = this.props
+    const asisProms = []
+    const tobeProms = []
+    defenders.asis.forEach(defender => {
+      tobeProms.push(updateIsDefender(firebase, defender, false))
+    })
+    defenders.tobe.forEach(defender => {
+      tobeProms.push(updateIsDefender(firebase, defender, true))
+    })
+    Promise.all(asisProms)
+    .then(() => {
+      return Promise.all(tobeProms)
+    })
+    .then(() => {
+      this.setState({ defenders: defenders.tobe, isLoading: false, showDefenderModal: false })
+      this._initCollectionState()
+    })
   }
   _handleOnChangeFilterInput (e) {
     const { filter } = this.state
@@ -314,19 +343,23 @@ class CollectionView extends React.Component {
     const { userToView } = this.state
     showUserModal({ user: userToView, isMyself: auth.uid === userId, isLoading: false })
   }
+  _handleOnClickShield (col) {
+    this.setState({ showDefenderModal: true, currentCol: col })
+  }
   render () {
-    const { filter, filteredCollections, filterCollapse, openFloatMenu, mode, userToView } = this.state
+    const { filter, filteredCollections, filterCollapse, openFloatMenu, mode, userToView, defenders } = this.state
     const { pickMonInfo, auth, params } = this.props
     const { userId } = params
-    const isMine = userId === auth.uid
+    const isMine = auth && userId === auth.uid
     const renderCollections = () => {
       if (filteredCollections.length === 0) {
         return <div className='text-center'><WarningText text='조건에 맞는 포켓몬이 없습니다.' /></div>
       }
       return filteredCollections.map((col, idx) => {
+        const isMineAndHave = isMine && col.userId
         return <MonCard isSelectable={this.state.mode === 'mix'} onSelect={() => this._handleOnSelectMon(col)}
-          onUnselect={() => {}} isNotMine={!isMine} showStatusBadge={isMine}
-          key={idx} mon={{ asis: null, tobe: col }} type={col.mon ? 'collection' : 'mon'} />
+          onUnselect={() => { }} isNotMine={!isMine} showStatusBadge={isMineAndHave && mode === 'view'}
+          key={idx} mon={{ asis: null, tobe: col }} type={col.mon ? 'collection' : 'mon'} onClickShield={() => this._handleOnClickShield(col)} />
       })
     }
     const renderFilterBody = () => {
@@ -513,6 +546,14 @@ class CollectionView extends React.Component {
               show={this.state.showFilterModal}
               close={() => this.setState({ showFilterModal: false })}
               backdrop
+            />
+            <DefenderModal
+              defenders={defenders}
+              show={this.state.showDefenderModal}
+              close={() => this.setState({ showDefenderModal: false })}
+              onClickApply={this._handleOnClickApplyDefender}
+              currentCol={this.state.currentCol}
+              isLoading={this.state.isLoading}
             />
           </div>
         )

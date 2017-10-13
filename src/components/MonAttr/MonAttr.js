@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import shallowCompare from 'react-addons-shallow-compare'
 
-import { gradesColors, attrColors } from 'constants/colors'
+import { gradesColors, attrColors, colors } from 'constants/colors'
 import { badgeStyle } from 'constants/styles'
 
 import { isScreenSize } from 'utils/commonUtil'
@@ -12,9 +12,11 @@ class MonAttr extends React.Component {
     return shallowCompare(this, nextProps, nextState)
   }
   render () {
-    const { grade, mainAttr, subAttr, point, ...restProps } = this.props
+    const { grade, mainAttr, subAttr, point, isDummy, ...restProps } = this.props
     const getGradeColor = grade => {
-      if (grade === 'b') {
+      if (isDummy) {
+        return { backgroundColor: colors.lightGray, color: colors.lightGray }
+      } else if (grade === 'b') {
         return { backgroundColor: gradesColors.basic.bg, color: gradesColors.basic.text }
       } else if (grade === 's') {
         return { backgroundColor: gradesColors.special.bg, color: gradesColors.special.text }
@@ -29,7 +31,9 @@ class MonAttr extends React.Component {
       }
     }
     const getGradeName = grade => {
-      if (grade === 'b') {
+      if (isDummy) {
+        return 'DUMMY'
+      } else if (grade === 'b') {
         return 'BASIC'
       } else if (grade === 's') {
         return isScreenSize.smallerThan(380) ? 'SPEC' : 'SPECIAL'
@@ -44,12 +48,13 @@ class MonAttr extends React.Component {
       }
     }
     const getAttrColor = attr => {
+      if (isDummy) return { backgroundColor: colors.lightGray, color: colors.lightGray }
       return { backgroundColor: attrColors[attr].bg, color: attrColors[attr].text }
     }
     return (
       <div {...restProps}>
         {
-          grade &&
+          (grade || isDummy) &&
           <i style={Object.assign({}, badgeStyle, getGradeColor(grade))}>{getGradeName(grade)}</i>
         }
         {
@@ -57,8 +62,8 @@ class MonAttr extends React.Component {
           <span>(<span className='c-blue f-700'>+{point}</span> 콜렉션점수)</span>
         }
         {
-          mainAttr &&
-          <i style={Object.assign({}, badgeStyle, getAttrColor(mainAttr))}>{mainAttr}</i>
+          (mainAttr || isDummy) &&
+          <i style={Object.assign({}, badgeStyle, getAttrColor(mainAttr))}>{isDummy ? 'DM' : mainAttr}</i>
         }
         {
           subAttr &&
@@ -73,7 +78,8 @@ MonAttr.propTypes = {
   grade: PropTypes.string,
   mainAttr: PropTypes.string,
   subAttr: PropTypes.string,
-  point: PropTypes.number
+  point: PropTypes.number,
+  isDummy: PropTypes.bool
 }
 
 export default MonAttr

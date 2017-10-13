@@ -216,3 +216,12 @@ export const toggleFavorite = (firebase, col, isFavorite) => {
   }
   return updater(firebase, updateObj)
 }
+
+export const updateIsDefender = (firebase, col, isDefender) => {
+  const updateObj = {
+    [`collections/${col.id}/isDefender`]: isDefender,
+    [`userCollections/${col.userId}/${col.id}/isDefender`]: isDefender,
+    [`monCollections/${col.monId}/${col.id}/isDefender`]: isDefender
+  }
+  return updater(firebase, updateObj)
+}

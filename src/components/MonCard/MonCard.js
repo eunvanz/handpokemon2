@@ -11,6 +11,7 @@ import MonLevel from '../MonLevel'
 import Img from '../Img'
 import LabelBadge from '../LabelBadge'
 import StatusBadge from '../StatusBadge'
+import Button from '../Button'
 
 import { getMonImage } from 'utils/monUtil'
 
@@ -22,7 +23,7 @@ class MonCard extends React.Component {
   constructor (props) {
     super(props)
     const { mon } = props
-    const tobeMon = mon.tobe
+    const tobeMon = mon ? mon.tobe : null
     this.state = {
       showMonModal: false,
       isSelected: false,
@@ -32,7 +33,7 @@ class MonCard extends React.Component {
     this._handleOnSelect = this._handleOnSelect.bind(this)
     this._handleOnUnselect = this._handleOnUnselect.bind(this)
     this._handleOnClickFavorite = this._handleOnClickFavorite.bind(this)
-    this._handleOnClickSheld = this._handleOnClickSheld.bind(this)
+    this._handleOnClickShield = this._handleOnClickShield.bind(this)
   }
   shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
@@ -59,13 +60,27 @@ class MonCard extends React.Component {
       this.setState({ isFavorite: isFavoriteToSet })
     })
   }
-  _handleOnClickSheld () {
-
+  _handleOnClickShield (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    const { onClickShield, mon } = this.props
+    onClickShield(mon.tobe)
   }
   render () {
-    const { mon, pick, className, type, isSelectable, onUnselect, isNotMine, firebase, showStatusBadge, ...restProps } = this.props
-    const tobeMon = mon.tobe
+    const { mon, pick, className, type, isSelectable, onUnselect, isNotMine, firebase, showStatusBadge, isDummy, onClickShield, onClickSetDefenderBtn, isCustomSize, ...restProps } = this.props
+    const tobeMon = mon ? mon.tobe : null
+    const renderSetDefenderBtn = () => {
+      return <Button
+        className='m-t-5'
+        size='xs'
+        color={isDummy ? 'green' : 'orange'}
+        text={isDummy ? '추가' : '교체'}
+        icon={isDummy ? 'fa fa-plus' : 'fa fa-refresh'}
+        onClick={onClickSetDefenderBtn}
+      />
+    }
     const renderLevelUpInfo = () => {
+      if (isDummy) return null
       if (mon.asis) {
         // 레벨 업 시
         return <div className='text-center m-b-30' style={{ height: '60px' }}>
@@ -81,13 +96,13 @@ class MonCard extends React.Component {
       }
     }
     return (
-      <div className={`col-md-2 col-sm-3 col-xs-6 text-left ${className || ''}`} {...restProps}
+      <div className={`${isCustomSize ? '' : 'col-md-2 col-sm-3 col-xs-6'} text-left ${className || ''}`} {...restProps}
         style={{ padding: '0px 5px' }} onClick={isSelectable ? (this.state.isSelected ? this._handleOnUnselect : this._handleOnSelect) : this._showMonModal}
       >
-        {type === 'collection' && <MonLevel level={tobeMon.level}
+        {!isDummy && (type === 'collection' || type === 'defender') && <MonLevel level={tobeMon.level}
           style={{ position: 'absolute', top: '0px', borderRadius: '0px 0px 2px 0px', backgroundColor: tobeMon.level >= (tobeMon.mon[tobeMon.monId].evoLv === 0 ? 99999 : tobeMon.mon[tobeMon.monId].evoLv) ? colors.deepOrange : colors.lightBlue }} />}
         <div className='text-right' style={{ marginRight: '18px' }}>
-          {type === 'collection' && <MonRank rank={tobeMon.rank} style={{ borderRadius: '0px 0px 0px 2px' }} />}
+          {!isDummy && (type === 'collection' || type === 'defender') && <MonRank rank={tobeMon.rank} style={{ borderRadius: '0px 0px 0px 2px' }} />}
         </div>
         <div className='c-item'
           style={{
@@ -99,31 +114,38 @@ class MonCard extends React.Component {
             padding: '4px'
           }}>
           <a className='ci-avatar'>
-            <Img src={type === 'collection' ? getMonImage(tobeMon).url : 'hidden'} width='100%' style={{ border: '1px dotted #e2e2e2' }} />
+            <Img src={(type === 'collection' || type === 'defender') && !isDummy ? getMonImage(tobeMon).url : 'hidden'} width='100%' style={{ border: '1px dotted #e2e2e2' }} />
           </a>
           <div className='c-info text-center' style={{ margin: '5px 0px', position: 'relative' }}>
             {
               showStatusBadge &&
-              <StatusBadge icon='zmdi zmdi-shield-check' side='left' isActive={tobeMon.isDefender} activeColor={colors.teal} onClick={this._handleOnClickSheld} />
+              <StatusBadge icon='zmdi zmdi-shield-check' side='left' isActive={tobeMon.isDefender} activeColor={colors.cyan} onClick={this._handleOnClickShield} />
             }
             {
               showStatusBadge &&
               <StatusBadge icon='fa fa-heart' side='right' isActive={this.state.isFavorite} activeColor={colors.pink} onClick={this._handleOnClickFavorite} />
             }
-            <MonCost cost={type === 'collection' ? tobeMon.mon[tobeMon.monId].cost : tobeMon.cost}
+            <MonCost cost={isDummy ? 0 : (type === 'collection' || type === 'defender') ? tobeMon.mon[tobeMon.monId].cost : tobeMon.cost}
               style={{ marginBottom: '5px' }} />
-            <MonAttr grade={type === 'collection' ? tobeMon.mon[tobeMon.monId].grade : tobeMon.grade}
-              mainAttr={type === 'collection' ? tobeMon.mon[tobeMon.monId].mainAttr : tobeMon.mainAttr}
-              subAttr={type === 'collection' ? tobeMon.mon[tobeMon.monId].subAttr : tobeMon.subAttr}
-              style={{ marginBottom: '10px' }} />
+            <MonAttr grade={isDummy ? null : (type === 'collection' || type === 'defender') ? tobeMon.mon[tobeMon.monId].grade : tobeMon.grade}
+              mainAttr={isDummy ? null : (type === 'collection' || type === 'defender') ? tobeMon.mon[tobeMon.monId].mainAttr : tobeMon.mainAttr}
+              subAttr={isDummy ? null : (type === 'collection' || type === 'defender') ? tobeMon.mon[tobeMon.monId].subAttr : tobeMon.subAttr}
+              style={{ marginBottom: '10px' }} isDummy={isDummy} />
           </div>
         </div>
         {
           pick &&
           renderLevelUpInfo()
         }
-        <MonModal mon={mon} type={this.props.type} show={this.state.showMonModal} isNotMine={isNotMine}
+        { !isDummy && <MonModal mon={mon} type={this.props.type} show={this.state.showMonModal} isNotMine={isNotMine}
           close={() => this.setState({ showMonModal: false })} />
+        }
+        {
+          type === 'defender' &&
+          <div className='text-center'>
+            {renderSetDefenderBtn()}
+          </div>
+        }
       </div>
     )
   }
@@ -139,7 +161,11 @@ MonCard.propTypes = {
   onUnselect: PropTypes.func,
   isNotMine: PropTypes.bool,
   firebase: PropTypes.object.isRequired,
-  showStatusBadge: PropTypes.bool
+  showStatusBadge: PropTypes.bool,
+  isDummy: PropTypes.bool,
+  onClickShield: PropTypes.func,
+  onClickSetDefenderBtn: PropTypes.func,
+  isCustomSize: PropTypes.bool
 }
 
 export default firebaseConnect()(MonCard)

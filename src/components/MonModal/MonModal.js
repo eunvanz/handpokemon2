@@ -90,7 +90,7 @@ class MonModal extends React.Component {
         <div>
           <MonLevel level={tobeMon.level} />
           {
-            !isNotMine &&
+            !isNotMine && type !== 'defender' &&
             <div className='m-t-15'>
               {
                 tobeMon.mon[tobeMon.monId].evoLv !== 0 && tobeMon.level >= tobeMon.mon[tobeMon.monId].evoLv &&
@@ -107,7 +107,7 @@ class MonModal extends React.Component {
         <div className='row'>
           <div className='col-sm-4 col-xs-12 text-center' style={{ marginBottom: '20px' }}>
             <p style={{ marginBottom: '10px' }}>
-              <Img src={type === 'collection' ? getMonImage(tobeMon).url : 'hidden'} width='100%'
+              <Img src={type === 'collection' || type === 'defender' ? getMonImage(tobeMon).url : 'hidden'} width='100%'
                 style={{ border: '1px dotted #e2e2e2', maxWidth: '200px' }} />
             </p>
             {tobeMon.level &&
