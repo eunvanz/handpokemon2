@@ -140,6 +140,7 @@ class CollectionView extends React.Component {
     this._cancelMix = this._cancelMix.bind(this)
     this._handleOnClickTrainerInfo = this._handleOnClickTrainerInfo.bind(this)
     this._handleOnClickApplyDefender = this._handleOnClickApplyDefender.bind(this)
+    this._isMine = this._isMine.bind(this)
   }
   componentDidMount () {
     const { pickMonInfo } = this.props
@@ -189,8 +190,9 @@ class CollectionView extends React.Component {
     }
   }
   componentWillUnmount () {
-    const { pickMonInfo, updatePickMonInfo } = this.props
+    const { pickMonInfo, updatePickMonInfo, firebase, params } = this.props
     if (pickMonInfo && pickMonInfo.mixCols && pickMonInfo.mixCols.length === 1) updatePickMonInfo(null)
+    if (!this._isMine) firebase.unWatchEvent('value', `/userCollections/${params.userId}`)
   }
   _initCollectionState () {
     const { params, firebase, mons } = this.props
@@ -345,6 +347,11 @@ class CollectionView extends React.Component {
   }
   _handleOnClickShield (col) {
     this.setState({ showDefenderModal: true, currentCol: col })
+  }
+  _isMine () {
+    const { auth, params } = this.props
+    const { userId } = params
+    return auth && userId === auth.uid
   }
   render () {
     const { filter, filteredCollections, filterCollapse, openFloatMenu, mode, userToView, defenders } = this.state
@@ -554,6 +561,7 @@ class CollectionView extends React.Component {
               onClickApply={this._handleOnClickApplyDefender}
               currentCol={this.state.currentCol}
               isLoading={this.state.isLoading}
+              user={userToView}
             />
           </div>
         )

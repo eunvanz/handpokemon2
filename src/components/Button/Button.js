@@ -38,7 +38,7 @@ class Button extends React.Component {
       <button
         id={this.props.id || this.state.key}
         className={`btn ${this.props.link ? '' : `bgm-${this.props.color || 'blue'}`} ${this.props.link ? 'btn-link' : ''} waves-effect ${this.props.size ? `btn-${this.props.size}` : ''} ${this.props.icon ? 'btn-icon-text' : ''} ${this.props.block ? 'btn-block' : ''} ${this.props.className}`}
-        onClick={this.props.onClick}
+        onClick={this.props.disabled ? null : this.props.onClick}
         data-dismiss={this.props['data-dismiss']} style={Object.assign({}, style.button, this.props.style)}
       >
         {this.props.icon && !this.props.iconRight && <i className={this.props.loading ? 'fa fa-circle-o-notch fa-spin fa-fw' : this.props.icon} style={style.icon} />}

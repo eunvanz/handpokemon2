@@ -23,5 +23,6 @@ export default class User {
     this.battleLose = 0
     this.colPoint_leaguePoint = '0000000000_0000001000'
     this.leaguePoint_colPoint = '0000001000_0000000000'
+    this.league = 0
   }
 }

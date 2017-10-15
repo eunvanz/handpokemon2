@@ -34,7 +34,7 @@ export const districts = [
     color: colors.brown
   },
   {
-    name: '뜨끈한 불지옥',
+    name: '하늘섬 용광로',
     attrs: ['불꽃', '비행', '강철'],
     color: colors.red
   },

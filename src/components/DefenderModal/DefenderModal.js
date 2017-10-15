@@ -8,12 +8,15 @@ import CustomModal from '../CustomModal'
 import MonCard from '../MonCard'
 import Button from '../Button'
 
+import { LEAGUE } from 'constants/rules'
+
 class DefenderModal extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
       asis: props.defenders,
       tobe: props.defenders,
+      asisTotalCost: props.defenders.reduce((accm, defender) => accm + defender.mon[defender.monId].cost, 0),
       totalCost: props.defenders.reduce((accm, defender) => accm + defender.mon[defender.monId].cost, 0),
       totalBattle: props.defenders.reduce((accm, defender) => accm + defender.total, 0)
     }
@@ -24,6 +27,7 @@ class DefenderModal extends React.Component {
     this._isInTobe = this._isInTobe.bind(this)
     this._isJustForCheck = this._isJustForCheck.bind(this)
     this._updateInfos = this._updateInfos.bind(this)
+    this._getMaxCost = this._getMaxCost.bind(this)
   }
   shouldUpdateComponent (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
@@ -78,8 +82,20 @@ class DefenderModal extends React.Component {
     const { currentCol } = this.props
     return currentCol && this._isInAsis(currentCol)
   }
+  _getMaxCost () {
+    const { user } = this.props
+    return LEAGUE[user.league || 0].maxCost
+  }
+  _isChangeable (tgtCost) {
+    const { currentCol } = this.props
+    if (!currentCol) return false
+    const srcCost = currentCol.mon[currentCol.monId].cost
+    const maxCost = this._getMaxCost()
+    const { asisTotalCost } = this.state
+    return asisTotalCost - tgtCost + srcCost <= maxCost
+  }
   render () {
-    const { show, close, isLoading, currentCol } = this.props
+    const { show, close, isLoading, currentCol, user } = this.props
     const { tobe } = this.state
     const renderMonCards = () => {
       const result = []
@@ -94,6 +110,7 @@ class DefenderModal extends React.Component {
             className={`col-md-4 col-sm-4 col-xs-6`}
             isCustomSize
             key={idx}
+            disableChangeBtn={!this._isChangeable(col.mon[col.monId].cost)}
           />
         )
       }
@@ -107,6 +124,7 @@ class DefenderModal extends React.Component {
             className={`col-md-4 col-sm-4 col-xs-6`}
             isCustomSize
             key={i}
+            disableChangeBtn={!this._isChangeable(0)}
           />
         )
       }
@@ -122,9 +140,9 @@ class DefenderModal extends React.Component {
             </div>
           }
           {renderMonCards()}
-          <div className='col-xs-12 m-t-20'>
+          <div className='col-xs-12'>
             <div>
-              총 코스트: <span className='c-lightblue f-700'>{this.state.totalCost}</span>
+              총 코스트: <span className='c-lightblue f-700'>{this.state.totalCost}</span>/{this._getMaxCost()}
             </div>
             <div>
               총 전투력: <span className='c-lightblue f-700'>{numeral(this.state.totalBattle).format('0,0')}</span>
@@ -178,7 +196,8 @@ DefenderModal.propTypes = {
   onClickApply: PropTypes.func.isRequired,
   defenders: PropTypes.array.isRequired,
   isLoading: PropTypes.bool,
-  currentCol: PropTypes.object
+  currentCol: PropTypes.object,
+  user: PropTypes.object.isRequired
 }
 
 export default DefenderModal

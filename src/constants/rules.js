@@ -69,9 +69,56 @@ export const getStandardCost = (grade, total) => {
   } else if (grade === 'l') {
     base = base.map(elem => elem + 60)
   }
-  console.log('base', base)
   for (let i = 0; i < base.length; i++) {
     if (total <= base[i]) return i
   }
   return 10
 }
+
+export const LEAGUE = [
+  {
+    name: '걸음마',
+    maxCost: 11,
+    cut: 90
+  },
+  {
+    name: '브론즈',
+    maxCost: 12,
+    cut: 80
+  },
+  {
+    name: '실버',
+    maxCost: 13,
+    cut: 70
+  },
+  {
+    name: '골드',
+    maxCost: 14,
+    cut: 60
+  },
+  {
+    name: '다이아',
+    maxCost: 16,
+    cut: 50
+  },
+  {
+    name: '에이스',
+    maxCost: 18,
+    cut: 40
+  },
+  {
+    name: '챔피온',
+    maxCost: 20,
+    cut: 30
+  },
+  {
+    name: '마스터',
+    maxCost: 22,
+    cut: 20
+  },
+  {
+    name: '레전드',
+    maxCost: 24,
+    cut: 10
+  }
+]

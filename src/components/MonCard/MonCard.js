@@ -67,7 +67,7 @@ class MonCard extends React.Component {
     onClickShield(mon.tobe)
   }
   render () {
-    const { mon, pick, className, type, isSelectable, onUnselect, isNotMine, firebase, showStatusBadge, isDummy, onClickShield, onClickSetDefenderBtn, isCustomSize, ...restProps } = this.props
+    const { mon, pick, className, type, isSelectable, onUnselect, isNotMine, firebase, showStatusBadge, isDummy, onClickShield, onClickSetDefenderBtn, isCustomSize, disableChangeBtn, ...restProps } = this.props
     const tobeMon = mon ? mon.tobe : null
     const renderSetDefenderBtn = () => {
       return <Button
@@ -77,6 +77,7 @@ class MonCard extends React.Component {
         text={isDummy ? '추가' : '교체'}
         icon={isDummy ? 'fa fa-plus' : 'fa fa-refresh'}
         onClick={onClickSetDefenderBtn}
+        disabled={disableChangeBtn}
       />
     }
     const renderLevelUpInfo = () => {
@@ -142,7 +143,7 @@ class MonCard extends React.Component {
         }
         {
           type === 'defender' &&
-          <div className='text-center'>
+          <div className='text-center' style={{ marginBottom: '20px' }}>
             {renderSetDefenderBtn()}
           </div>
         }
@@ -165,7 +166,8 @@ MonCard.propTypes = {
   isDummy: PropTypes.bool,
   onClickShield: PropTypes.func,
   onClickSetDefenderBtn: PropTypes.func,
-  isCustomSize: PropTypes.bool
+  isCustomSize: PropTypes.bool,
+  disableChangeBtn: PropTypes.bool
 }
 
 export default firebaseConnect()(MonCard)
