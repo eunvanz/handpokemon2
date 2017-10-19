@@ -4,6 +4,7 @@ import messageModalReducer from './messageModal'
 import pickMonInfoReducer from './pickMonInfo'
 import userModalReducer from './userModal'
 import creditInfoReducer from './creditInfo'
+import honorModalReducer from './honorModal'
 
 import { firebaseStateReducer } from 'react-redux-firebase'
 
@@ -15,6 +16,7 @@ export const makeRootReducer = (asyncReducers) => {
     firebase: firebaseStateReducer,
     userModal: userModalReducer,
     creditInfo: creditInfoReducer,
+    honorModal: honorModalReducer,
     ...asyncReducers
   })
 }

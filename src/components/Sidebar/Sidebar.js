@@ -10,10 +10,12 @@ import shallowCompare from 'react-addons-shallow-compare'
 import { DEFAULT_PROFILE_IMAGE_URL } from 'constants/urls'
 import { PICK_CREDIT_REFRESH, BATTLE_CREDIT_REFRESH, ADVENTURE_CREDIT_REFRESH,
   MAX_PICK_CREDIT, MAX_BATTLE_CREDIT, MAX_ADVENTURE_CREDIT } from 'constants/rules'
+import { honors } from 'constants/data'
 
 import Badge from 'components/Badge'
 
 import { refreshUserCredits, updateUserIndexes } from 'services/UserService'
+import { postHonor } from 'services/HonorService'
 
 import { convertTimeToMMSS, getAuthUserFromFirebase } from 'utils/commonUtil'
 
@@ -36,6 +38,7 @@ class Sidebar extends React.Component {
     this._refreshUserCredits = this._refreshUserCredits.bind(this)
     this._handleCredit = this._handleCredit.bind(this)
     this._increaseCredit = this._increaseCredit.bind(this)
+    this._handleOnClickPostHonor = this._handleOnClickPostHonor.bind(this)
     this.state = {
       pickCreditTimer: null,
       battleCreditTimer: null,
@@ -157,6 +160,13 @@ class Sidebar extends React.Component {
       }
     }, 1000)
   }
+  _handleOnClickPostHonor () {
+    const { firebase } = this.props
+    const reducer = honors.reduce((prom, honor) => {
+      return prom.then(() => postHonor(firebase, honor))
+    }, Promise.resolve())
+    reducer()
+  }
   render () {
     const { user, auth } = this.props
     const { pickCreditTimer, battleCreditTimer, adventureCreditTimer } = this.state
@@ -237,7 +247,7 @@ class Sidebar extends React.Component {
                 <Link to='/'>
                   <i className='fa fa-shopping-cart' style={{ fontSize: '22px' }} /> 상점
                   {
-                    user && <Badge color='amber' text={`${numeral(1000).format(user.pokemoney || 0)}P`} />
+                    user && <Badge color='amber' text={`${numeral(user.pokemoney || 0).format('0,0')}P`} />
                   }
                 </Link>
               </li>
@@ -266,9 +276,12 @@ class Sidebar extends React.Component {
               <li className='f-700'>
                 <Link to='/forbidden-area'><i className='fa fa-lock' style={{ fontSize: '22px' }} /> 포켓몬관리</Link>
               </li>
-              <li className='f-700'>
+              {/* <li className='f-700'>
                 <a onClick={() => updateUserIndexes(this.props.firebase)}><i className='fa fa-lock' style={{ fontSize: '22px' }} /> 일회용</a>
               </li>
+              <li className='f-700'>
+                <a onClick={this._handleOnClickPostHonor}><i className='fa fa-lock' style={{ fontSize: '22px' }} /> 칭호등록</a>
+              </li> */}
             </ul>
           </div>
         </div>

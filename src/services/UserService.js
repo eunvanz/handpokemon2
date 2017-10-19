@@ -218,6 +218,10 @@ export const updateUserRanking = (firebase, type, userId, rank) => {
   return firebase.ref(`/users/${userId}/${rankPath}`).set(rank)
 }
 
+export const setUserPath = (firebase, userId, path, value) => {
+  return firebase.ref(`/users/${userId}/${path}`).set(value)
+}
+
 // 일회용 함수: 콜렉션점수&시합점수 인덱스 필드 생성
 export const updateUserIndexes = firebase => {
   const usersRef = firebase.ref('/users')

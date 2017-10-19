@@ -54,7 +54,7 @@ class CustomModal extends React.Component {
 
 CustomModal.propTypes = {
   title: PropTypes.string,
-  bodyComponent: PropTypes.element.isRequired,
+  bodyComponent: PropTypes.any.isRequired,
   footerComponent: PropTypes.element.isRequired,
   show: PropTypes.bool.isRequired,
   close: PropTypes.func,

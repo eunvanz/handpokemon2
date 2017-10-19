@@ -160,3 +160,7 @@ export const convertNumberToStringForIndex = (numArr, digit = 10) => {
   })
   return result
 }
+
+export const countAttrsInCollections = (attr, collections) => {
+  return collections.filter(collection => collection.mon[collection.monId].mainAttr === attr || collection.mon[collection.monId].subAttr === attr).length
+}

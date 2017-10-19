@@ -41,6 +41,7 @@ class DefenderModal extends React.Component {
     this.setState({
       asis: defenders,
       tobe: defenders,
+      asisTotalCost: defenders.reduce((accm, defender) => accm + defender.mon[defender.monId].cost, 0),
       totalCost: defenders.reduce((accm, defender) => accm + defender.mon[defender.monId].cost, 0),
       totalBattle: defenders.reduce((accm, defender) => accm + defender.total, 0)
     })
@@ -92,6 +93,10 @@ class DefenderModal extends React.Component {
     const srcCost = currentCol.mon[currentCol.monId].cost
     const maxCost = this._getMaxCost()
     const { asisTotalCost } = this.state
+    console.log('asisTotalCost', asisTotalCost)
+    console.log('tgtCost', tgtCost)
+    console.log('srcCost', srcCost)
+    console.log('maxCost', maxCost)
     return asisTotalCost - tgtCost + srcCost <= maxCost
   }
   render () {

@@ -9,16 +9,17 @@ import Roulette from 'components/Roulette'
 import Loading from 'components/Loading'
 import MonCard from 'components/MonCard'
 import Button from 'components/Button'
+import HonorModal from 'components/HonorModal'
 
 import { getPickMons, getNextMons } from 'services/MonService'
 import { postCollection } from 'services/CollectionService'
-import { decreaseCredit, refreshUserCredits } from 'services/UserService'
+import { decreaseCredit, refreshUserCredits, setUserPath } from 'services/UserService'
 
 import { PICK_MON_ROULETTE_DELAY, getMixGrades } from 'constants/rules'
 import { attrs as allAttrs } from 'constants/data'
 
 import { mergePickResults } from 'utils/monUtil'
-import { showAlert } from 'utils/commonUtil'
+import { showAlert, countAttrsInCollections, convertMapToArr } from 'utils/commonUtil'
 
 class PickMonView extends React.Component {
   constructor (props) {
@@ -33,6 +34,7 @@ class PickMonView extends React.Component {
     }
     this._initPick = this._initPick.bind(this)
     this._handleOnClickContinue = this._handleOnClickContinue.bind(this)
+    this._checkHonorGot = this._checkHonorGot.bind(this)
   }
   componentDidMount () {
     const { pickMonInfo, auth } = this.props
@@ -107,6 +109,7 @@ class PickMonView extends React.Component {
           return postCollection(firebase, auth.uid, picks[pickedIdx], 'pick')
             .then(result => {
               this.setState({ picks, pickedIdx, result })
+              console.log('result', result)
               return Promise.resolve()
             })
         } else {
@@ -122,8 +125,12 @@ class PickMonView extends React.Component {
           }), Promise.resolve())
           .then(() => {
             results = mergePickResults(results)
+            console.log('results', results)
             this.setState({ multiPicks: results })
             return Promise.resolve()
+          })
+          .then(() => {
+            this._checkHonorGot()
           })
         }
       })
@@ -143,6 +150,9 @@ class PickMonView extends React.Component {
         .then(result => {
           this.setState({ picks, pickedIdx, result })
           return Promise.resolve()
+        })
+        .then(() => {
+          this._checkHonorGot()
         })
       })
       .catch(msg => {
@@ -172,6 +182,9 @@ class PickMonView extends React.Component {
             this.setState({ multiPicks: [result] })
             return Promise.resolve()
           })
+          .then(() => {
+            this._checkHonorGot()
+          })
         }
       })
       .catch(msg => {
@@ -199,9 +212,103 @@ class PickMonView extends React.Component {
       this.context.router.push(`pick-mon?f=${keygen._()}`)
     })
   }
+  _checkHonorGot () {
+    const before = new Date().getTime()
+    // 새로운 포켓몬이 나오거나 포켓몬이 사라졌을 때 칭호가 비활성화 되거나 칭호를 새롭게 얻음
+    const { user, showHonorModal, honors, userCollections, auth, firebase } = this.props
+    let { gotHonors, enabledHonors } = user
+    let tobeEnabledHonors = []
+    let tobeGotHonors = []
+    if (enabledHonors) tobeEnabledHonors = enabledHonors.slice()
+    if (gotHonors) tobeGotHonors = gotHonors.slice()
+    let isEnabledHonorsChanged = false
+    let isTobeGotHonorsChanged = false
+    const messages = []
+    const honorsForModal = []
+    const userCollectionsArr = convertMapToArr(userCollections[auth.uid])
+    // 전체 honors에서 user의 colPoint보다 낮으면서 gotHonor에 없는 honor가 있는지 탐색
+    // 전체 honors에서 user가 얻은 포켓몬 속성에 대해서만 user가 가진 해당 속성 콜렉션의 수와 비교
+    // enabledHonor에서 user가 자격 미달인 honor가 있는지 탐색
+    if (enabledHonors && enabledHonors.length > 0) {
+      enabledHonors.forEach((honor, idx) => {
+        if (honor.type === 1) {
+          if (user.colPoint < honor.condition) {
+            messages.push('콜렉션 점수 하락으로 아래 칭호가 해제되었습니다.')
+            honorsForModal.push(honor)
+            // TODO: enabledHonor 삭제 로직
+            isEnabledHonorsChanged = true
+            tobeEnabledHonors.splice(idx, 1)
+          }
+        } else {
+          const attr = honor.attr
+          if (countAttrsInCollections(attr, userCollectionsArr) < honor.condition) {
+            messages.push('콜렉션 개체 수 하락으로 아래 칭호가 해제되었습니다.')
+            honorsForModal.push(honor)
+            // TODO: enabledHonor 삭제 로직
+            isEnabledHonorsChanged = true
+            tobeEnabledHonors.splice(idx, 1)
+          }
+        }
+      })
+    }
+    let honorsNotGot
+    if (gotHonors) honorsNotGot = honors.filter(honor => _.findIndex(gotHonors, gotHonor => gotHonor.id === honor.id) > -1)
+    else {
+      honorsNotGot = honors
+      gotHonors = []
+    }
+    const honorsNotGotType1 = []
+    const honorsNotGotType2 = []
+    honorsNotGot.forEach(honor => {
+      if (honor.type === 1) {
+        honorsNotGotType1.push(honor)
+      } else {
+        honorsNotGotType2.push(honor)
+      }
+    })
+    for (const honorNotGotType1 of honorsNotGotType1) {
+      if (honorNotGotType1.condition < user.colPoint) {
+        messages.push('콜렉션 점수 상승으로 아래 칭호를 획득했습니다.')
+        honorsForModal.push(honorNotGotType1)
+        isTobeGotHonorsChanged = true
+        tobeGotHonors.push(honorNotGotType1)
+      }
+    }
+    for (const honorNotGotType2 of honorsNotGotType2) {
+      if (honorNotGotType2.condition < countAttrsInCollections(honorNotGotType2.attr, userCollectionsArr)) {
+        messages.push('콜렉션 개체 수 상승으로 아래 칭호를 획득했습니다.')
+        honorsForModal.push(honorNotGotType2)
+        isTobeGotHonorsChanged = true
+        tobeGotHonors.push(honorNotGotType2)
+      }
+    }
+    const updateUserHonorInfoProms = []
+    if (isEnabledHonorsChanged) {
+      updateUserHonorInfoProms.push(setUserPath(firebase, auth.uid, 'enabledHonors', tobeEnabledHonors))
+    }
+    if (isTobeGotHonorsChanged) {
+      updateUserHonorInfoProms.push(setUserPath(firebase, auth.uid, 'gotHonors', tobeGotHonors))
+      const gotPokemoney = tobeGotHonors.reduce((accm, honor) => {
+        return accm + honor.reward
+      }, 0)
+      updateUserHonorInfoProms.push(setUserPath(firebase, auth.uid, 'pokemoney', user.pokemoney + gotPokemoney))
+    }
+    if (updateUserHonorInfoProms.length > 0) {
+      Promise.all(updateUserHonorInfoProms)
+      .then(() => {
+        const honorModal = {
+          messages, honors: honorsForModal
+        }
+        console.log('honorModal', honorModal)
+        showHonorModal(honorModal)
+        const after = new Date().getTime()
+        console.log('time:', after - before)
+      })
+    }
+  }
   render () {
     const { mode } = this.state
-    const { user, pickMonInfo, auth, location } = this.props
+    const { user, pickMonInfo, auth, location, honorModal, hideHonorModal } = this.props
     const renderBtnComponent = () => {
       return (
         <div className='text-center'>
@@ -229,6 +336,7 @@ class PickMonView extends React.Component {
             delay={PICK_MON_ROULETTE_DELAY}
             mon={this.state.result}
             btnComponent={renderBtnComponent()}
+            afterStop={this._checkHonorGot}
           />
         </div>
       )
@@ -272,6 +380,7 @@ class PickMonView extends React.Component {
               height={mode === 'single' ? 277 : 337}
             />
           }
+          <HonorModal honorModalInfo={honorModal} close={hideHonorModal} />
         </div>
       )
     }
@@ -296,7 +405,12 @@ PickMonView.propTypes = {
   auth: PropTypes.object,
   location: PropTypes.object,
   updatePickMonInfo: PropTypes.func.isRequired,
-  clearPickMonInfo: PropTypes.func.isRequired
+  clearPickMonInfo: PropTypes.func.isRequired,
+  showHonorModal: PropTypes.func.isRequired,
+  hideHonorModal: PropTypes.func.isRequired,
+  honorModal: PropTypes.object.isRequired,
+  honors: PropTypes.array,
+  userCollections: PropTypes.object
 }
 
 export default PickMonView

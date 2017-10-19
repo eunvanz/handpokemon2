@@ -50,6 +50,7 @@ class Roulette extends React.Component {
       $('#stopBtn').css('display', 'none')
       $('#monInfo').css('display', 'block')
       $('#btnArea').css('display', 'block')
+      this.props.afterStop()
     }
     if (this.props.btnComponent !== nextProps.btnComponent) {
       ReactDOM.render(nextProps.btnComponent, document.getElementById('btnArea'))
@@ -167,7 +168,8 @@ Roulette.propTypes = {
   innerSize: PropTypes.number,
   mon: PropTypes.object,
   btnComponent: PropTypes.element,
-  updatePickMonInfo: PropTypes.func.isRequired
+  updatePickMonInfo: PropTypes.func.isRequired,
+  afterStop: PropTypes.func
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Roulette)
