@@ -252,11 +252,14 @@ class PickMonView extends React.Component {
       })
     }
     let honorsNotGot
-    if (gotHonors) honorsNotGot = honors.filter(honor => _.findIndex(gotHonors, gotHonor => gotHonor.id === honor.id) > -1)
+    console.log('gotHonors', gotHonors)
+    console.log('honors', honors)
+    if (gotHonors) honorsNotGot = honors.filter(honor => _.findIndex(gotHonors, gotHonor => gotHonor.id === honor.id) < 0)
     else {
       honorsNotGot = honors
       gotHonors = []
     }
+    console.log('honorsNotGot', honorsNotGot)
     const honorsNotGotType1 = []
     const honorsNotGotType2 = []
     honorsNotGot.forEach(honor => {
@@ -309,6 +312,7 @@ class PickMonView extends React.Component {
   render () {
     const { mode } = this.state
     const { user, pickMonInfo, auth, location, honorModal, hideHonorModal } = this.props
+    if (!auth) return null
     const renderBtnComponent = () => {
       return (
         <div className='text-center'>
@@ -326,6 +330,7 @@ class PickMonView extends React.Component {
       return (
         <div id='rouletteContainer' key={location.query.f}>
           <Roulette
+            user={user}
             images={this.state.picks.map(pick => pick.mon[pick.monId].monImage[0].url)}
             stopIdx={this.state.pickedIdx}
             size={220}
@@ -349,7 +354,7 @@ class PickMonView extends React.Component {
       else if (multiPicks.length === 2) className = 'col-md-offset-4 col-sm-offset-3'
       else if (multiPicks.length === 1) className = 'col-md-offset-5 col-sm-offset-4 col-xs-offset-3'
       else if (multiPicks.length === 5) className = 'col-md-offset-1'
-      return multiPicks.map((pick, idx) => <MonCard mon={pick} pick
+      return multiPicks.map((pick, idx) => <MonCard mon={pick} pick user={user}
         className={idx === 0 ? className : null} key={idx} type='collection' />)
     }
     const renderQuantity = () => {

@@ -20,10 +20,10 @@ class CustomModal extends React.Component {
   }
   componentDidUpdate () {
     // $('.modal-backdrop').css('z-index', '1030').css('height', '100%')
-    if (this.props.width) {
-      $('.modal-dialog').css('width', 'auto')
-      $(`#${this.props.id}>.modal-dialog`).css('max-width', this.props.width)
-    }
+    // if (this.props.width) {
+    //   $('.modal-dialog').css('width', 'auto')
+    //   $(`#${this.props.id}>.modal-dialog`).css('max-width', this.props.width)
+    // }
   }
   render () {
     const { title, bodyComponent, footerComponent, show, close, backdrop, id, width, ...restProps } = this.props

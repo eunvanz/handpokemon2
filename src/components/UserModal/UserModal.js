@@ -7,6 +7,7 @@ import CustomModal from 'components/CustomModal'
 import Button from 'components/Button'
 import Img from 'components/Img'
 import Loading from 'components/Loading'
+import HonorBadge from 'components/HonorBadge'
 
 class TrainerModal extends React.Component {
   constructor (props) {
@@ -19,6 +20,11 @@ class TrainerModal extends React.Component {
   }
   render () {
     const { show, user, isMyself, isLoading, close, ...restProps } = this.props
+    const renderHonorBadges = () => {
+      const { enabledHonors } = user
+      if (!enabledHonors) return null
+      return enabledHonors.map((honor, idx) => <HonorBadge key={idx} honor={honor} />)
+    }
     const renderBody = () => {
       if (isLoading) return <Loading text='트레이너 정보를 불러오는 중...' height={400} />
       return (
@@ -37,7 +43,7 @@ class TrainerModal extends React.Component {
             <div className='row' style={{ marginBottom: '15px' }}>
               <div className='col-xs-3 f-700'>칭호</div>
               <div className='col-xs-9'>
-                {/* TODO */}
+                {renderHonorBadges()}
               </div>
             </div>
             <div className='row' style={{ marginBottom: '15px' }}>

@@ -67,7 +67,7 @@ class MonCard extends React.Component {
     onClickShield(mon.tobe)
   }
   render () {
-    const { mon, pick, className, type, isSelectable, onUnselect, isNotMine, firebase, showStatusBadge, isDummy, onClickShield, onClickSetDefenderBtn, isCustomSize, disableChangeBtn, ...restProps } = this.props
+    const { mon, pick, className, type, isSelectable, onUnselect, isNotMine, firebase, showStatusBadge, isDummy, onClickShield, onClickSetDefenderBtn, isCustomSize, disableChangeBtn, user, ...restProps } = this.props
     const tobeMon = mon ? mon.tobe : null
     const renderSetDefenderBtn = () => {
       return <Button
@@ -138,7 +138,7 @@ class MonCard extends React.Component {
           pick &&
           renderLevelUpInfo()
         }
-        { !isDummy && <MonModal mon={mon} type={this.props.type} show={this.state.showMonModal} isNotMine={isNotMine}
+        { !isDummy && <MonModal mon={mon} type={this.props.type} show={this.state.showMonModal} isNotMine={isNotMine} user={user}
           close={() => this.setState({ showMonModal: false })} />
         }
         {
@@ -167,7 +167,8 @@ MonCard.propTypes = {
   onClickShield: PropTypes.func,
   onClickSetDefenderBtn: PropTypes.func,
   isCustomSize: PropTypes.bool,
-  disableChangeBtn: PropTypes.bool
+  disableChangeBtn: PropTypes.bool,
+  user: PropTypes.object
 }
 
 export default firebaseConnect()(MonCard)

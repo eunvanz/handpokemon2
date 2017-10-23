@@ -217,7 +217,7 @@ class Sidebar extends React.Component {
                 <Link to='/' onClick={() => $('.ma-backdrop').click()}><i className='fa fa-home' style={{ fontSize: '22px' }} /> 홈</Link>
               </li>
               <li className='f-700'>
-                <Link to='/'><i className='fa fa-bookmark' style={{ fontSize: '22px' }} /> 업적</Link>
+                <Link to='/honor' onClick={() => $('.ma-backdrop').click()}><i className='fa fa-bookmark' style={{ fontSize: '22px' }} /> 업적</Link>
               </li>
               {
                 auth &&

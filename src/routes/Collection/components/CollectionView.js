@@ -361,7 +361,7 @@ class CollectionView extends React.Component {
   }
   render () {
     const { filter, filteredCollections, filterCollapse, openFloatMenu, mode, userToView, defenders } = this.state
-    const { pickMonInfo, auth, params } = this.props
+    const { pickMonInfo, auth, params, user } = this.props
     const { userId } = params
     const isMine = auth && userId === auth.uid
     const renderCollections = () => {
@@ -371,7 +371,7 @@ class CollectionView extends React.Component {
       return filteredCollections.map((col, idx) => {
         const isMineAndHave = isMine && col.userId
         return <MonCard isSelectable={this.state.mode === 'mix'} onSelect={() => this._handleOnSelectMon(col)}
-          onUnselect={() => { }} isNotMine={!isMine} showStatusBadge={isMineAndHave && mode === 'view'}
+          onUnselect={() => { }} isNotMine={!isMine} showStatusBadge={isMineAndHave && mode === 'view'} user={userToView}
           key={idx} mon={{ asis: null, tobe: col }} type={col.mon ? 'collection' : 'mon'} onClickShield={() => this._handleOnClickShield(col)} />
       })
     }

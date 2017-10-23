@@ -105,7 +105,7 @@ class Roulette extends React.Component {
     this.context.router.push(`pick-mon?f=${keygen._()}`)
   }
   render () {
-    const { images, size, id, style, innerSize, mon, btnComponent } = this.props
+    const { images, size, id, style, innerSize, mon, btnComponent, user } = this.props
     const renderImages = () => {
       return images.map(image => <img src={image} key={keygen._()} style={{ width: `${innerSize || size}px`, height: `${innerSize || size}px` }} />)
     }
@@ -143,7 +143,7 @@ class Roulette extends React.Component {
         <div id='monInfo' style={{ display: 'none' }}>
           {renderLevelUpInfo()}
           <div className='row'>
-            <MonInfo monObj={mon} type='collection' showStat={mon.asis !== null} />
+            <MonInfo monObj={mon} type='collection' showStat={mon.asis !== null} user={user} />
           </div>
         </div>
         <div className='text-center' id='btnArea' style={{ display: 'none', marginTop: '40px' }}>
@@ -169,7 +169,8 @@ Roulette.propTypes = {
   mon: PropTypes.object,
   btnComponent: PropTypes.element,
   updatePickMonInfo: PropTypes.func.isRequired,
-  afterStop: PropTypes.func
+  afterStop: PropTypes.func,
+  user: PropTypes.object.isRequired
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Roulette)

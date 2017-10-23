@@ -13,7 +13,8 @@ const mapDispatchToProps = dispatch => {
 const mapStateToProps = (state) => {
   return {
     ...getAuthUserFromFirebase(state),
-    honors: convertMapToArr(dataToJS(state.firebase, 'honors'))
+    honors: convertMapToArr(dataToJS(state.firebase, 'honors')),
+    userCollections: dataToJS(state.firebase, 'userCollections')
   }
 }
 

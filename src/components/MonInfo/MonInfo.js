@@ -20,7 +20,18 @@ class MonInfo extends React.Component {
     if (nextProps.showStat !== this.props.showStat) this.setState({ showStat: nextProps.showStat })
   }
   render () {
-    const { monObj, type, forModal } = this.props
+    const { monObj, type, forModal, user } = this.props
+    let honorBurf = [0, 0, 0, 0, 0, 0]
+    const getHonorBurf = () => {
+      const result = [0, 0, 0, 0, 0, 0]
+      user.enabledHonors.forEach(honor => {
+        for (let i = 0; i < result.length; i++) {
+          result[i] += honor.burf[i]
+        }
+      })
+      return result
+    }
+    if (user && user.enabledHonors) honorBurf = getHonorBurf()
     const mon = monObj.tobe
     const asisMon = monObj.asis
     let monToView = type === 'collection' || type === 'defender' ? mon.mon[mon.monId] : mon
@@ -93,23 +104,23 @@ class MonInfo extends React.Component {
               {
                 !asisMon &&
                 <div>
-                  <Stat label={mon.mon ? '체력' : '평균 체력'} value={mon.hp} addedValue1={mon.addedHp ? mon.addedHp : 0} addedValue2={0} />
-                  <Stat label={mon.mon ? '공격' : '평균 공격'} value={mon.power} addedValue1={mon.addedPower ? mon.addedPower : 0} addedValue2={0} />
-                  <Stat label={mon.mon ? '방어' : '평균 방어'} value={mon.armor} addedValue1={mon.addedArmor ? mon.addedArmor : 0} addedValue2={0} />
-                  <Stat label={mon.mon ? '특수공격' : '평균 특수공격'} value={mon.sPower} addedValue1={mon.addedSPower ? mon.addedSPower : 0} addedValue2={0} />
-                  <Stat label={mon.mon ? '특수방어' : '평균 특수방어'} value={mon.sArmor} addedValue1={mon.addedSArmor ? mon.addedSArmor : 0} addedValue2={0} />
-                  <Stat label={mon.mon ? '민첩' : '평균 민첩'} value={mon.dex} addedValue1={mon.addedDex ? mon.addedDex : 0} addedValue2={0} />
+                  <Stat label={mon.mon ? '체력' : '평균 체력'} value={mon.hp} addedValue1={mon.addedHp ? mon.addedHp : 0} addedValue2={0} preValue={honorBurf[0]} />
+                  <Stat label={mon.mon ? '공격' : '평균 공격'} value={mon.power} addedValue1={mon.addedPower ? mon.addedPower : 0} addedValue2={0} preValue={honorBurf[1]} />
+                  <Stat label={mon.mon ? '방어' : '평균 방어'} value={mon.armor} addedValue1={mon.addedArmor ? mon.addedArmor : 0} addedValue2={0} preValue={honorBurf[2]} />
+                  <Stat label={mon.mon ? '특수공격' : '평균 특수공격'} value={mon.sPower} addedValue1={mon.addedSPower ? mon.addedSPower : 0} addedValue2={0} preValue={honorBurf[3]} />
+                  <Stat label={mon.mon ? '특수방어' : '평균 특수방어'} value={mon.sArmor} addedValue1={mon.addedSArmor ? mon.addedSArmor : 0} addedValue2={0} preValue={honorBurf[4]} />
+                  <Stat label={mon.mon ? '민첩' : '평균 민첩'} value={mon.dex} addedValue1={mon.addedDex ? mon.addedDex : 0} addedValue2={0} preValue={honorBurf[5]} />
                 </div>
               }
               {
                 asisMon &&
                 <div>
-                  <Stat label={mon.mon ? '체력' : '평균 체력'} value={mon.hp} addedValue1={asisMon.addedHp} addedValue2={mon.addedHp - asisMon.addedHp} />
-                  <Stat label={mon.mon ? '공격' : '평균 공격'} value={mon.power} addedValue1={asisMon.addedPower} addedValue2={mon.addedPower - asisMon.addedPower} />
-                  <Stat label={mon.mon ? '방어' : '평균 방어'} value={mon.armor} addedValue1={asisMon.addedArmor} addedValue2={mon.addedArmor - asisMon.addedArmor} />
-                  <Stat label={mon.mon ? '특수공격' : '평균 특수공격'} value={mon.sPower} addedValue1={asisMon.addedSPower} addedValue2={mon.addedSPower - asisMon.addedSPower} />
-                  <Stat label={mon.mon ? '특수방어' : '평균 특수방어'} value={mon.sArmor} addedValue1={asisMon.addedSArmor} addedValue2={mon.addedSArmor - asisMon.addedSArmor} />
-                  <Stat label={mon.mon ? '민첩' : '평균 민첩'} value={mon.dex} addedValue1={asisMon.addedDex} addedValue2={mon.addedDex - asisMon.addedDex} />
+                  <Stat label={mon.mon ? '체력' : '평균 체력'} value={mon.hp} addedValue1={asisMon.addedHp} addedValue2={mon.addedHp - asisMon.addedHp} preValue={honorBurf[0]} />
+                  <Stat label={mon.mon ? '공격' : '평균 공격'} value={mon.power} addedValue1={asisMon.addedPower} addedValue2={mon.addedPower - asisMon.addedPower} preValue={honorBurf[1]} />
+                  <Stat label={mon.mon ? '방어' : '평균 방어'} value={mon.armor} addedValue1={asisMon.addedArmor} addedValue2={mon.addedArmor - asisMon.addedArmor} preValue={honorBurf[2]} />
+                  <Stat label={mon.mon ? '특수공격' : '평균 특수공격'} value={mon.sPower} addedValue1={asisMon.addedSPower} addedValue2={mon.addedSPower - asisMon.addedSPower} preValue={honorBurf[3]} />
+                  <Stat label={mon.mon ? '특수방어' : '평균 특수방어'} value={mon.sArmor} addedValue1={asisMon.addedSArmor} addedValue2={mon.addedSArmor - asisMon.addedSArmor} preValue={honorBurf[4]} />
+                  <Stat label={mon.mon ? '민첩' : '평균 민첩'} value={mon.dex} addedValue1={asisMon.addedDex} addedValue2={mon.addedDex - asisMon.addedDex} preValue={honorBurf[5]} />
                 </div>
               }
             </div>
@@ -142,7 +153,8 @@ MonInfo.propTypes = {
   monObj: PropTypes.object.isRequired,
   type: PropTypes.string.isRequired,
   showStat: PropTypes.bool,
-  forModal: PropTypes.bool
+  forModal: PropTypes.bool,
+  user: PropTypes.object
 }
 
 export default MonInfo

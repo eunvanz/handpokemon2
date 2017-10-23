@@ -219,6 +219,9 @@ export const updateUserRanking = (firebase, type, userId, rank) => {
 }
 
 export const setUserPath = (firebase, userId, path, value) => {
+  console.log('value', value)
+  console.log('userId', userId)
+  console.log('path', path)
   return firebase.ref(`/users/${userId}/${path}`).set(value)
 }
 
