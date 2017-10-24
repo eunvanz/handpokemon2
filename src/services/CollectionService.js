@@ -178,7 +178,13 @@ export const postCollection = (firebase, userId, collection, type, srcCols) => {
       })
     } else if (type === 'mix') {
       // srcCols에 대해 levelDown처리
-      const promArr = srcCols.map(srcCol => getResolveLevelDownObj(firebase, srcCol, type, resultPoint, leaguePoint))
+      let promArr = []
+      let subResultPoint = resultPoint
+      srcCols.forEach((srcCol, idx) => {
+        if (idx === 1 && srcCols[0].level === 1) subResultPoint -= srcCols[0].mon[srcCols[0].monId].point
+        promArr.push(getResolveLevelDownObj(firebase, srcCol, type, subResultPoint, leaguePoint))
+      })
+      // const promArr = srcCols.map(srcCol => getResolveLevelDownObj(firebase, srcCol, type, resultPoint, leaguePoint))
       console.log('promArr', promArr)
       return Promise.all(promArr)
       .then(result => {
