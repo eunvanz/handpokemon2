@@ -151,9 +151,6 @@ class PickMonView extends React.Component {
           this.setState({ picks, pickedIdx, result })
           return Promise.resolve()
         })
-        .then(() => {
-          this._checkHonorGot()
-        })
       })
       .catch(msg => {
         console.log('msg', msg)

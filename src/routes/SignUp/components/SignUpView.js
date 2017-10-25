@@ -52,7 +52,7 @@ class SignUpView extends React.Component {
       startPick: null,
       loading: false,
       profileImageFile: null,
-      applicable: false,
+      isApplicable: false,
       signUpProcess: false
     }
     this._handleOnChangeInput = this._handleOnChangeInput.bind(this)
@@ -213,7 +213,7 @@ class SignUpView extends React.Component {
       console.log('userId', userId)
       const { startPick } = this.state
       console.log('startPick', startPick)
-      const promArr = startPick.map(col => () => postCollection(firebase, userId, col))
+      const promArr = startPick.map(col => () => postCollection(firebase, userId, col, 'signUp'))
       return getSeqPromise(promArr)
     })
     .then(() => {
@@ -265,7 +265,7 @@ class SignUpView extends React.Component {
       this.setState({ startPick })
       console.log('startPick', startPick)
       this.setState({ loading: false })
-      if (!this.state.applicable) this.setState({ applicable: true })
+      if (!this.state.isApplicable) this.setState({ isApplicable: true })
     })
   }
   render () {
@@ -426,7 +426,7 @@ class SignUpView extends React.Component {
             <Button text={this.state.step === 3 ? '가입신청' : '다음단계'}
               icon={this.state.step === 3 ? 'zmdi zmdi-check' : 'zmdi zmdi-arrow-forward'}
               iconRight color={this.state.step === 3 ? 'green' : 'blue'} onClick={this._handleOnClickNext}
-              disabled={this.state.loading || (this.state.step === 3 && !this.state.applicable)}
+              disabled={this.state.loading || (this.state.step === 3 && !this.state.isApplicable)}
               loading={this.state.signUpProcess}
             />
           </div>

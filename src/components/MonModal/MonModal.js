@@ -11,6 +11,7 @@ import MonInfo from 'components/MonInfo'
 import Img from 'components/Img'
 
 import { getMonImage } from 'utils/monUtil'
+import { showAlert } from 'utils/commonUtil'
 
 import { colors } from 'constants/colors'
 
@@ -43,9 +44,17 @@ class MonModal extends React.Component {
   }
   _handleOnClickEvolution () {
     const { mon, updatePickMonInfo, close } = this.props
+    const colToEvolute = mon.tobe
+    if (colToEvolute.isDefender && colToEvolute.level === colToEvolute.mon[colToEvolute.monId].evoLv) {
+      showAlert({ title: '이런!', text: '진화가능 레벨의 수비 포켓몬은 진화할 수 없습니다. 한번 더 레벨업 해주세요.', type: 'error' })
+      return false
+    } else if (colToEvolute.isFavorite && colToEvolute.level === colToEvolute.mon[colToEvolute.monId].evoLv) {
+      showAlert({ title: '이런!', text: '진화가능 레벨의 즐겨찾기 포켓몬은 진화할 수 없습니다. 한번 더 레벨업 해주세요.', type: 'error' })
+      return false
+    }
     const pickMonInfo = {
       quantity: 1,
-      evoluteCol: mon.tobe
+      evoluteCol: colToEvolute
     }
     updatePickMonInfo(pickMonInfo)
     .then(() => {
@@ -55,9 +64,17 @@ class MonModal extends React.Component {
   }
   _handleOnClickMix () {
     const { mon, updatePickMonInfo, close } = this.props
+    const colToMix = mon.tobe
+    if (colToMix.isDefender && colToMix.level === 1) {
+      showAlert({ title: '이런!', text: 'LV.1의 수비 포켓몬은 교배할 수 없습니다.', type: 'error' })
+      return false
+    } else if (colToMix.isFavorite && colToMix.level === 1) {
+      showAlert({ title: '이런!', text: 'LV.1의 즐겨찾기 포켓몬은 교배할 수 없습니다.', type: 'error' })
+      return false
+    }
     const pickMonInfo = {
       quantity: 1,
-      mixCols: [mon.tobe]
+      mixCols: [colToMix]
     }
     updatePickMonInfo(pickMonInfo)
     .then(() => {

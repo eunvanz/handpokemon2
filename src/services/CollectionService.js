@@ -133,7 +133,7 @@ export const postCollection = (firebase, userId, collection, type, srcCols) => {
         [`users/${userId}/leaguePoint_colPoint`]: convertNumberToStringForIndex([leaguePoint, resultPoint])
       }
       // 콜렉션을 생성함
-      tobe = Object.assign({}, collection, { userId }) // 콜렉션
+      tobe = Object.assign({}, collection, { userId, isDefender: type === 'signUp' }) // 콜렉션
       const newCollectionKey = firebase.push('collections').key // collections에 추가
       // userCollections, monCollections에 추가
       tobe.id = newCollectionKey

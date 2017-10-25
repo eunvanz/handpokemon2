@@ -325,6 +325,12 @@ class CollectionView extends React.Component {
     if (col.id === pickMonInfo.mixCols[0].id) {
       showAlert('같은 포켓몬은 선택할 수 없습니다.')
       return false
+    } else if (col.isDefender && col.level === 1) {
+      showAlert({ title: '이런!', text: 'LV.1의 수비 포켓몬은 교배할 수 없습니다.', type: 'error' })
+      return false
+    } else if (col.isFavorite && col.level === 1) {
+      showAlert({ title: '이런!', text: 'LV.1의 즐겨찾기 포켓몬은 교배할 수 없습니다.', type: 'error' })
+      return false
     }
     const asisMixCols = pickMonInfo.mixCols
     const mixCols = _.concat(asisMixCols, col)
