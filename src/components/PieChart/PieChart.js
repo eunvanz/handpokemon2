@@ -12,7 +12,7 @@ class PieChart extends React.Component {
   componentDidMount () {
     setTimeout(() => this._initialize(), 500)
   }
-  shouldUpdateComponent (nextProps, nextState) {
+  shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
   }
   _initialize () {

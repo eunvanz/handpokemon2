@@ -8,7 +8,7 @@ import { levelBadgeStyle } from 'constants/styles'
 import { colors } from 'constants/colors'
 
 class UserRankingCard extends React.Component {
-  shouldUpdateComponent (nextProps, nextState) {
+  shouldComponentUpdate (nextProps, nextState) {
     return !is(fromJS(nextProps), fromJS(this.props)) || !is(fromJS(nextState), fromJS(this.state))
   }
   render () {

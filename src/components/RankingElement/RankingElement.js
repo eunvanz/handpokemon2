@@ -25,7 +25,7 @@ class RankingElement extends React.Component {
       this._adjustStyle()
     })
   }
-  shouldUpdateComponent (nextProps, nextState) {
+  shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
   }
   componentWillUnmount () {

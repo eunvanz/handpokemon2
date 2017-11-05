@@ -8,6 +8,7 @@ import Header from 'components/Header'
 import Sidebar from 'components/Sidebar'
 import MessageModal from 'components/MessageModal'
 import UserModal from 'components/UserModal'
+import Footer from 'components/Footer'
 
 import { closeMessageModal } from 'store/messageModal'
 import { closeUserModal } from 'store/userModal'
@@ -23,7 +24,7 @@ const mapDispatchToProps = {
 }
 
 class CoreLayout extends React.Component {
-  shouldUpdateComponent (nextProps, nextState) {
+  shouldComponentUpdate (nextProps, nextState) {
     return !is(fromJS(nextProps), fromJS(this.props)) || !is(fromJS(nextState), fromJS(this.state))
   }
   render () {
@@ -70,6 +71,7 @@ class CoreLayout extends React.Component {
           <section id='content' className='core-layout__viewport'>
             {children}
           </section>
+          <Footer />
           <MessageModal
             {...messageModal}
             close={closeMessageModal}

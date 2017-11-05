@@ -34,7 +34,7 @@ class HonorView extends React.Component {
   componentDidUpdate (prevProps, prevState) {
     if (prevProps.honors !== this.props.honors) this._initStateHonors()
   }
-  shouldUpdateComponent (nextProps, nextState) {
+  shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
   }
   _initStateHonors () {

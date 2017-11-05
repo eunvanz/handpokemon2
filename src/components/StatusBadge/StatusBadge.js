@@ -5,7 +5,7 @@ import shallowCompare from 'react-addons-shallow-compare'
 import { colors } from 'constants/colors'
 
 class StatusBadge extends React.Component {
-  shouldUpdateComponent (nextProps, nextState) {
+  shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
   }
   render () {

@@ -8,7 +8,7 @@ import { isScreenSize } from 'utils/commonUtil'
 import { colors } from 'constants/colors'
 
 class RankingHeader extends React.Component {
-  shouldUpdateComponent (nextProps, nextState) {
+  shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
   }
   render () {

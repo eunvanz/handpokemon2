@@ -30,7 +30,8 @@ const webpackConfig = {
       utils: 'utils',
       constants: 'constants',
       dummy: 'dummy',
-      models: 'models'
+      models: 'models',
+      hocs: 'hocs'
     }
   },
   module : {}

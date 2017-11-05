@@ -7,7 +7,7 @@ import Loading from 'components/Loading'
 
 // ContentContainer 의 body에 들어가야 함
 class ListContainer extends React.Component {
-  shouldUpdateComponent (nextProps, nextState) {
+  shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
   }
   render () {

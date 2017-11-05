@@ -7,7 +7,7 @@ import Button from 'components/Button'
 import HonorBadge from 'components/HonorBadge'
 
 class HonorModal extends React.Component {
-  shouldUpdateComponent (nextProps, nextState) {
+  shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
   }
   render () {

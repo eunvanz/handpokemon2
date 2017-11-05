@@ -29,7 +29,7 @@ class DefenderModal extends React.Component {
     this._updateInfos = this._updateInfos.bind(this)
     this._getMaxCost = this._getMaxCost.bind(this)
   }
-  shouldUpdateComponent (nextProps, nextState) {
+  shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
   }
   componentDidUpdate (prevProps, prevState) {

@@ -9,6 +9,7 @@ import MonManagement from './MonManagement'
 import Collection from './Collection'
 import Ranking from './Ranking'
 import Honor from './Honor'
+import Battle from './Battle'
 
 /*  Note: Instead of using JSX, we recommend using react-router
     PlainRoute objects to build route definitions.   */
@@ -25,7 +26,8 @@ export const createRoutes = (store) => ({
     MonManagement(store),
     Collection(store),
     Ranking(store),
-    Honor(store)
+    Honor(store),
+    Battle(store)
   ]
 })
 

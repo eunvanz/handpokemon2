@@ -16,7 +16,7 @@ class AvatarImgInput extends React.Component {
     this._handleOnRemoveImage = this._handleOnRemoveImage.bind(this)
     this._setEditorRef = this._setEditorRef.bind(this)
   }
-  shouldUpdateComponent (nextProps, nextState) {
+  shouldComponentUpdate (nextProps, nextState) {
     return !is(fromJS(nextProps), fromJS(this.props)) || !is(fromJS(nextState), fromJS(this.state))
   }
   _handleOnChangeImage (e) {

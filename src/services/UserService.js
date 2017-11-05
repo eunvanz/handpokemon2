@@ -225,6 +225,13 @@ export const setUserPath = (firebase, userId, path, value) => {
   return firebase.ref(`/users/${userId}/${path}`).set(value)
 }
 
+export const getUsersByLeagueForBattle = (firebase, league) => {
+  const ref = firebase.ref('users')
+  console.log('ref', ref)
+  return ref.orderByChild('league').equalTo(league).once('value')
+  .then(snapshot => Promise.resolve(snapshot.val()))
+}
+
 // 일회용 함수: 콜렉션점수&시합점수 인덱스 필드 생성
 export const updateUserIndexes = firebase => {
   const usersRef = firebase.ref('/users')
