@@ -27,8 +27,6 @@ class HonorView extends React.Component {
     this._handleOnClickActivate = this._handleOnClickActivate.bind(this)
   }
   componentDidMount () {
-    const { user } = this.props
-    if (!user) return this.context.router.push('sign-in')
     this._initStateHonors()
   }
   componentDidUpdate (prevProps, prevState) {

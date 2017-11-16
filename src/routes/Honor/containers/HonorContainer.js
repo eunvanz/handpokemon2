@@ -3,7 +3,9 @@ import { firebaseConnect, dataToJS } from 'react-redux-firebase'
 
 import HonorView from '../components/HonorView'
 
-import { getAuthUserFromFirebase, convertMapToArr } from 'utils/commonUtil'
+import { convertMapToArr } from 'utils/commonUtil'
+
+import needAuth from 'hocs/needAuth'
 
 const mapDispatchToProps = dispatch => {
   return {
@@ -12,7 +14,6 @@ const mapDispatchToProps = dispatch => {
 
 const mapStateToProps = (state) => {
   return {
-    ...getAuthUserFromFirebase(state),
     honors: convertMapToArr(dataToJS(state.firebase, 'honors')),
     userCollections: dataToJS(state.firebase, 'userCollections')
   }
@@ -22,4 +23,4 @@ const wrappedHonorView = firebaseConnect([
   '/honors'
 ])(HonorView)
 
-export default connect(mapStateToProps, mapDispatchToProps)(wrappedHonorView)
+export default connect(mapStateToProps, mapDispatchToProps)(needAuth(wrappedHonorView))

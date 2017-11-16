@@ -1,6 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import shallowCompare from 'react-addons-shallow-compare'
+import { connect } from 'react-redux'
+import { firebaseConnect } from 'react-redux-firebase'
+
+import { getAuthUserFromFirebase } from 'utils/commonUtil'
 
 export default ComposedComponent => {
   class needAuth extends React.Component {
@@ -29,5 +33,13 @@ export default ComposedComponent => {
     user: PropTypes.object
   }
 
-  return needAuth
+  const mapStateToProps = (state) => {
+    return {
+      ...getAuthUserFromFirebase(state)
+    }
+  }
+
+  const wrappedNeedAuth = firebaseConnect([])(needAuth)
+
+  return connect(mapStateToProps, null)(wrappedNeedAuth)
 }

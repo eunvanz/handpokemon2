@@ -5,7 +5,7 @@ import PickDistrictView from '../components/PickDistrictView'
 
 import { updatePickMonInfo } from 'store/pickMonInfo'
 
-import { getAuthUserFromFirebase } from 'utils/commonUtil'
+import needAuth from 'hocs/needAuth'
 
 const mapDispatchToProps = dispatch => {
   return {
@@ -15,12 +15,11 @@ const mapDispatchToProps = dispatch => {
 
 const mapStateToProps = (state) => {
   return {
-    ...getAuthUserFromFirebase(state),
     pickMonInfo: state.pickMonInfo,
     creditInfo: state.creditInfo
   }
 }
 
-const wrappedPickDistrictView = firebaseConnect(['/mons'])(PickDistrictView)
+const wrappedPickDistrictView = firebaseConnect(['/mons'])(needAuth(PickDistrictView))
 
 export default connect(mapStateToProps, mapDispatchToProps)(wrappedPickDistrictView)

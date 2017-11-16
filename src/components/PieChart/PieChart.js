@@ -10,7 +10,8 @@ class PieChart extends React.Component {
     this._initialize = this._initialize.bind(this)
   }
   componentDidMount () {
-    setTimeout(() => this._initialize(), 500)
+    this._initialize()
+    // setTimeout(() => this._initialize(), 500)
   }
   shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)

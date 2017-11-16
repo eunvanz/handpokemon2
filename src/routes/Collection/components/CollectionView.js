@@ -195,7 +195,7 @@ class CollectionView extends React.Component {
     if (!this._isMine) firebase.unWatchEvent('value', `/userCollections/${params.userId}`)
   }
   _initCollectionState () {
-    const { params, firebase, mons } = this.props
+    const { params, firebase, mons, userCollections, auth, user } = this.props
     const { userId } = params
     const collections = []
     const quantity = {
@@ -206,7 +206,10 @@ class CollectionView extends React.Component {
       e: { has: 0, total: 0 },
       l: { has: 0, total: 0 }
     }
-    return getCollectionsByUserId(firebase, userId)
+    let getCollectionToView
+    if (userId === auth.uid) getCollectionToView = () => Promise.resolve(userCollections)
+    else getCollectionToView = () => getCollectionsByUserId(firebase, userId)
+    return getCollectionToView()
     .then(cols => {
       let defenders
       mons.forEach(mon => {
@@ -227,9 +230,10 @@ class CollectionView extends React.Component {
       return Promise.resolve()
     })
     .then(() => {
-      return getUserRankingByUserId(firebase, 'collection', userId) // 랭킹 업데이트 후 유저정보가져옴
-      .then(() => getUserRankingByUserId(firebase, 'battle', userId))
-      .then(() => getUserByUserId(firebase, userId))
+      let getUserToView
+      if (userId === auth.uid) getUserToView = () => Promise.resolve(user)
+      else getUserToView = () => getUserRankingByUserId(firebase, 'collection', userId).then(() => getUserRankingByUserId(firebase, 'battle', userId)).then(() => getUserByUserId(firebase, userId))
+      return getUserToView() // 랭킹 업데이트 후 유저정보가져옴
     })
     .then(userToView => {
       this.setState({ userToView })
@@ -632,7 +636,8 @@ CollectionView.propTypes = {
   updatePickMonInfo: PropTypes.func.isRequired,
   pickMonInfo: PropTypes.object,
   showUserModal: PropTypes.func.isRequired,
-  userModal: PropTypes.object.isRequired
+  userModal: PropTypes.object.isRequired,
+  userCollections: PropTypes.array.isRequired
 }
 
 export default CollectionView

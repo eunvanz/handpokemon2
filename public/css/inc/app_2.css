@@ -3254,12 +3254,12 @@ table.dataTable.no-footer {
 .swal2-modal {
   border-radius: 2px;
   padding: 30px !important;
-  font-family: roboto;
+  font-family: 'Spoqa Han Sans','Sans-serif';
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
 }
 
 .swal2-modal h2 {
-  font-size: 16px;
+  font-size: 18px;
   position: relative;
   z-index: 1;
   color: #333;
@@ -3275,17 +3275,17 @@ table.dataTable.no-footer {
 
 .swal2-modal .swal2-content {
   color: #777777;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: normal;
 }
 
 .swal2-modal .styled {
-  padding: 6px 12px;
-  font-size: 12px;
+  padding: 8px 14px;
+  font-size: 16px;
+  font-weight: 700;
   border-radius: 2px;
   margin: 0 2px;
   text-transform: uppercase;
-  font-weight: normal;
   font-family: inherit;
   -webkit-transition: all;
   -o-transition: all;
