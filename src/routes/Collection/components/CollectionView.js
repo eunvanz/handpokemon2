@@ -4,6 +4,7 @@ import { fromJS } from 'immutable'
 import shallowCompare from 'react-addons-shallow-compare'
 import _ from 'lodash'
 import { Collapse } from 'react-bootstrap'
+import keygen from 'keygenerator'
 
 import ContentContainer from 'components/ContentContainer'
 import Loading from 'components/Loading'
@@ -128,7 +129,9 @@ class CollectionView extends React.Component {
         cost: false,
         generation: false,
         isEvolutable: false
-      }
+      },
+      pieChartKey: keygen._(),
+      collectionsKey: keygen._()
     }
     this._handleOnClickApplyFilter = this._handleOnClickApplyFilter.bind(this)
     this._handleOnClickFilter = this._handleOnClickFilter.bind(this)
@@ -153,7 +156,7 @@ class CollectionView extends React.Component {
     return shallowCompare(this, nextProps, nextState)
   }
   componentWillUpdate (nextProps, nextState) {
-    if (nextProps.pickMonInfo && nextProps.pickMonInfo.mixCols && nextProps.pickMonInfo.mixCols.length === 1) {
+    if (!this.props.pickMonInfo && nextProps.pickMonInfo && nextProps.pickMonInfo.mixCols && nextProps.pickMonInfo.mixCols.length === 1) {
       this.setState({ mode: 'mix' })
     }
   }
@@ -161,7 +164,7 @@ class CollectionView extends React.Component {
     if (!this.state.collections || !fromJS(prevProps.mons).equals(fromJS(this.props.mons)) || this.props.params.userId !== prevProps.params.userId) {
       this._initCollectionState()
     }
-    if (!this.state.isInitializedMixMode && this.props.pickMonInfo && this.props.pickMonInfo.mixCols && this.props.pickMonInfo.mixCols.length === 1) {
+    if (this.state.mode === 'mix' && !this.state.isInitializedMixMode && this.props.pickMonInfo && this.props.pickMonInfo.mixCols && this.props.pickMonInfo.mixCols.length === 1) {
       if (!this.state.collections) {
         this._initCollectionState().then(() => this._initMixMode())
       } else {
@@ -192,7 +195,9 @@ class CollectionView extends React.Component {
   componentWillUnmount () {
     const { pickMonInfo, updatePickMonInfo, firebase, params } = this.props
     if (pickMonInfo && pickMonInfo.mixCols && pickMonInfo.mixCols.length === 1) updatePickMonInfo(null)
-    if (!this._isMine) firebase.unWatchEvent('value', `/userCollections/${params.userId}`)
+    if (!this._isMine()) {
+      firebase.unWatchEvent('value', `/userCollections/${params.userId}`)
+    }
   }
   _initCollectionState () {
     const { params, firebase, mons, userCollections, auth, user } = this.props
@@ -246,7 +251,7 @@ class CollectionView extends React.Component {
     const { filter } = this.state
     this._applyFilter(filter)
   }
-  _applyFilter (filter, colId) { // 두번째 파라미터는 옵션 (교배시 교배대상 첫번째 포켓몬 제외용)
+  _applyFilter (filter, colId, shouldRefreshElements) { // 두번째 파라미터는 옵션 (교배시 교배대상 첫번째 포켓몬 제외용), 세번째 파라메터는 교배취소 시 차트와 콜렉션 리프레시용. 없으면 렌더링이 안됨
     const { collections } = this.state
     const filteredCollections = collections.filter(col => {
       const mon = col.mon ? col.mon[col.monId] : col
@@ -256,6 +261,9 @@ class CollectionView extends React.Component {
         filter.subAttr[!mon.subAttr ? '없음' : mon.subAttr] && filter.cost[mon.cost] && filter.generation[mon.generation] && (colId ? col.id !== colId : true)
     })
     this.setState({ showFilterModal: false, filteredCollections })
+    if (shouldRefreshElements) {
+      this.setState({ pieChartKey: keygen._(), collectionsKey: keygen._() })
+    }
   }
   _handleOnClickApplyDefender (defenders) { // defenders.asis, defenders.tobe
     // TODO: 총 전투력 제한 및 코스트 체크로직 들어가야함
@@ -349,7 +357,7 @@ class CollectionView extends React.Component {
       mode: 'view',
       isInitializedMixMode: false
     })
-    this._applyFilter(filter)
+    this._applyFilter(filter, null, true)
   }
   _handleOnClickCollapse (key) {
     const { filterCollapse } = this.state
@@ -375,15 +383,17 @@ class CollectionView extends React.Component {
     const { userId } = params
     const isMine = auth && userId === auth.uid
     const renderCollections = () => {
+      const { collectionsKey } = this.state
       if (filteredCollections.length === 0) {
         return <div className='text-center'><WarningText text='조건에 맞는 포켓몬이 없습니다.' /></div>
       }
-      return filteredCollections.map((col, idx) => {
+      const collectionsArr = filteredCollections.map((col, idx) => {
         const isMineAndHave = isMine && col.userId
         return <MonCard isSelectable={this.state.mode === 'mix'} onSelect={() => this._handleOnSelectMon(col)}
           onUnselect={() => { }} isNotMine={!isMine} showStatusBadge={isMineAndHave && mode === 'view'} user={userToView}
           key={idx} mon={{ asis: null, tobe: col }} type={col.mon ? 'collection' : 'mon'} onClickShield={() => this._handleOnClickShield(col)} />
       })
+      return <div key={collectionsKey}>{collectionsArr}</div>
     }
     const renderFilterBody = () => {
       const grades = {
@@ -570,24 +580,27 @@ class CollectionView extends React.Component {
               close={() => this.setState({ showFilterModal: false })}
               backdrop
             />
-            <DefenderModal
-              defenders={defenders}
-              show={this.state.showDefenderModal}
-              close={() => this.setState({ showDefenderModal: false })}
-              onClickApply={this._handleOnClickApplyDefender}
-              currentCol={this.state.currentCol}
-              isLoading={this.state.isLoading}
-              user={userToView}
-            />
+            {
+              this.state.defenders &&
+              <DefenderModal
+                defenders={defenders}
+                show={this.state.showDefenderModal}
+                close={() => this.setState({ showDefenderModal: false })}
+                onClickApply={this._handleOnClickApplyDefender}
+                currentCol={this.state.currentCol}
+                isLoading={this.state.isLoading}
+                user={userToView}
+              />
+            }
           </div>
         )
       }
     }
     const renderCharts = () => {
-      const { quantity } = this.state
+      const { quantity, pieChartKey } = this.state
       if (!quantity) return null
       const grades = Object.keys(quantity)
-      return grades.map((grade, idx) => {
+      const pieChartArr = grades.map((grade, idx) => {
         const barColor = grade === 'b' ? colors.amber : grade === 'r' ? colors.green : grade === 's' ? colors.lightBlue : grade === 'sr' ? colors.deepPurple : grade === 'e' ? colors.pink : grade === 'l' ? colors.orange : ''
         return (
           <PieChart sub={quantity[grade].has} total={quantity[grade].total} key={idx} trackColor={colors.lightGray} barColor={barColor}
@@ -595,6 +608,7 @@ class CollectionView extends React.Component {
           />
         )
       })
+      return <div key={pieChartKey}>{pieChartArr}</div>
     }
     const renderHeader = () => {
       if (mode === 'mix') {

@@ -3,15 +3,9 @@ import PropTypes from 'prop-types'
 import shallowCompare from 'react-addons-shallow-compare'
 import $ from 'jquery'
 
-class CenterMidContainer extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-
-    }
-  }
+class CenterMidContainer extends React.PureComponent {
   componentDidMount () {
-    $('#divToAlignCenter').css('height', $('#main').height() - 180)
+    $('#divToAlignCenter').css('height', $('#main').height() - 159)
     $('#divToAlignMid').css('top', $('#divToAlignCenter').height() / 2 - $('#divToAlignMidBody').height() / 2)
   }
   shouldComponentUpdate (nextProps, nextState) {

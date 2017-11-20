@@ -226,8 +226,8 @@ export const setUserPath = (firebase, userId, path, value) => {
 }
 
 export const getUsersByLeagueForBattle = (firebase, league) => {
+  console.log('league', league)
   const ref = firebase.ref('users')
-  console.log('ref', ref)
   return ref.orderByChild('league').equalTo(league).once('value')
   .then(snapshot => Promise.resolve(snapshot.val()))
 }

@@ -6,6 +6,7 @@ import ContentContainer from 'components/ContentContainer'
 import Button from 'components/Button'
 import CenterMidContainer from 'components/CenterMidContainer'
 import Loading from 'components/Loading'
+import Step1 from './Step1'
 
 class BattleView extends React.Component {
   constructor (props) {
@@ -35,25 +36,9 @@ class BattleView extends React.Component {
     const { step } = this.state
     const { user, candidates } = this.props
     const renderBody = () => {
-      const renderStep1Body = () => {
-        if (user.battleCredit > 0) {
-          return (
-            <div>
-              <h4>시합을 시작할 준비가 됐나?<br />시합이 시작된 이후에 도망친다면 패배처리되니 조심하라구.</h4>
-              <Button text='시합시작!' onClick={this._handleOnClickStartBattle} />
-            </div>
-          )
-        } else {
-          return (
-            <div>
-              <h4>시합 크레딧이 부족하군. 조금 기다렸다가 다시 도전해보라구.</h4>
-            </div>
-          )
-        }
-      }
       if (step === 1) {
         return (
-          <CenterMidContainer bodyComponent={renderStep1Body()} />
+          <Step1 user={user} onClickStart={this._handleOnClickStartBattle} />
         )
       } else if (step === 2) {
         if (candidates) {
@@ -67,12 +52,7 @@ class BattleView extends React.Component {
         }
       }
     }
-    return (
-      <ContentContainer
-        title={step === 1 ? '시합준비' : step === 2 ? '상대 선택' : step === 3 ? '출전 포켓몬 선택' : '포켓몬 시합'}
-        body={renderBody()}
-      />
-    )
+    return renderBody()
   }
 }
 

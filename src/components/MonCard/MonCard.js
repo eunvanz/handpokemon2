@@ -19,6 +19,8 @@ import { toggleFavorite } from 'services/CollectionService'
 
 import { colors } from 'constants/colors'
 
+import unloader from './assets/unloader.png'
+
 class MonCard extends React.Component {
   constructor (props) {
     super(props)
@@ -115,7 +117,7 @@ class MonCard extends React.Component {
             padding: '4px'
           }}>
           <a className='ci-avatar'>
-            <Img src={(type === 'collection' || type === 'defender') && !isDummy ? getMonImage(tobeMon).url : 'hidden'} width='100%' style={{ border: '1px dotted #e2e2e2' }} />
+            <Img src={(type === 'collection' || type === 'defender') && !isDummy ? getMonImage(tobeMon).url : unloader} width='100%' style={{ border: '1px dotted #e2e2e2' }} />
           </a>
           <div className='c-info text-center' style={{ margin: '5px 0px', position: 'relative' }}>
             {

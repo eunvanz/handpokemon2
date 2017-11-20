@@ -12,7 +12,7 @@ class ContentContainer extends React.Component {
   }
   render () {
     return (
-      <div className='container container-alt' style={{ padding: isScreenSize.sm() || isScreenSize.xs() ? '0px' : '0px 15px' }}>
+      <div className='container container-alt' style={Object.assign({}, { padding: isScreenSize.sm() || isScreenSize.xs() ? '0px' : '0px 15px' }, this.props.style)}>
         {
           this.props.title &&
           <div className='block-header'>
@@ -31,7 +31,8 @@ ContentContainer.propTypes = {
   header: PropTypes.element,
   clearPadding: PropTypes.bool,
   stickyHeader: PropTypes.bool,
-  headerBgColor: PropTypes.string
+  headerBgColor: PropTypes.string,
+  style: PropTypes.object
 }
 
 export default ContentContainer

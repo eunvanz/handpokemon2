@@ -6,29 +6,31 @@ import { firebaseConnect } from 'react-redux-firebase'
 
 import { getAuthUserFromFirebase } from 'utils/commonUtil'
 
-export default ComposedComponent => {
-  class needAuth extends React.Component {
+export default isAuthRequired => ComposedComponent => {
+  class withAuth extends React.Component {
     componentDidMount () {
-      const { user } = this.props
-      if (!user) this.context.router.push('/sign-in')
+      if (isAuthRequired) {
+        const { user } = this.props
+        if (!user) this.context.router.push('/sign-in')
+      }
     }
     shouldComponentUpdate (nextProps, nextState) {
       return shallowCompare(this, nextProps, nextState)
     }
     render () {
       const { user, ...props } = this.props
-      if (!user) return null
+      if (isAuthRequired && !user) return null
       return (
         <ComposedComponent user={user} {...props} />
       )
     }
   }
 
-  needAuth.contextTypes = {
+  withAuth.contextTypes = {
     router: PropTypes.object.isRequired
   }
 
-  needAuth.propTypes = {
+  withAuth.propTypes = {
     auth: PropTypes.object,
     user: PropTypes.object
   }
@@ -39,7 +41,7 @@ export default ComposedComponent => {
     }
   }
 
-  const wrappedNeedAuth = firebaseConnect([])(needAuth)
+  const wrappedWithAuth = firebaseConnect()(withAuth)
 
-  return connect(mapStateToProps, null)(wrappedNeedAuth)
+  return connect(mapStateToProps, null)(wrappedWithAuth)
 }

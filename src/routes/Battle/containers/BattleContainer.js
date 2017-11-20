@@ -1,11 +1,10 @@
 import { connect } from 'react-redux'
 import { firebaseConnect } from 'react-redux-firebase'
+import { compose } from 'recompose'
 
 import BattleView from '../components/BattleView'
 
-import { getAuthUserFromFirebase } from 'utils/commonUtil'
-
-import needAuth from 'hocs/needAuth'
+import withAuth from 'hocs/withAuth'
 
 import { fetchCandidates, setEnemyPicks, setUserPicks, setBattleLog, clearBattle } from '../modules/battle'
 
@@ -21,12 +20,10 @@ const mapDispatchToProps = dispatch => {
 
 const mapStateToProps = (state) => {
   return {
-    ...getAuthUserFromFirebase(state),
     ...state.battle
   }
 }
 
-const wrappedBattleView = firebaseConnect([
-])(needAuth(BattleView))
+const wrappedBattleView = compose(firebaseConnect(), withAuth(true))(BattleView)
 
 export default connect(mapStateToProps, mapDispatchToProps)(wrappedBattleView)

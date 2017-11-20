@@ -1,12 +1,16 @@
 import { connect } from 'react-redux'
 import { firebaseConnect, dataToJS } from 'react-redux-firebase'
+import { compose } from 'recompose'
 
 import PickMonView from '../components/PickMonView'
+
+import withUserCollections from 'hocs/withUserCollections'
+import withAuth from 'hocs/withAuth'
 
 import { updatePickMonInfo, clearPickMonInfo } from 'store/pickMonInfo'
 import { showHonorModal, hideHonorModal } from 'store/honorModal'
 
-import { getAuthUserFromFirebase, convertMapToArr } from 'utils/commonUtil'
+import { convertMapToArr } from 'utils/commonUtil'
 
 const mapDispatchToProps = dispatch => {
   return {
@@ -19,14 +23,13 @@ const mapDispatchToProps = dispatch => {
 
 const mapStateToProps = (state) => {
   return {
-    ...getAuthUserFromFirebase(state),
     pickMonInfo: state.pickMonInfo,
     honorModal: state.honorModal,
-    honors: convertMapToArr(dataToJS(state.firebase, 'honors')),
-    userCollections: dataToJS(state.firebase, 'userCollections')
+    honors: convertMapToArr(dataToJS(state.firebase, 'honors'))
   }
 }
 
-const wrappedPickMonView = firebaseConnect(['/mons', '/honors'])(PickMonView)
+// const wrappedPickMonView = firebaseConnect(['/mons', '/honors'])(PickMonView)
+const wrappedPickMonView = compose(withAuth(true), withUserCollections, firebaseConnect())(PickMonView)
 
 export default connect(mapStateToProps, mapDispatchToProps)(wrappedPickMonView)

@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import Helmet from 'react-helmet'
 import { connect } from 'react-redux'
 import { fromJS, is } from 'immutable'
+import { compose } from 'recompose'
+import { firebaseConnect } from 'react-redux-firebase'
 
 import Header from 'components/Header'
 import Sidebar from 'components/Sidebar'
@@ -12,6 +14,10 @@ import Footer from 'components/Footer'
 
 import { closeMessageModal } from 'store/messageModal'
 import { closeUserModal } from 'store/userModal'
+
+import withAuth from 'hocs/withAuth'
+import withUserCollections from 'hocs/withUserCollections'
+import withMons from 'hocs/withMons'
 
 const mapStateToProps = state => ({
   messageModal: state.messageModal,
@@ -94,4 +100,10 @@ CoreLayout.propTypes = {
   closeUserModal: PropTypes.func.isRequired
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CoreLayout)
+const wrappedCoreLayout = compose(withAuth(false), firebaseConnect(({ auth }) => {
+  const defaultPaths = ['/honors', '/mons']
+  if (auth) defaultPaths.push(`/collections/${auth.uid}`)
+  return defaultPaths
+}))(CoreLayout)
+
+export default connect(mapStateToProps, mapDispatchToProps)(wrappedCoreLayout)

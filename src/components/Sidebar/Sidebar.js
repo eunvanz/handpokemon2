@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { Link } from 'react-router'
 import { connect } from 'react-redux'
 import numeral from 'numeral'
-import { firebaseConnect, pathToJS } from 'react-redux-firebase'
+import { firebaseConnect } from 'react-redux-firebase'
 import $ from 'jquery'
 import shallowCompare from 'react-addons-shallow-compare'
 
@@ -20,17 +20,6 @@ import { postHonor } from 'services/HonorService'
 import { convertTimeToMMSS, getAuthUserFromFirebase } from 'utils/commonUtil'
 
 import { receiveCreditInfo } from 'store/creditInfo'
-
-const mapStateToProps = (state) => {
-  return {
-    ...getAuthUserFromFirebase(state),
-    creditInfo: state.creditInfo
-  }
-}
-
-const mapDispatchToProps = {
-  receiveCreditInfo
-}
 
 class Sidebar extends React.Component {
   constructor (props) {
@@ -302,9 +291,24 @@ Sidebar.propTypes = {
   receiveCreditInfo: PropTypes.func.isRequired
 }
 
-const authConnected = connect(({ firebase }) => ({ auth: pathToJS(firebase, 'auth') }))(Sidebar)
+// const authConnected = connect(({ firebase }) => ({ auth: pathToJS(firebase, 'auth') }))(Sidebar)
 
-const wrappedSidebar = firebaseConnect(({ auth }) =>
-  (auth ? [`/userCollections/${auth.uid}`, '/mons'] : null))(authConnected)
+// const wrappedSidebar = firebaseConnect(({ auth }) =>
+//   (auth ? [`/userCollections/${auth.uid}`, '/mons'] : null))(authConnected)
+
+const mapStateToProps = (state) => {
+  return {
+    ...getAuthUserFromFirebase(state),
+    creditInfo: state.creditInfo
+  }
+}
+
+const mapDispatchToProps = {
+  receiveCreditInfo
+}
+
+// const wrappedSidebar = connect(({ firebase }) => ({ auth: pathToJS(firebase, 'auth') }))(Sidebar)
+
+const wrappedSidebar = firebaseConnect()(Sidebar)
 
 export default connect(mapStateToProps, mapDispatchToProps)(wrappedSidebar)

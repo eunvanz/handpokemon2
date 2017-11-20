@@ -5,7 +5,7 @@ import HonorView from '../components/HonorView'
 
 import { convertMapToArr } from 'utils/commonUtil'
 
-import needAuth from 'hocs/needAuth'
+import withAuth from 'hocs/withAuth'
 
 const mapDispatchToProps = dispatch => {
   return {
@@ -23,4 +23,4 @@ const wrappedHonorView = firebaseConnect([
   '/honors'
 ])(HonorView)
 
-export default connect(mapStateToProps, mapDispatchToProps)(needAuth(wrappedHonorView))
+export default connect(mapStateToProps, mapDispatchToProps)(withAuth(true)(wrappedHonorView))
