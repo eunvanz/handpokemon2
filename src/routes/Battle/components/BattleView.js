@@ -7,6 +7,7 @@ import Button from 'components/Button'
 import CenterMidContainer from 'components/CenterMidContainer'
 import Loading from 'components/Loading'
 import Step1 from './Step1'
+import Step2 from './Step2'
 
 class BattleView extends React.Component {
   constructor (props) {
@@ -41,15 +42,9 @@ class BattleView extends React.Component {
           <Step1 user={user} onClickStart={this._handleOnClickStartBattle} />
         )
       } else if (step === 2) {
-        if (candidates) {
-          return (
-            <div>
-              상대를 찾음
-            </div>
-          )
-        } else {
-          return <CenterMidContainer bodyComponent={<Loading text='상대를 탐색 중...' />} />
-        }
+        return (
+          <Step2 candidates={candidates} />
+        )
       }
     }
     return renderBody()

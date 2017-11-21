@@ -114,7 +114,8 @@ class MonCard extends React.Component {
             marginBottom: '8px',
             borderRadius: '2px',
             boxShadow: '1px 1px 1px rgba(0, 0, 0, 0.1)',
-            padding: '4px'
+            padding: '4px',
+            backgroundColor: 'white'
           }}>
           <a className='ci-avatar'>
             <Img src={(type === 'collection' || type === 'defender') && !isDummy ? getMonImage(tobeMon).url : unloader} width='100%' style={{ border: '1px dotted #e2e2e2' }} />
@@ -157,13 +158,13 @@ class MonCard extends React.Component {
 MonCard.propTypes = {
   mon: PropTypes.object, // asis, tobe
   className: PropTypes.string,
-  type: PropTypes.string,
+  type: PropTypes.string, // collection, mon
   pick: PropTypes.bool, // 채집시
   isSelectable: PropTypes.bool,
   onSelect: PropTypes.func,
   onUnselect: PropTypes.func,
   isNotMine: PropTypes.bool,
-  firebase: PropTypes.object.isRequired,
+  firebase: PropTypes.object,
   showStatusBadge: PropTypes.bool,
   isDummy: PropTypes.bool,
   onClickShield: PropTypes.func,

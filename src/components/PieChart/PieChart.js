@@ -34,7 +34,7 @@ class PieChart extends React.Component {
 
     easyPieChart(this.state.key, this.props.trackColor, false, this.props.barColor, 2, 'butt', 100)
     // console.log('isInitialized to be true')
-    this.setState({ isInitialized: true })
+    if (this.refs.pieChart) this.setState({ isInitialized: true }) // 순간적으로 unMount시 setState를 방지하기 위해 조건문을 넣음
   }
   render () {
     const { sub, total, label, trackColor, barColor, ...rest } = this.props
@@ -43,7 +43,7 @@ class PieChart extends React.Component {
     // console.log('total', total)
     // console.log('this.state.isInitialized', this.state.isInitialized)
     return (
-      <div className='col-md-2 col-sm-3 col-xs-6 text-center m-b-30' {...rest}>
+      <div ref='pieChart' className='col-md-2 col-sm-3 col-xs-6 text-center m-b-30' {...rest}>
         {
           !isInitialized && <Loading height={114} />
         }
