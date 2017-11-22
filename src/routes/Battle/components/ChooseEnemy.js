@@ -1,33 +1,24 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import shallowCompare from 'react-addons-shallow-compare'
 import _ from 'lodash'
 
 import { isScreenSize } from 'utils/commonUtil'
 
-import ContentContainer from 'components/ContentContainer'
 import Loading from 'components/Loading'
 import Img from 'components/Img'
 import MonCard from 'components/MonCard'
 import CenterMidContainer from 'components/CenterMidContainer'
 import Button from 'components/Button'
 import Card from 'components/Card'
+import HonorBadge from 'components/HonorBadge'
 
-class Step2 extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-
-    }
-  }
-  shouldComponentUpdate (nextProps, nextState) {
-    return shallowCompare(this, nextProps, nextState)
-  }
+class ChooseEnemy extends React.PureComponent {
   render () {
-    const { candidates } = this.props
+    const { candidates, onClickChoose } = this.props
     const renderMonCards = (defenders) => {
+      const showIdx = _.random(0, defenders.length - 1)
       return defenders.map((defender, idx) => {
-        if (idx === 0) {
+        if (idx === showIdx) {
           return (
             <MonCard
               key={idx}
@@ -48,15 +39,17 @@ class Step2 extends React.Component {
         const { user, defenders } = candidate
         return (
           <Card
+            key={idx}
             body={
               <div className='row' key={idx}>
                 <div className='col-md-2 col-sm-3 col-xs-6 col-md-offset-2'>
                   <p style={{ marginBottom: '10px' }}>
-                    <Img src={user.profileImage} width='100%'
-                      style={{ border: '1px dotted #e2e2e2', maxWidth: '200px' }} />
+                    <Img src={user.profileImage} className='mCS_img_loaded'
+                      style={{ border: '1px dotted #e2e2e2', width: isScreenSize.xs() ? '50%' : '70%', borderRadius: '50%' }} />
                   </p>
-                  <p className='m-b-15'>{user.nickname}</p>
-                  <Button text='선택' size='xs' block color='orange' />
+                  <p className='m-b-10'>{user.nickname}</p>
+                  <p className='m-b-30' style={{ minHeight: '22px' }}>{user.enabledHonors && user.enabledHonors.map((honor, idx) => <HonorBadge key={idx} honor={honor} />)}</p>
+                  <Button text='선택' size='xs' block color='orange' onClick={() => onClickChoose(idx)} />
                 </div>
                 {renderMonCards(_.shuffle(defenders))}
               </div>
@@ -87,12 +80,13 @@ class Step2 extends React.Component {
   }
 }
 
-Step2.contextTypes = {
+ChooseEnemy.contextTypes = {
   router: PropTypes.object.isRequired
 }
 
-Step2.propTypes = {
-  candidates: PropTypes.array
+ChooseEnemy.propTypes = {
+  candidates: PropTypes.array,
+  onClickChoose: PropTypes.func.isRequired
 }
 
-export default Step2
+export default ChooseEnemy

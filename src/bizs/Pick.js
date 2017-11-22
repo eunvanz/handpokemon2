@@ -1,29 +1,30 @@
 class Pick {
   constructor (col, user) {
+    console.log('col', col)
     this.col = col
     this.hp = (col.hp + col.addedHp +
-      user.enabledHonors ? (user.enabledHonors[0] ? user.enabledHonors[0].burf[0] : 0) : 0 +
-        user.enabledHonors ? (user.enabledHonors[1] ? user.enabledHonors[0].burf[0] : 0) : 0)
+      (user.enabledHonors ? (user.enabledHonors[0] ? user.enabledHonors[0].burf[0] : 0) : 0) +
+        (user.enabledHonors ? (user.enabledHonors[1] ? user.enabledHonors[0].burf[0] : 0) : 0))
     this.power = (col.power + col.addedPower +
-      user.enabledHonors ? (user.enabledHonors[0] ? user.enabledHonors[0].burf[1] : 0) : 0 +
-        user.enabledHonors ? (user.enabledHonors[1] ? user.enabledHonors[0].burf[1] : 0) : 0)
+      (user.enabledHonors ? (user.enabledHonors[0] ? user.enabledHonors[0].burf[1] : 0) : 0) +
+        (user.enabledHonors ? (user.enabledHonors[1] ? user.enabledHonors[0].burf[1] : 0) : 0))
     this.armor = (col.armor + col.addedArmor +
-      user.enabledHonors ? (user.enabledHonors[0] ? user.enabledHonors[0].burf[2] : 0) : 0 +
-        user.enabledHonors ? (user.enabledHonors[1] ? user.enabledHonors[0].burf[2] : 0) : 0)
-    this.specialPower = (col.specialPower + col.addedSpecialPower +
-      user.enabledHonors ? (user.enabledHonors[0] ? user.enabledHonors[0].burf[3] : 0) : 0 +
-        user.enabledHonors ? (user.enabledHonors[1] ? user.enabledHonors[0].burf[3] : 0) : 0)
-    this.specialArmor = (col.specialArmor + col.addedSpecialArmor +
-      user.enabledHonors ? (user.enabledHonors[0] ? user.enabledHonors[0].burf[4] : 0) : 0 +
-        user.enabledHonors ? (user.enabledHonors[1] ? user.enabledHonors[0].burf[4] : 0) : 0)
+      (user.enabledHonors ? (user.enabledHonors[0] ? user.enabledHonors[0].burf[2] : 0) : 0) +
+        (user.enabledHonors ? (user.enabledHonors[1] ? user.enabledHonors[0].burf[2] : 0) : 0))
+    this.sPower = (col.sPower + col.addedSPower +
+      (user.enabledHonors ? (user.enabledHonors[0] ? user.enabledHonors[0].burf[3] : 0) : 0) +
+        (user.enabledHonors ? (user.enabledHonors[1] ? user.enabledHonors[0].burf[3] : 0) : 0))
+    this.sArmor = (col.sArmor + col.addedSArmor +
+      (user.enabledHonors ? (user.enabledHonors[0] ? user.enabledHonors[0].burf[4] : 0) : 0) +
+        (user.enabledHonors ? (user.enabledHonors[1] ? user.enabledHonors[0].burf[4] : 0) : 0))
     this.dex = (col.dex + col.addedDex +
-      user.enabledHonors ? (user.enabledHonors[0] ? user.enabledHonors[0].burf[5] : 0) : 0 +
-        user.enabledHonors ? (user.enabledHonors[1] ? user.enabledHonors[0].burf[5] : 0) : 0)
+      (user.enabledHonors ? (user.enabledHonors[0] ? user.enabledHonors[0].burf[5] : 0) : 0) +
+        (user.enabledHonors ? (user.enabledHonors[1] ? user.enabledHonors[0].burf[5] : 0) : 0))
     this.adjHp = this.hp
     this.adjPower = this.power
     this.adjArmor = this.armor
-    this.adjSpecialPower = this.specialPower
-    this.adjSpecialArmor = this.specialArmor
+    this.adjSPower = this.sPower
+    this.adjSArmor = this.sArmor
     this.adjDex = this.dex
     this.totalHp = this.hp * 4 + 360
     this.restHp = this.totalHp
@@ -31,7 +32,8 @@ class Pick {
     this.col = col
     this.user = user
     this.kills = 0
-    this.totalAbility = this.hp + this.power + this.armor + this.specialPower + this.specialArmor + this.dex
+    this.totalAbility = this.hp + this.power + this.armor + this.sPower + this.sArmor + this.dex
+    this.point = 0
   }
 }
 

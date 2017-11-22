@@ -24,5 +24,10 @@ export default class User {
     this.colPoint_leaguePoint = '0000000000_0000001000'
     this.leaguePoint_colPoint = '0000001000_0000000000'
     this.league = 0
+    this.attackWin = 0
+    this.attackLose = 0
+    this.defenseWin = 0
+    this.defenseLose = 0
+    this.winInRoew = 0
   }
 }

@@ -5,7 +5,7 @@ import ContentContainer from 'components/ContentContainer'
 import Button from 'components/Button'
 import CenterMidContainer from 'components/CenterMidContainer'
 
-class Step1 extends React.PureComponent {
+class BattleReady extends React.PureComponent {
   render () {
     const { user, onClickStart } = this.props
     const renderBody = () => {
@@ -33,13 +33,13 @@ class Step1 extends React.PureComponent {
   }
 }
 
-Step1.contextTypes = {
+BattleReady.contextTypes = {
   router: PropTypes.object.isRequired
 }
 
-Step1.propTypes = {
+BattleReady.propTypes = {
   user: PropTypes.object,
   onClickStart: PropTypes.func.isRequired
 }
 
-export default Step1
+export default BattleReady

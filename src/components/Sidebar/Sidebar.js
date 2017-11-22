@@ -227,7 +227,7 @@ class Sidebar extends React.Component {
                 </Link>
               </li>
               <li className='f-700'>
-                <Link to='/battle'>
+                <Link to='/battle' onClick={() => $('.ma-backdrop').click()}>
                   <i className='fa fa-gamepad' style={{ fontSize: '22px' }} /> 포켓몬 시합
                   {renderCreditBadge('battle')}
                 </Link>

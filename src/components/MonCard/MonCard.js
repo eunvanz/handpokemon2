@@ -28,7 +28,7 @@ class MonCard extends React.Component {
     const tobeMon = mon ? mon.tobe : null
     this.state = {
       showMonModal: false,
-      isSelected: false,
+      isSelected: props.isSelected || false,
       isFavorite: tobeMon ? tobeMon.isFavorite : false
     }
     this._showMonModal = this._showMonModal.bind(this)
@@ -37,6 +37,11 @@ class MonCard extends React.Component {
     this._handleOnClickFavorite = this._handleOnClickFavorite.bind(this)
     this._handleOnClickShield = this._handleOnClickShield.bind(this)
   }
+  componentDidUpdate (prevProps, prevState) {
+    if (prevProps.isSelected !== this.props.isSelected) {
+      this.setState({ isSelected: this.props.isSelected })
+    }
+  }
   shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
   }
@@ -44,12 +49,11 @@ class MonCard extends React.Component {
     this.setState({ showMonModal: true })
   }
   _handleOnSelect () {
-    if (this.props.onSelect()) {
-      this.setState({ isSelected: true })
-    }
+    if (this.props.isToggleable) this.setState({ isSelected: true })
+    this.props.onSelect()
   }
   _handleOnUnselect () {
-    this.setState({ isSelected: false })
+    if (this.props.isToggleable) this.setState({ isSelected: false })
     this.props.onUnselect()
   }
   _handleOnClickFavorite (e) {
@@ -69,7 +73,7 @@ class MonCard extends React.Component {
     onClickShield(mon.tobe)
   }
   render () {
-    const { mon, pick, className, type, isSelectable, onUnselect, isNotMine, firebase, showStatusBadge, isDummy, onClickShield, onClickSetDefenderBtn, isCustomSize, disableChangeBtn, user, ...restProps } = this.props
+    const { mon, pick, className, type, isSelectable, onUnselect, isToggleable, isSelected, isNotMine, firebase, showStatusBadge, isDummy, onClickShield, onClickSetDefenderBtn, isCustomSize, disableChangeBtn, user, ...restProps } = this.props
     const tobeMon = mon ? mon.tobe : null
     const renderSetDefenderBtn = () => {
       return <Button
@@ -171,7 +175,9 @@ MonCard.propTypes = {
   onClickSetDefenderBtn: PropTypes.func,
   isCustomSize: PropTypes.bool,
   disableChangeBtn: PropTypes.bool,
-  user: PropTypes.object
+  user: PropTypes.object,
+  isToggleable: PropTypes.bool,
+  isSelected: PropTypes.bool
 }
 
 export default firebaseConnect()(MonCard)

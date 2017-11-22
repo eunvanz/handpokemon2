@@ -3,12 +3,12 @@ import numeral from 'numeral'
 
 import { ATTR_MATCH, ATTR_IDX } from 'constants/rules'
 
-class Battle {
+export default class Battle {
   constructor (userPicks, enemyPicks, firstAttacker) {
     this.userPicks = userPicks
     this.enemyPicks = enemyPicks
-    this.attacker = firstAttacker
-    this.defender = firstAttacker === 'user' ? 'enemy' : 'user'
+    this.attacker = firstAttacker === 'user' ? 'enemy' : 'user'
+    this.defender = firstAttacker
     this.turn = 0
     this.mom = null
     this.isFinished = false
@@ -50,9 +50,11 @@ class Battle {
     let mom
     let highestPoint = 0
     this.userPicks.forEach(pick => {
+      console.log('pick', pick)
       if (pick.point > highestPoint) mom = pick
     })
     this.enemyPicks.forEach(pick => {
+      console.log('pick', pick)
       if (pick.point > highestPoint) mom = pick
     })
     return mom
@@ -61,6 +63,7 @@ class Battle {
     this.attacker = this.attacker === 'user' ? 'enemy' : 'user'
     this.defender = this.defender === 'user' ? 'enemy' : 'user'
     this.turn++
+    console.log('turn', this.turn)
     const attackerPicks = this.attacker === 'user' ? this.userPicks : this.enemyPicks
     const defenderPicks = this.attacker === 'user' ? this.enemyPicks : this.userPicks
     const attackerIdx = this._pickIdx(this.attacker)
@@ -69,15 +72,20 @@ class Battle {
     const defenderPick = defenderPicks[defenderIdx]
     const attackType = _.random(0, 2) // 0, 1 - 일반, 2 - 특수
     const beforeHp = defenderPick.restHp
+    console.log('beforeHp', beforeHp)
     const pureDamage = attackType === 2 ? this._getSpecialDamage(attackerPick, defenderPick) : this._getBasicDamage(attackerPick, defenderPick)
-    const attrBonus = numeral(this._getAttrMatchAdjustedVar(attackerPick, defenderPick)).format('0%')
+    console.log('pureDamage', pureDamage)
+    const attrBonus = numeral(1 - this._getAttrMatchAdjustedVar(attackerPick, defenderPick)).format('0%')
+    console.log('attrBonus', attrBonus)
     const isAvoid = this._isAvoid(attackerPick, defenderPick)
+    console.log('isAvoid', isAvoid)
     let finalDamage = 0
     let afterHp = beforeHp
     if (isAvoid) {
       defenderPick.point += pureDamage
     } else {
       finalDamage = this._getFinalDamage(attackType, pureDamage, defenderPick)
+      console.log('finalDamage', finalDamage)
       afterHp -= pureDamage
       afterHp = afterHp < 0 ? 0 : afterHp
       if (afterHp === 0) attackerPick.kills++
@@ -85,6 +93,8 @@ class Battle {
       attackerPick.point += afterHp === 0 ? beforeHp : pureDamage
       defenderPick.point += pureDamage
     }
+    console.log('attackerPick.point', attackerPick.point)
+    console.log('defenderPick.point', defenderPick.point)
     if (this._areAllDead(defenderPicks)) {
       this.isFinished = true
       this.winner = this.attacker
@@ -105,27 +115,32 @@ class Battle {
       finalDamage,
       attrBonus,
       afterHp,
+      isAvoid,
       isFinished: this.isFinished
     }
+    console.log('result', result)
     return result
   }
   _pickIdx (srcName) {
     const srcPicks = srcName === 'user' ? this.userPicks : this.enemyPicks
+    let idx = 1
     while (true) {
-      const idx = _.random(0, 2)
-      if (srcPicks[idx].restHp > 0) return idx
+      idx = _.random(0, 2)
+      if (srcPicks[idx].restHp > 0) break
     }
+    return idx
   }
   _getBasicDamage (attackMon, defenseMon) {
     const attackRange = Math.floor(Math.random() * 10) * 0.1 + 1.5
-    return (attackMon.adjPower * attackRange +
+    console.log('attackRange', attackRange)
+    return Math.round((attackMon.adjPower * attackRange +
       attackMon.adjDex * 0.1 * attackRange) *
-      this._getAttrMatchAdjustedVar(attackMon, defenseMon)
+      this._getAttrMatchAdjustedVar(attackMon, defenseMon))
   }
   _getFinalDamage (attackType, pureDamage, defenderPick) {
     let armor = defenderPick.adjArmor
-    if (attackType === 2) armor = defenderPick.adjSpecialArmor
-    return pureDamage - pureDamage * this._getArmorPct(armor, defenderPick.adjDex)
+    if (attackType === 2) armor = defenderPick.adjSArmor
+    return Math.round(pureDamage - pureDamage * this._getArmorPct(armor, defenderPick.adjDex))
   }
   _getArmorPct (armor, dex) {
     let pct = 0.001 + armor * 0.003 + dex * 0.0005
@@ -134,9 +149,11 @@ class Battle {
   }
   _getSpecialDamage (attackMon, defenseMon) {
     const specialRange = Math.floor(Math.random() * 20) * 0.1 + 3.5
-    return (attackMon.adjSpecialPower * specialRange +
+    console.log('specialRange', specialRange)
+    console.log('attackMon.adjSPower', attackMon.adjSPower)
+    return Math.round((attackMon.adjSPower * specialRange +
       attackMon.adjDex * 0.1 * specialRange) *
-      this._getAttrMatchAdjustedVar(attackMon, defenseMon)
+      this._getAttrMatchAdjustedVar(attackMon, defenseMon))
   }
   _getAttrMatchAdjustedVar (attackerPick, defenderPick) {
     const srcCollection = attackerPick.col
@@ -156,12 +173,15 @@ class Battle {
       result = result * ATTR_MATCH[srcSubAttrIdx][tgtMainAttrIdx]
       if (tgtSubAttrIdx !== -1) result = result * ATTR_MATCH[srcSubAttrIdx][tgtSubAttrIdx]
     }
+    console.log('attrMatchAdjVar', result)
     return result
   }
   _areAllDead (picks) {
     const totalRestHp = picks.reduce((accm, pick) => {
-      accm += pick.restHp
+      console.log('pick.restHp', pick.restHp)
+      return accm + pick.restHp
     }, 0)
+    console.log('totalRestHp', totalRestHp)
     return totalRestHp === 0
   }
   _isAvoid (attackerPick, defenderPick) {
@@ -175,5 +195,3 @@ class Battle {
     return avoidIdx <= point
   }
 }
-
-export default Battle
