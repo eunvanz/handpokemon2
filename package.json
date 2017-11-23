@@ -139,6 +139,7 @@
     "velocity-react": "^1.3.3",
     "webpack": "^1.12.14",
     "why-did-you-update": "0.0.8",
+    "wnumb": "^1.1.0",
     "yargs": "^6.3.0"
   },
   "devDependencies": {

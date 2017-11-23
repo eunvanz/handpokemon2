@@ -164,3 +164,7 @@ export const convertNumberToStringForIndex = (numArr, digit = 10) => {
 export const countAttrsInCollections = (attr, collections) => {
   return collections.filter(collection => collection.mon[collection.monId].mainAttr === attr || collection.mon[collection.monId].subAttr === attr).length
 }
+
+export const deepCopyArray = array => {
+  return JSON.parse(JSON.stringify(array))
+}

@@ -412,7 +412,7 @@ PickMonView.propTypes = {
   hideHonorModal: PropTypes.func.isRequired,
   honorModal: PropTypes.object.isRequired,
   honors: PropTypes.array,
-  userCollections: PropTypes.object
+  userCollections: PropTypes.array
 }
 
 export default PickMonView

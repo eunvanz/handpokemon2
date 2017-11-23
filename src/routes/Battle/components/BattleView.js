@@ -58,6 +58,7 @@ class BattleView extends React.Component {
     if (stopIdx === 0) firstAttacker = 'user'
     const userPicksToSet = userPicks.map(pick => new Pick(pick, user))
     const enemyPicksToSet = enemyPicks.map(pick => new Pick(pick, chosenEnemy))
+    console.log('userPicksToSet', userPicksToSet)
     const battle = new Battle(userPicksToSet, enemyPicksToSet, firstAttacker)
     const log = battle._generateBattleLog()
     setBattleLog(log)

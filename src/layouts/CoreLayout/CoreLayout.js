@@ -63,6 +63,10 @@ class CoreLayout extends React.Component {
             },
             {
               'rel': 'stylesheet',
+              'href': '/vendors/bower_components/nouislider/distribute/nouislider.min.css'
+            },
+            {
+              'rel': 'stylesheet',
               'href': '/css/inc/app_1.css'
             },
             {

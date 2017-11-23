@@ -1,6 +1,5 @@
 class Pick {
   constructor (col, user) {
-    console.log('col', col)
     this.col = col
     this.hp = (col.hp + col.addedHp +
       (user.enabledHonors ? (user.enabledHonors[0] ? user.enabledHonors[0].burf[0] : 0) : 0) +
