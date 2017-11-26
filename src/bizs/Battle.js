@@ -38,10 +38,9 @@ export default class Battle {
   }
   _isUnderDog () {
     if (this.winner !== 'user') return false
-    console.log('userPicks total', this.userPicks.reduce((total, pick) => total + pick.totalAbility, 0))
-    console.log('enemyPicks total', this.enemyPicks.reduce((total, pick) => total + pick.totalAbility, 0))
-    return this.userPicks.reduce((total, pick) => total + pick.totalAbilty, 0) -
-      this.enemyPicks.reduce((total, pick) => total + pick.totalAbilty, 0) < 0
+    const userTotal = this.userPicks.reduce((total, pick) => total + pick.totalAbility, 0)
+    const enemyTotal = this.enemyPicks.reduce((total, pick) => total + pick.totalAbility, 0)
+    return userTotal < enemyTotal
   }
   _isPerfectGame () {
     if (this.winner !== 'user') return false

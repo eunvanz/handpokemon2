@@ -32,7 +32,7 @@ class MonInfo extends React.Component {
       return result
     }
     if (user && user.enabledHonors) honorBurf = getHonorBurf()
-    const honorTotal = honorBurf ? honorBurf.reduce((accm, burf) => accm + burf, 0) : null
+    const honorTotal = honorBurf ? honorBurf.reduce((accm, burf) => accm + burf, 0) : 0
     const mon = monObj.tobe
     const asisMon = monObj.asis
     let monToView = type === 'collection' || type === 'defender' ? mon.mon[mon.monId] : mon
@@ -43,13 +43,13 @@ class MonInfo extends React.Component {
           if (asisMon) {
             return (
               <div className='col-xs-9 f-700'>
-                <span className='c-blue'>{mon.total + mon.addedTotal + (honorTotal || 0)}</span> (<span className='c-gray'>{asisMon.total}</span><span className='c-green'>{honorTotal ? ` +${honorTotal}` : ''}</span>{asisMon.addedTotal > 0 && <span className='c-orange'> +{asisMon.addedTotal}</span>}<span className='c-lightblue'> +{mon.addedTotal - asisMon.addedTotal}</span>)
+                <span className='c-blue'>{mon.total + mon.addedTotal + (honorTotal || 0)}</span> (<span className='c-gray'>{asisMon.total}</span><span className='c-green'>{honorTotal !== 0 ? ` +${honorTotal}` : ''}</span>{asisMon.addedTotal > 0 && <span className='c-orange'> +{asisMon.addedTotal}</span>}<span className='c-lightblue'> +{mon.addedTotal - asisMon.addedTotal}</span>)
               </div>
             )
           } else {
             return (
               <div className='col-xs-9 f-700'>
-                <span className='c-blue'>{mon.total + mon.addedTotal + (honorTotal || 0)}</span> {(mon.addedTotal > 0 || honorTotal) && <span>(<span className='c-gray'>{mon.total}</span><span className='c-green'>{honorTotal ? ` +${honorTotal}` : ''}</span><span className='c-orange'>{mon.addedTotal === 0 ? '' : ` +${mon.addedTotal}`}</span>)</span>}
+                <span className='c-blue'>{mon.total + mon.addedTotal + (honorTotal || 0)}</span> {(mon.addedTotal > 0 || honorTotal !== 0) && <span>(<span className='c-gray'>{mon.total}</span><span className='c-green'>{honorTotal !== 0 ? ` +${honorTotal}` : ''}</span><span className='c-orange'>{mon.addedTotal === 0 ? '' : ` +${mon.addedTotal}`}</span>)</span>}
               </div>
             )
           }
