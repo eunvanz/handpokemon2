@@ -7,6 +7,7 @@ import { deepCopyArray } from 'utils/commonUtil'
 
 export default class Battle {
   constructor (userPicks, enemyPicks, firstAttacker) {
+    this.firstAttacker = firstAttacker
     this.userPicks = userPicks
     this.enemyPicks = enemyPicks
     this.attacker = firstAttacker === 'user' ? 'enemy' : 'user'
@@ -26,11 +27,12 @@ export default class Battle {
     while (!this.isFinished) {
       log.turns.push(this._proceedNextTurn())
     }
-    log.mom = this._getMonOfTheMatch()
+    log.mom = this._getMonOfTheMatch(log.turns)
     log.isGandang = this._isGandang()
     log.isOneMonShow = this._isOneMonShow()
     log.isPerfectGame = this._isPerfectGame()
     log.isUnderDog = this._isUnderDog()
+    log.isFirstDefense = this._isFirstDefense()
     log.winner = this.winner
     return log
   }
@@ -51,14 +53,25 @@ export default class Battle {
     if (this.winner !== 'user') return false
     return this.userPicks.reduce((totalRestHp, pick) => totalRestHp + pick.restHp, 0) <= 30
   }
-  _getMonOfTheMatch () {
+  _isFirstDefense () {
+    if (this.winner !== 'user') return false
+    return this.firstAttacker !== 'user'
+  }
+  _getMonOfTheMatch (turns) {
+    const lastTurn = turns[turns.length - 1]
     let mom
     let highestPoint = 0
-    this.userPicks.forEach(pick => {
-      if (pick.point > highestPoint) mom = pick
+    lastTurn.attackerPicks.forEach(pick => {
+      if (pick.point > highestPoint) {
+        mom = pick
+        highestPoint = pick.point
+      }
     })
-    this.enemyPicks.forEach(pick => {
-      if (pick.point > highestPoint) mom = pick
+    lastTurn.defenderPicks.forEach(pick => {
+      if (pick.point > highestPoint) {
+        mom = pick
+        highestPoint = pick.point
+      }
     })
     return mom
   }
@@ -75,7 +88,8 @@ export default class Battle {
     const attackType = _.random(0, 2) // 0, 1 - 일반, 2 - 특수
     const beforeHp = defenderPick.restHp
     const pureDamage = attackType === 2 ? this._getSpecialDamage(attackerPick, defenderPick) : this._getBasicDamage(attackerPick, defenderPick)
-    const attrBonus = numeral(1 - this._getAttrMatchAdjustedVar(attackerPick, defenderPick)).format('0%')
+    const attrBonus = numeral(this._getAttrMatchAdjustedVar(attackerPick, defenderPick) - 1).format('0%')
+    // console.log('attrBonus', attrBonus)
     const isAvoid = this._isAvoid(attackerPick, defenderPick)
     let finalDamage = 0
     let afterHp = beforeHp
@@ -164,6 +178,11 @@ export default class Battle {
       result = result * ATTR_MATCH[srcSubAttrIdx][tgtMainAttrIdx]
       if (tgtSubAttrIdx !== -1) result = result * ATTR_MATCH[srcSubAttrIdx][tgtSubAttrIdx]
     }
+    // console.log('srcMainAttr', srcMainAttr)
+    // console.log('srcSubAttr', srcSubAttr)
+    // console.log('tgtMainAttr', tgtMainAttr)
+    // console.log('tgtSubAttr', tgtSubAttr)
+    // console.log('attrVar', result)
     return result
   }
   _areAllDead (picks) {

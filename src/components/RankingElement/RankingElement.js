@@ -41,10 +41,10 @@ class RankingElement extends React.Component {
     })
   }
   render () {
-    const { user, rank, type, isMine, isHeader } = this.props
+    const { user, rank, type, isMine, isHeader, isEnemy, style, ...props } = this.props
     const { lineHeight, fontSize, padding, width, showProfile } = this.state
     return (
-      <div className='list-group-item media' style={{ height: '70px', padding, fontSize, border: isMine ? `1px solid ${colors.amber}` : '' }}>
+      <div className='list-group-item media' style={Object.assign({}, { height: '70px', padding, fontSize, border: isMine ? `1px solid ${colors.amber}` : isEnemy ? `1px solid ${colors.red}` : '' }, style)} {...props}>
         <div className='pull-left text-center' style={{ width: width[0], lineHeight }}>{isHeader ? <strong>순위</strong> : numeral(rank).format('0,0')}</div>
         <div className={`pull-left ${isHeader ? 'text-center' : ''}`} style={{ width: width[1] }}>
           {isHeader
@@ -74,7 +74,9 @@ RankingElement.propTypes = {
   rank: PropTypes.number,
   type: PropTypes.string,
   isMine: PropTypes.bool,
-  isHeader: PropTypes.bool
+  isHeader: PropTypes.bool,
+  isEnemy: PropTypes.bool,
+  style: PropTypes.object
 }
 
 export default RankingElement

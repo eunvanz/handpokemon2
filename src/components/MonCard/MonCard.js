@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import shallowCompare from 'react-addons-shallow-compare'
 import { firebaseConnect } from 'react-redux-firebase'
+import numeral from 'numeral'
 
 import MonCost from '../MonCost'
 import MonAttr from '../MonAttr'
@@ -73,7 +74,9 @@ class MonCard extends React.Component {
     onClickShield(mon.tobe)
   }
   render () {
-    const { mon, pick, className, type, isSelectable, onUnselect, isToggleable, isSelected, isNotMine, firebase, showStatusBadge, isDummy, onClickShield, onClickSetDefenderBtn, isCustomSize, disableChangeBtn, user, ...restProps } = this.props
+    const { mon, pick, className, type, isSelectable, onUnselect, isToggleable, isSelected,
+      isNotMine, firebase, showStatusBadge, isDummy, onClickShield, onClickSetDefenderBtn,
+      isCustomSize, disableChangeBtn, user, kills, point, isMom, ...restProps } = this.props
     const tobeMon = mon ? mon.tobe : null
     const renderSetDefenderBtn = () => {
       return <Button
@@ -139,8 +142,19 @@ class MonCard extends React.Component {
               mainAttr={isDummy ? null : (type === 'collection' || type === 'defender') ? tobeMon.mon[tobeMon.monId].mainAttr : tobeMon.mainAttr}
               subAttr={isDummy ? null : (type === 'collection' || type === 'defender') ? tobeMon.mon[tobeMon.monId].subAttr : tobeMon.subAttr}
               style={{ marginBottom: '10px' }} isDummy={isDummy} />
+            {
+              isMom &&
+              <div className='text-center c-white' style={{ position: 'absolute', width: 'calc(100% + 10px)', backgroundColor: colors.red, fontSize: '14px', top: '-25px', left: '-5px' }}>MON OF THE MATCH</div>
+            }
           </div>
         </div>
+        {
+          kills !== undefined && point !== undefined &&
+          <div className='text-center m-b-20'>
+            <p className='m-b-0'>마무리: <span className='c-lightblue f-700'>{kills}</span></p>
+            <p>포인트: <span className='c-lightblue f-700'>{numeral(point).format('0,0')}</span></p>
+          </div>
+        }
         {
           pick &&
           renderLevelUpInfo()
@@ -177,7 +191,10 @@ MonCard.propTypes = {
   disableChangeBtn: PropTypes.bool,
   user: PropTypes.object,
   isToggleable: PropTypes.bool,
-  isSelected: PropTypes.bool
+  isSelected: PropTypes.bool,
+  kills: PropTypes.number,
+  point: PropTypes.number,
+  isMom: PropTypes.bool
 }
 
 export default firebaseConnect()(MonCard)

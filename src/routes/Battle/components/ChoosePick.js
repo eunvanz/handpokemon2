@@ -162,7 +162,8 @@ class ChoosePick extends React.Component {
     if (pick.length === 3) return this.setState({ sortedCollections: pick })
     const { collections } = this.props
     const { maxCost } = this.state
-    const originCollections = _.orderBy(collections.filter(c => !c.isDefender), ['isFavorite'], ['desc'])
+    const adjustCollections = collections.map(col => Object.assign({}, col, { totalIdx: col.total + col.addedTotal }))
+    const originCollections = _.orderBy(adjustCollections.filter(c => !c.isDefender), ['isFavorite', 'totalIdx'], ['desc', 'desc'])
     const restPick = 2 - pick.length
     const availableCost = maxCost - cost - restPick
     const filteredCollections = originCollections.filter(c => (c.mon[c.monId].cost <= availableCost) ||
@@ -343,7 +344,7 @@ class ChoosePick extends React.Component {
                 <MonCard isSelectable onSelect={() => this._handleOnSelectMon(col)}
                   onUnselect={() => this._handleOnUnselectMon(col)} user={user}
                   isSelected={this._findColInChosenPick(col) != null}
-                  key={idx} mon={{ asis: null, tobe: col }} type='collection' />
+                  key={col.id} mon={{ asis: null, tobe: col }} type='collection' />
               )
             })
           }

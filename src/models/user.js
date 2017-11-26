@@ -28,6 +28,8 @@ export default class User {
     this.attackLose = 0
     this.defenseWin = 0
     this.defenseLose = 0
-    this.winInRoew = 0
+    this.winInRow = 0
+    this.battleSpeed = 2
+    this.inventory = []
   }
 }

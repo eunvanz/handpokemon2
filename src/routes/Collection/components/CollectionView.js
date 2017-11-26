@@ -391,7 +391,7 @@ class CollectionView extends React.Component {
         const isMineAndHave = isMine && col.userId
         return <MonCard isSelectable={this.state.mode === 'mix'} onSelect={() => this._handleOnSelectMon(col)}
           onUnselect={() => { }} isNotMine={!isMine} showStatusBadge={isMineAndHave && mode === 'view'} user={userToView}
-          key={idx} mon={{ asis: null, tobe: col }} type={col.mon ? 'collection' : 'mon'} onClickShield={() => this._handleOnClickShield(col)} />
+          key={col.id} mon={{ asis: null, tobe: col }} type={col.mon ? 'collection' : 'mon'} onClickShield={() => this._handleOnClickShield(col)} />
       })
       return <div key={collectionsKey}>{collectionsArr}</div>
     }

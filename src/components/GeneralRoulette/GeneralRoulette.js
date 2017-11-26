@@ -5,7 +5,7 @@ import bg from './assets/unloader.png'
 
 class GeneralRoulette extends React.PureComponent {
   render () {
-    const { id, images, stopIdx, onStart, onStop, onSlowdown, style, size, innerSize, ...props } = this.props
+    const { id, images, style, size, innerSize, ...props } = this.props
     const renderImages = () => {
       return images.map((image, idx) => <img key={idx} src={image} style={{ width: `${innerSize}px` }} />)
     }
@@ -26,10 +26,6 @@ GeneralRoulette.contextTypes = {
 GeneralRoulette.propTypes = {
   id: PropTypes.string.isRequired,
   images: PropTypes.array.isRequired,
-  stopIdx: PropTypes.number,
-  onStart: PropTypes.func,
-  onStop: PropTypes.func,
-  onSlowdown: PropTypes.func,
   style: PropTypes.object,
   size: PropTypes.number.isRequired,
   innerSize: PropTypes.number

@@ -18,21 +18,24 @@ class ChooseFirstAttack extends React.Component {
     super(props)
     this.state = {
       isSlowdown: false,
-      isStopped: false
+      isStopped: false,
+      stopIdx: 0
     }
     this._handleOnClickStop = this._handleOnClickStop.bind(this)
     this._onSlowdownCallback = this._onSlowdownCallback.bind(this)
     this._onStopCallback = this._onStopCallback.bind(this)
   }
   componentDidMount () {
+    const stopIdx = _.random(0, 1)
+    this.setState({ stopIdx })
     const option = {
       speed: 8,
       duration: 10,
-      stopImageNumber: _.random(0, 1),
+      stopImageNumber: stopIdx,
       slowDownCallback: this._onSlowdownCallback,
       stopCallback: this._onStopCallback
     }
-    window.$(`#firstAttackRoulette`).roulette(option).delay(10000).roulette('start')
+    window.$(`#firstAttackRoulette`).roulette(option).roulette('start')
   }
   shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
@@ -41,13 +44,13 @@ class ChooseFirstAttack extends React.Component {
     window.$('#firstAttackRoulette').roulette('stop')
   }
   _onSlowdownCallback () {
+    const { stopIdx } = this.state
+    const { onSlowdownCallback } = this.props
+    onSlowdownCallback(stopIdx)
     this.setState({ isSlowdown: true })
   }
   _onStopCallback () {
-    const { onStopCallback } = this.props
-    const { stopIdx } = this.state
     this.setState({ isStopped: true, isSlowdown: false })
-    onStopCallback(stopIdx)
   }
   render () {
     const { isStopped, isSlowdown } = this.state
@@ -59,9 +62,6 @@ class ChooseFirstAttack extends React.Component {
           <GeneralRoulette
             id='firstAttackRoulette'
             images={[pawImage, shieldImage]}
-            stopIdx={this.state.stopIdx}
-            onSlowdown={this._onSlowdownCallback}
-            onStop={this._onStopCallback}
             style={{ border: `3px solid ${colors.lightGray}`, borderRadius: '20px', margin: 'auto' }}
             size={220}
             innerSize={200}
@@ -84,7 +84,7 @@ ChooseFirstAttack.contextTypes = {
 }
 
 ChooseFirstAttack.propTypes = {
-  onStopCallback: PropTypes.func.isRequired,
+  onSlowdownCallback: PropTypes.func.isRequired,
   onClickStart: PropTypes.func.isRequired
 }
 

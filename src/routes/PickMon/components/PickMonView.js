@@ -288,7 +288,7 @@ class PickMonView extends React.Component {
     }
     if (isTobeGotHonorsChanged) {
       updateUserHonorInfoProms.push(setUserPath(firebase, auth.uid, 'gotHonors', tobeGotHonors))
-      const gotPokemoney = tobeGotHonors.reduce((accm, honor) => {
+      const gotPokemoney = _.difference(tobeGotHonors, gotHonors).reduce((accm, honor) => {
         return accm + honor.reward
       }, 0)
       updateUserHonorInfoProms.push(setUserPath(firebase, auth.uid, 'pokemoney', user.pokemoney + gotPokemoney))

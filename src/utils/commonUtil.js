@@ -15,6 +15,17 @@ export const isScreenSize = {
     } else {
       return window.innerWidth < size
     }
+  },
+  largerThan: (size) => {
+    if (size === 'xs') {
+      return window.innerWidth >= 768
+    } else if (size === 'sm') {
+      return window.innerWidth >= 992
+    } else if (size === 'md') {
+      return window.innerWidth >= 1200
+    } else {
+      return window.innerWidth > size
+    }
   }
 }
 

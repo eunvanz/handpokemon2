@@ -2,18 +2,17 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import shallowCompare from 'react-addons-shallow-compare'
 
-import ContentContainer from 'components/ContentContainer'
-import Button from 'components/Button'
-import CenterMidContainer from 'components/CenterMidContainer'
-import Loading from 'components/Loading'
 import BattleReady from './BattleReady'
 import ChooseEnemy from './ChooseEnemy'
 import ChoosePick from './ChoosePick'
 import ChooseFirstAttack from './ChooseFirstAttack'
 import BattleStage from './BattleStage'
+import BattleResult from './BattleResult'
 
 import Battle from 'bizs/Battle'
 import Pick from 'bizs/Pick'
+
+import { setUserPath, updateUserToLose } from 'services/UserService'
 
 class BattleView extends React.Component {
   constructor (props) {
@@ -25,8 +24,10 @@ class BattleView extends React.Component {
     this._handleOnClickStartBattle = this._handleOnClickStartBattle.bind(this)
     this._handleOnClickChooseEnemy = this._handleOnClickChooseEnemy.bind(this)
     this._handleOnClickPickNext = this._handleOnClickPickNext.bind(this)
-    this._onStopRouletteCallback = this._onStopRouletteCallback.bind(this)
+    this._onSlowdownFirstAttackRouletteCallback = this._onSlowdownFirstAttackRouletteCallback.bind(this)
     this._handleOnClickReady = this._handleOnClickReady.bind(this)
+    this._handleOnClickCompleteBattle = this._handleOnClickCompleteBattle.bind(this)
+    this._handleOnClickContinueBattle = this._handleOnClickContinueBattle.bind(this)
   }
   shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
@@ -36,7 +37,9 @@ class BattleView extends React.Component {
     clearBattle()
   }
   _handleOnClickReady () {
-    const { fetchCandidates, user, firebase } = this.props
+    const { fetchCandidates, auth, user, firebase } = this.props
+    // 유저의 패배를 기록
+    // updateUserToLose(firebase, auth.uid, user, 'attackLose', 6)
     this.setState({ step: 2 })
     fetchCandidates(firebase, user.league)
   }
@@ -51,20 +54,27 @@ class BattleView extends React.Component {
     setEnemyPicks(choosenCandidate.defenders)
     this.setState({ chosenEnemy: choosenCandidate.user, step: 4 })
   }
-  _onStopRouletteCallback (stopIdx) {
+  _onSlowdownFirstAttackRouletteCallback (stopIdx) {
     const { userPicks, enemyPicks, user, setBattleLog } = this.props
     const { chosenEnemy } = this.state
     let firstAttacker = 'enemy'
     if (stopIdx === 0) firstAttacker = 'user'
     const userPicksToSet = userPicks.map(pick => new Pick(pick, user))
     const enemyPicksToSet = enemyPicks.map(pick => new Pick(pick, chosenEnemy))
-    console.log('userPicksToSet', userPicksToSet)
     const battle = new Battle(userPicksToSet, enemyPicksToSet, firstAttacker)
     const log = battle._generateBattleLog()
     setBattleLog(log)
   }
   _handleOnClickStartBattle () {
     this.setState({ step: 5 })
+  }
+  _handleOnClickCompleteBattle (speed) {
+    const { auth, firebase } = this.props
+    setUserPath(firebase, auth.uid, 'battleSpeed', speed)
+    this.setState({ step: 6 })
+  }
+  _handleOnClickContinueBattle () {
+    this.setState({ step: 1, chosenEnemy: null })
   }
   render () {
     const { step, chosenEnemy } = this.state
@@ -84,11 +94,15 @@ class BattleView extends React.Component {
         )
       } else if (step === 4) {
         return (
-          <ChooseFirstAttack onStopCallback={this._onStopRouletteCallback} onClickStart={this._handleOnClickStartBattle} />
+          <ChooseFirstAttack onSlowdownCallback={this._onSlowdownFirstAttackRouletteCallback} onClickStart={this._handleOnClickStartBattle} />
         )
       } else if (step === 5) {
         return (
-          <BattleStage battleLog={battleLog} userPicks={userPicks} user={user} enemy={chosenEnemy} enemyPicks={enemyPicks} />
+          <BattleStage battleLog={battleLog} userPicks={userPicks} user={user} enemy={chosenEnemy} enemyPicks={enemyPicks} onClickNext={this._handleOnClickCompleteBattle} />
+        )
+      } else if (step === 6) {
+        return (
+          <BattleResult user={user} enemy={chosenEnemy} battleLog={battleLog} onClickContinue={this._handleOnClickContinueBattle} />
         )
       }
     }

@@ -205,13 +205,22 @@ class Sidebar extends React.Component {
               <li className='f-700'>
                 <Link to='/' onClick={() => $('.ma-backdrop').click()}><i className='fa fa-home' style={{ fontSize: '22px' }} /> 홈</Link>
               </li>
-              <li className='f-700'>
-                <Link to='/honor' onClick={() => $('.ma-backdrop').click()}><i className='fa fa-bookmark' style={{ fontSize: '22px' }} /> 업적</Link>
-              </li>
+              {
+                auth &&
+                <li className='f-700'>
+                  <Link to='/honor' onClick={() => $('.ma-backdrop').click()}><i className='fa fa-bookmark' style={{ fontSize: '22px' }} /> 내 업적</Link>
+                </li>
+              }
               {
                 auth &&
                 <li className='f-700'>
                   <Link to={`/collection/${auth.uid}`} onClick={() => $('.ma-backdrop').click()}><i className='zmdi zmdi-apps' style={{ fontSize: '22px' }} /> 내 콜렉션</Link>
+                </li>
+              }
+              {
+                auth &&
+                <li className='f-700'>
+                  <Link to={`/inventory/${auth.uid}`} onClick={() => $('.ma-backdrop').click()}><i className='fa fa-gift' style={{ fontSize: '22px' }} /> 내 선물함</Link>
                 </li>
               }
               <li className='f-700'>

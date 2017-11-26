@@ -225,6 +225,16 @@ export const setUserPath = (firebase, userId, path, value) => {
   return firebase.ref(`/users/${userId}/${path}`).set(value)
 }
 
+export const updateUserToLose = (firebase, userId, user, type, point) => {
+  // type should be attackLose or defenseLose
+  const updateObj = {
+    [`/users/${userId}/battleLose`]: user.battleLose + 1,
+    [`/users/${userId}/${type}`]: (user[type] || 0) + 1,
+    [`/users/${userId}/leaguePoint`]: user.leaguePoint + point
+  }
+  return updater(firebase, updateObj)
+}
+
 export const getUsersByLeagueForBattle = (firebase, league) => {
   console.log('league', league)
   const ref = firebase.ref('users')

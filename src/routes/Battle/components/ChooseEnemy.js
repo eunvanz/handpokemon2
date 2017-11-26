@@ -1,6 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import shallowCompare from 'react-addons-shallow-compare'
 import _ from 'lodash'
+import numeral from 'numeral'
 
 import { isScreenSize } from 'utils/commonUtil'
 
@@ -11,20 +13,35 @@ import CenterMidContainer from 'components/CenterMidContainer'
 import Button from 'components/Button'
 import Card from 'components/Card'
 import HonorBadge from 'components/HonorBadge'
+import UserModal from 'components/UserModal'
+import UserInfo from './UserInfo'
 
-class ChooseEnemy extends React.PureComponent {
+class ChooseEnemy extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      isHidden: true,
+      chosenIdx: null,
+      showUserModal: false
+    }
+  }
+  shouldComponentUpdate (nextProps, nextState) {
+    return shallowCompare(this, nextProps, nextState)
+  }
   render () {
     const { candidates, onClickChoose } = this.props
-    const renderMonCards = (defenders) => {
+    const { isHidden, chosenIdx, showUserModal } = this.state
+    const renderMonCards = (defenders, user) => {
       const showIdx = _.random(0, defenders.length - 1)
       return defenders.map((defender, idx) => {
         if (idx === showIdx) {
           return (
             <MonCard
-              key={idx}
+              key={defender.id}
               mon={{ tobe: defender }}
               isNotMine
               type='collection'
+              user={user}
             />
           )
         } else {
@@ -34,24 +51,47 @@ class ChooseEnemy extends React.PureComponent {
         }
       })
     }
+    const renderAllMonCards = (defenders, user) => {
+      return defenders.map((defender, idx) => {
+        return (
+          <MonCard
+            key={defender.id}
+            mon={{ tobe: defender }}
+            isNotMine
+            type='collection'
+            user={user}
+          />
+        )
+      })
+    }
+    const renderAllHiddenCard = (defenders) => {
+      return defenders.map((defender, idx) => {
+        return (
+          <MonCard key={idx} isDummy isNotMine type='collection' />
+        )
+      })
+    }
     const renderCandidates = () => {
       return candidates.map((candidate, idx) => {
         const { user, defenders } = candidate
         return (
           <Card
-            key={idx}
+            key={user.nickname}
             body={
-              <div className='row' key={idx}>
+              <div className='row'>
                 <div className='col-md-2 col-sm-3 col-xs-6 col-md-offset-2'>
-                  <p style={{ marginBottom: '10px' }}>
-                    <Img src={user.profileImage} className='mCS_img_loaded'
-                      style={{ border: '1px dotted #e2e2e2', width: isScreenSize.xs() ? '50%' : '70%', borderRadius: '50%' }} />
-                  </p>
-                  <p className='m-b-10'>{user.nickname}</p>
-                  <p className='m-b-30' style={{ minHeight: '22px' }}>{user.enabledHonors && user.enabledHonors.map((honor, idx) => <HonorBadge key={idx} honor={honor} />)}</p>
-                  <Button text='선택' size='xs' block color='orange' onClick={() => onClickChoose(idx)} />
+                  <UserInfo
+                    isHidden={isHidden}
+                    isChosen={chosenIdx === idx}
+                    user={user}
+                    onClickChoose={() => this.setState({ isHidden: false, chosenIdx: idx })}
+                    onClickNext={() => onClickChoose(idx)}
+                    picks={defenders}
+                  />
                 </div>
-                {renderMonCards(_.shuffle(defenders))}
+                {isHidden && renderMonCards(defenders, user)}
+                {(!isHidden && chosenIdx !== idx) && renderAllHiddenCard(defenders)}
+                {(!isHidden && chosenIdx === idx) && renderAllMonCards(defenders, user)}
               </div>
             }
           />

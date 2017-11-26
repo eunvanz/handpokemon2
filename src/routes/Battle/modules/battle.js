@@ -65,32 +65,35 @@ export function receiveBattle (battle = initialState) {
 export const fetchCandidates = (firebase, league) => {
   return dispatch => {
     return getUsersByLeagueForBattle(firebase, league)
-      .then(users => {
-        const userArr = convertMapToArr(users)
-        const result = []
-        const promArr = []
-        const getRandomIds = () => {
-          const ids = []
-          while (ids.length < 3) {
-            const id = userArr[_.random(0, userArr.length - 1)].id
-            if (ids.indexOf(id) === -1) ids.push(id)
-          }
-          return ids
+    .then(users => {
+      const userArr = convertMapToArr(users)
+      const result = []
+      const promArr = []
+      const getRandomIds = () => {
+        const ids = []
+        while (ids.length < 3) {
+          const id = userArr[_.random(0, userArr.length - 1)].id
+          if (ids.indexOf(id) === -1) ids.push(id)
         }
-        const userIds = getRandomIds()
-        for (let i = 0; i < 3; i++) {
-          promArr.push(getCollectionsByUserId(firebase, userIds[i]))
-        }
-        return Promise.all(promArr)
-        .then(userCollectionsArr => {
-          userCollectionsArr.forEach(userCollections => {
-            const defenders = userCollections.filter(col => col.isDefender)
-            const candidateDefenders = Object.assign({}, { defenders }, { user: users[defenders[0].userId] })
-            result.push(candidateDefenders)
-          })
-          return dispatch(receiveCandiates(result))
+        return ids
+      }
+      const userIds = getRandomIds()
+      for (let i = 0; i < 3; i++) {
+        promArr.push(getCollectionsByUserId(firebase, userIds[i]))
+      }
+      return Promise.all(promArr)
+      .then(userCollectionsArr => {
+        userCollectionsArr.forEach(userCollections => {
+          const defenders = userCollections.filter(col => col.isDefender)
+          const candidateDefenders = Object.assign({}, { defenders }, { user: users[defenders[0].userId] })
+          result.push(candidateDefenders)
         })
+        return dispatch(receiveCandiates(result))
       })
+      .catch(() => {
+        return dispatch(fetchCandidates(firebase, league))
+      })
+    })
   }
 }
 

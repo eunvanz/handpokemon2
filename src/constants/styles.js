@@ -52,3 +52,21 @@ export const creditBadgeStyle = Object.assign({}, badgeStyle, {
 })
 
 export const nullContainerHeight = window.innerHeight - 280
+
+export const fontSizeByDamage = damage => {
+  if (damage < 150) {
+    return '16px'
+  } else if (damage < 200) {
+    return '18px'
+  } else if (damage < 250) {
+    return '20px'
+  } else if (damage < 300) {
+    return '22px'
+  } else if (damage < 350) {
+    return '24px'
+  } else if (damage < 400) {
+    return '26px'
+  } else {
+    return '28px'
+  }
+}
