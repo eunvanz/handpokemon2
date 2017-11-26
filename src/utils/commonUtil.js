@@ -179,3 +179,20 @@ export const countAttrsInCollections = (attr, collections) => {
 export const deepCopyArray = array => {
   return JSON.parse(JSON.stringify(array))
 }
+
+export const getHonorBurf = user => {
+  const result = [0, 0, 0, 0, 0, 0]
+  user.enabledHonors.forEach(honor => {
+    for (let i = 0; i < result.length; i++) {
+      result[i] += honor.burf[i]
+    }
+  })
+  console.log('getHonorBurf', result)
+  return result
+}
+
+export const getHonorBurfTotal = honorBurf => {
+  const honorTotal = honorBurf ? honorBurf.reduce((accm, burf) => accm + burf, 0) : 0
+  console.log('honorTotal', honorTotal)
+  return honorTotal
+}

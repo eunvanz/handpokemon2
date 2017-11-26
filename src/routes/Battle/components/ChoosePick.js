@@ -17,6 +17,8 @@ import { LEAGUE } from 'constants/rules'
 import { colors } from 'constants/colors'
 import { attrs } from 'constants/data'
 
+import { getHonorBurf, getHonorBurfTotal } from 'utils/commonUtil'
+
 class ChoosePick extends React.Component {
   constructor (props) {
     super(props)
@@ -367,7 +369,7 @@ class ChoosePick extends React.Component {
     const renderHeader = () => {
       return (
         <div>
-          <h2 style={{ paddingRight: '60px' }}>총 전투력: <span className='c-lightblue f-700'>{chosenPick ? numeral(chosenPick.reduce((accm, p) => accm + p.total + p.addedTotal, 0)).format('0,0') : 0}</span> (코스트: <span className='c-lightblue f-700'>{currentCost}</span> / {maxCost})</h2>
+          <h2 style={{ paddingRight: '60px' }}>총 전투력: <span className='c-lightblue f-700'>{chosenPick ? numeral(chosenPick.reduce((accm, p) => accm + p.total + p.addedTotal, 0) + getHonorBurfTotal(getHonorBurf(user)) * chosenPick.length).format('0,0') : 0}</span> (코스트: <span className='c-lightblue f-700'>{currentCost}</span> / {maxCost})</h2>
           <ul className='actions' style={{ right: '20px' }}>
             <li><Button icon='fa fa-check' text='선택완료' color='green' disabled={chosenPick.length !== 3} onClick={this._handleOnClickNext} /></li>
           </ul>

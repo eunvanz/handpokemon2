@@ -72,6 +72,7 @@ class BattleStage extends React.Component {
     const movementSpeed = 800
     const afterAttackDelay = 200
     const damageSpeed = 1200
+    const infoSpeed = 600
     const termToNext = 800
     const guageSpeed = 200
     const avoidSpeed = 50
@@ -95,32 +96,40 @@ class BattleStage extends React.Component {
         const offsetTop = defenderPosition.top - attackerPosition.top
         const offsetLeft = defenderPosition.left - attackerPosition.left
 
+        let movementDelay = termForRoulette * speedVar
+        let specialDelay = 0
+
         // 상성보너스 표시 애니메이션
         if (turn.attrBonus !== '0%') {
+          specialDelay += infoSpeed * speedVar + infoSpeed * 2 * speedVar
+          movementDelay += specialDelay
           const bonusNumber = Number(_.replace(turn.attrBonus, '%', ''))
           const textColor = bonusNumber > 0 ? colors.blue : colors.red
           const attrBonusInfoDiv = $(`#${attacker}-${attackerIdx}-attrBonusInfo`)
           attrBonusInfoDiv.css('top', isScreenSize.xs() ? -25 : -30).css('color', textColor).css('opacity', 1)
           .text(`${bonusNumber > 0 ? '+' : ''}${turn.attrBonus}`)
-          .effect('pulsate')
           setTimeout(() => {
-            attrBonusInfoDiv.animate({ opacity: 0 }, damageSpeed * speedVar)
-          }, damageSpeed * speedVar)
+            attrBonusInfoDiv.animate({ opacity: 0 }, infoSpeed * speedVar)
+          }, infoSpeed * 2 * speedVar)
         }
 
-        setTimeout(() => {
-          // 특수기술명 표시 애니메이션
-          if (turn.attackType === 2) {
+        // 특수기술명 표시 애니메이션
+        if (turn.attackType === 2) {
+          movementDelay += infoSpeed * speedVar + infoSpeed * 2 * speedVar
+          setTimeout(() => {
             const specialInfo = $(`#${attacker}-${attackerIdx}-specialInfo`)
             specialInfo.css('top', 0).css('fontSize', '14px')
             specialInfo
               .text(attackerPick.col.mon[attackerPick.col.monId].skill)
-              .animate({ opacity: 1, top: isScreenSize.xs() ? -25 : -40 }, damageSpeed * speedVar)
+              .css({ opacity: 1, top: isScreenSize.xs() ? -25 : -30 })
+              .effect('pulsate')
             setTimeout(() => {
-              specialInfo.animate({ opacity: 0 }, damageSpeed * speedVar)
-            }, damageSpeed * speedVar)
-          }
-  
+              specialInfo.animate({ opacity: 0 }, infoSpeed * speedVar)
+            }, infoSpeed * 2 * speedVar)
+          }, specialDelay)
+        }
+        
+        setTimeout(() => {
           // 공격 후 돌아오는 애니메이션
           attackerUnit
             .animate({ top: offsetTop - ((monSize / 1.5) * (attacker === 'user' ? -1 : 1)), left: offsetLeft === 0 ? offsetLeft : offsetLeft > 0 ? offsetLeft - (monSize / 1.5) : offsetLeft + (monSize / 1.5) }, movementSpeed * speedVar, 'easeInCirc')
@@ -175,7 +184,7 @@ class BattleStage extends React.Component {
               }
             }
           }, movementSpeed * speedVar)
-        }, turn.attrBonus === '0%' ? termForRoulette * speedVar : (damageSpeed + termForRoulette) * speedVar * 2) // 보너스 상성이 표기된 후 공격 시작
+        }, movementDelay) // 보너스 상성이 표기된 후 공격 시작
       }
 
       // 룰렛 시작

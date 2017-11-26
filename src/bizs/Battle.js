@@ -38,6 +38,8 @@ export default class Battle {
   }
   _isUnderDog () {
     if (this.winner !== 'user') return false
+    console.log('userPicks total', this.userPicks.reduce((total, pick) => total + pick.totalAbility, 0))
+    console.log('enemyPicks total', this.enemyPicks.reduce((total, pick) => total + pick.totalAbility, 0))
     return this.userPicks.reduce((total, pick) => total + pick.totalAbilty, 0) -
       this.enemyPicks.reduce((total, pick) => total + pick.totalAbilty, 0) < 0
   }
@@ -97,7 +99,7 @@ export default class Battle {
       defenderPick.point += pureDamage
     } else {
       finalDamage = this._getFinalDamage(attackType, pureDamage, defenderPick)
-      afterHp -= pureDamage
+      afterHp -= finalDamage
       afterHp = afterHp < 0 ? 0 : afterHp
       if (afterHp === 0) attackerPick.kills++
       defenderPick.restHp = afterHp
@@ -152,6 +154,7 @@ export default class Battle {
   _getArmorPct (armor, dex) {
     let pct = 0.001 + armor * 0.003 + dex * 0.0005
     if (pct > 0.8) pct = 0.8
+    // TODO: 완벽방어 확률 추가
     return pct
   }
   _getSpecialDamage (attackMon, defenseMon) {

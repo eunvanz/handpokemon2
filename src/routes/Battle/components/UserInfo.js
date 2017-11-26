@@ -8,7 +8,7 @@ import Img from 'components/Img'
 import Button from 'components/Button'
 import HonorBadge from 'components/HonorBadge'
 
-import { isScreenSize } from 'utils/commonUtil'
+import { isScreenSize, getHonorBurf, getHonorBurfTotal } from 'utils/commonUtil'
 
 class UserInfo extends React.Component {
   constructor (props) {
@@ -42,7 +42,7 @@ class UserInfo extends React.Component {
         }
         {
           ((!isHidden && isChosen) || isForResult) &&
-          <p className='m-b-30' style={{ minHeight: '22px' }}>총 전투력: <span className='c-blue f-700'>{numeral(picks.reduce((accm, defender) => accm + defender.total + defender.addedTotal, 0)).format('0,0')}</span></p>
+          <p className='m-b-30' style={{ minHeight: '22px' }}>총 전투력: <span className='c-blue f-700'>{numeral(picks.reduce((accm, defender) => accm + defender.total + defender.addedTotal, 0) + 3 * getHonorBurfTotal(getHonorBurf(user))).format('0,0')}</span></p>
         }
         {
           isHidden &&
