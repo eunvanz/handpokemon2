@@ -12,14 +12,17 @@ import BattleResult from './BattleResult'
 import Battle from 'bizs/Battle'
 import Pick from 'bizs/Pick'
 
-import { setUserPath, updateUserToLose } from 'services/UserService'
+import { setUserPath, updateUserToLose, decreaseCredit, updateUserToWin,
+  getUserRankingByUserId } from 'services/UserService'
 
 class BattleView extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
       step: 1,
-      chosenEnemy: null
+      chosenEnemy: null,
+      winInRow: props.user.winInRow || 0,
+      battleResultInfo: null
     }
     this._handleOnClickStartBattle = this._handleOnClickStartBattle.bind(this)
     this._handleOnClickChooseEnemy = this._handleOnClickChooseEnemy.bind(this)
@@ -28,6 +31,7 @@ class BattleView extends React.Component {
     this._handleOnClickReady = this._handleOnClickReady.bind(this)
     this._handleOnClickCompleteBattle = this._handleOnClickCompleteBattle.bind(this)
     this._handleOnClickContinueBattle = this._handleOnClickContinueBattle.bind(this)
+    this._generateBattleResult = this._generateBattleResult.bind(this)
   }
   shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
@@ -39,9 +43,17 @@ class BattleView extends React.Component {
   _handleOnClickReady () {
     const { fetchCandidates, auth, user, firebase } = this.props
     // 유저의 패배를 기록
-    // updateUserToLose(firebase, auth.uid, user, 'attackLose', 6)
-    this.setState({ step: 2 })
-    fetchCandidates(firebase, user.league)
+    decreaseCredit(firebase, auth.uid, 1, 'battle')
+    .then(() => {
+      this.setState({ step: 2, chosenEnemy: null, winInRow: user.winInRow, battleResultInfo: null })
+      return updateUserToLose(firebase, auth.uid, 'attackLose', 5)
+    })
+    .then(() => {
+      return fetchCandidates(firebase, user.league)
+    })
+    .catch(err => {
+      return window.swal({ text: '에러가 발생했습니다. - ' + err })
+    })
   }
   _handleOnClickPickNext (userPick) {
     const { setUserPicks } = this.props
@@ -52,7 +64,10 @@ class BattleView extends React.Component {
     const { candidates, setEnemyPicks } = this.props
     const choosenCandidate = candidates[idx]
     setEnemyPicks(choosenCandidate.defenders)
-    this.setState({ chosenEnemy: choosenCandidate.user, step: 4 })
+    this.setState({
+      chosenEnemy: choosenCandidate.user,
+      step: 4
+    })
   }
   _onSlowdownFirstAttackRouletteCallback (stopIdx) {
     const { userPicks, enemyPicks, user, setBattleLog } = this.props
@@ -72,25 +87,76 @@ class BattleView extends React.Component {
     const { auth, firebase } = this.props
     setUserPath(firebase, auth.uid, 'battleSpeed', speed)
     this.setState({ step: 6 })
+    this._generateBattleResult()
   }
   _handleOnClickContinueBattle () {
     this.setState({ step: 1, chosenEnemy: null })
   }
+  _generateBattleResult () {
+    const { auth, firebase, battleLog, user } = this.props
+    const { chosenEnemy, winInRow } = this.state
+    const battleResultInfo = {
+      asisUser: {
+        leaguePoint: user.leaguePoint + 5,
+        leagueRank: user.leagueRank
+      },
+      asisEnemy: {
+        leaguePoint: chosenEnemy.leaguePoint,
+        leagueRank: chosenEnemy.leagueRank
+      }
+    }
+    let tobeResultInfo = { tobeUser: {}, tobeEnemy: {} }
+    Promise.resolve()
+    .then(() => {
+      const winner = battleLog.winner
+      let userWinPoint = 10
+      let enemyWinPoint = 2
+      if (battleLog.mom.user.email === user.email) userWinPoint += 1
+      else enemyWinPoint += 1
+      if (winner === 'user') {
+        tobeResultInfo.tobeUser.leaguePoint = user.leaguePoint + userWinPoint
+        return updateUserToWin(firebase, auth.uid, 'attackWin', userWinPoint, winInRow)
+        .then(() => {
+          tobeResultInfo.tobeEnemy.leaguePoint = chosenEnemy.leaguePoint - 2
+          return updateUserToLose(firebase, chosenEnemy.id, 'defenseLose', 2)
+        })
+      } else {
+        tobeResultInfo.tobeEnemy.leaguePoint = chosenEnemy.leaguePoint + enemyWinPoint
+        tobeResultInfo.tobeUser.leaguePoint = user.leaguePoint
+        return updateUserToWin(firebase, chosenEnemy.id, 'defenseWin', enemyWinPoint)
+      }
+    })
+    .then(() => {
+      return getUserRankingByUserId(firebase, 'battle', auth.uid)
+    })
+    .then(rank => {
+      tobeResultInfo.tobeUser.leagueRank = rank
+      return getUserRankingByUserId(firebase, 'battle', chosenEnemy.id)
+    })
+    .then(rank => {
+      tobeResultInfo.tobeEnemy.leagueRank = rank
+      const lastBattleResultInfo = Object.assign({}, battleResultInfo, tobeResultInfo)
+      this.setState({ battleResultInfo: lastBattleResultInfo })
+    })
+    // .catch(err => {
+    //   window.swal({ text: `에러가 발생했습니다. - ${err}` })
+    // })
+  }
   render () {
-    const { step, chosenEnemy } = this.state
-    const { user, candidates, userCollections, battleLog, userPicks, enemyPicks } = this.props
+    const { step, chosenEnemy, winInRow, battleResultInfo } = this.state
+    const { user, candidates, userCollections, battleLog, userPicks, enemyPicks, auth, creditInfo, locale, items, firebase, messages } = this.props
     const renderBody = () => {
       if (step === 1) {
         return (
-          <BattleReady user={user} onClickStart={this._handleOnClickReady} />
+          <BattleReady auth={auth} onClickStart={this._handleOnClickReady} creditInfo={creditInfo} />
         )
       } else if (step === 2) {
         return (
-          <ChoosePick collections={userCollections} onClickNext={this._handleOnClickPickNext} user={user} />
+          <ChoosePick collections={userCollections} onClickNext={this._handleOnClickPickNext} user={user} locale={locale} messages={messages} />
         )
       } else if (step === 3) {
         return (
-          <ChooseEnemy candidates={candidates} onClickChoose={this._handleOnClickChooseEnemy} />
+          <ChooseEnemy candidates={candidates} userPicks={userPicks} onClickChoose={this._handleOnClickChooseEnemy} locale={locale} messages={messages} />
         )
       } else if (step === 4) {
         return (
@@ -98,11 +164,14 @@ class BattleView extends React.Component {
         )
       } else if (step === 5) {
         return (
-          <BattleStage battleLog={battleLog} userPicks={userPicks} user={user} enemy={chosenEnemy} enemyPicks={enemyPicks} onClickNext={this._handleOnClickCompleteBattle} />
+          <BattleStage battleLog={battleLog} userPicks={userPicks} user={user} enemy={chosenEnemy} enemyPicks={enemyPicks} locale={locale} onClickNext={this._handleOnClickCompleteBattle} />
         )
       } else if (step === 6) {
         return (
-          <BattleResult user={user} enemy={chosenEnemy} battleLog={battleLog} onClickContinue={this._handleOnClickContinueBattle} />
+          <BattleResult user={user} winInRow={winInRow} enemy={chosenEnemy} auth={auth} locale={locale} items={items} firebase={firebase}
+            battleLog={battleLog} onClickContinue={this._handleOnClickContinueBattle} battleResultInfo={battleResultInfo} />
+          // <BattleResult user={user} winInRow={winInRow} enemy={chosenEnemy} onMount={this._handleOnMountBattleResultView}
+          //   battleLog={battleLog} onClickContinue={this._handleOnClickContinueBattle} />
         )
       }
     }
@@ -127,7 +196,11 @@ BattleView.propTypes = {
   userPicks: PropTypes.array,
   battleLog: PropTypes.object,
   clearBattle: PropTypes.func.isRequired,
-  userCollections: PropTypes.array.isRequired
+  userCollections: PropTypes.array.isRequired,
+  creditInfo: PropTypes.object.isRequired,
+  locale: PropTypes.string.isRequired,
+  items: PropTypes.array.isRequired,
+  messages: PropTypes.object.isRequired
 }
 
 export default BattleView

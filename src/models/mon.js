@@ -1,8 +1,8 @@
 export default class Mon {
   constructor () {
     this.no = 0
-    this.name = ''
-    this.description = ''
+    this.name = { ko: '' }
+    this.description = { ko: '' }
     this.mainAttr = null
     this.subAttr = null
     this.hp = 0
@@ -13,7 +13,7 @@ export default class Mon {
     this.dex = 0
     this.total = 0
     this.grade = ''
-    this.skill = ''
+    this.skill = { ko: '' }
     this.generation = 0
     this.height = 0
     this.weight = 0

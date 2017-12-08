@@ -16,8 +16,6 @@ import { fontSizeByDamage } from 'constants/styles'
 import specialImage from './assets/fire.svg'
 import normalImage from './assets/paw.png'
 
-import { setUserPath } from 'services/UserService'
-
 const rouletteStyle = {
   border: `3px solid ${colors.lightGray}`, borderRadius: isScreenSize.xs() ? '5px' : '10px', margin: 'auto'
 }
@@ -83,7 +81,7 @@ class BattleStage extends React.Component {
       const speed = slider.noUiSlider.get()
       const speedVar = 1 / speed
       const rouletteSpeed = 10 * speed > 20 ? 20 : 10 * speed
-      const rouletteDelay = 1
+      const rouletteDelay = 1 * speedVar
       this.setState({ damages: Object.assign({}, damages, { speed: damageSpeed * speedVar }) })
       let { attacker, defender, attackerIdx, defenderIdx, attackType, finalDamage, defenderPick, attackerPick } = turn
 
@@ -120,7 +118,6 @@ class BattleStage extends React.Component {
             const specialInfo = $(`#${attacker}-${attackerIdx}-specialInfo`)
             specialInfo.css('top', 0).css('fontSize', '14px')
             specialInfo
-              .text(attackerPick.col.mon[attackerPick.col.monId].skill)
               .css({ opacity: 1, top: isScreenSize.xs() ? -25 : -30 })
               .effect('pulsate')
             setTimeout(() => {
@@ -165,7 +162,7 @@ class BattleStage extends React.Component {
               damageInfoDiv.css('top', 0).css('fontSize', '16px')
               damageInfoDiv
                 .text(-1 * finalDamage)
-                .animate({ opacity: 1, top: isScreenSize.xs() ? -25 : -40, fontSize: fontSizeByDamage(finalDamage) }, damageSpeed * speedVar)
+                .animate({ opacity: 1, top: isScreenSize.xs() ? -30 : -40, fontSize: fontSizeByDamage(finalDamage) }, damageSpeed * speedVar)
               setTimeout(() => {
                 damageInfoDiv.animate({ opacity: 0 }, damageSpeed * speedVar)
               }, damageSpeed * speedVar)
@@ -198,10 +195,9 @@ class BattleStage extends React.Component {
     runTurn(0)
   }
   _initRoulette (rouletteId, stopIdx, speed, duration, stopCallback, turn) {
-    console.log('duration', duration)
     const option = {
       speed,
-      duration,
+      duration: turn < 2 ? 1 : duration,
       stopImageNumber: stopIdx,
       stopCallback: stopCallback
     }
@@ -213,7 +209,7 @@ class BattleStage extends React.Component {
     }
   }
   render () {
-    const { user, enemy, userPicks, enemyPicks } = this.props
+    const { user, enemy, userPicks, enemyPicks, locale } = this.props
     const renderController = type => {
       let myself = enemy
       let myPicks = enemyPicks
@@ -276,7 +272,7 @@ class BattleStage extends React.Component {
     const renderMons = (picks, type) => {
       return picks.map((pick, idx) => {
         return (
-          <MonUnit mon={pick} key={idx} id={`${type}-${idx}`} />
+          <MonUnit mon={pick} key={idx} id={`${type}-${idx}`} user={pick.user} locale={locale} />
         )
       })
     }
@@ -322,7 +318,8 @@ BattleStage.propTypes = {
   userPicks: PropTypes.array.isRequired,
   enemy: PropTypes.object.isRequired,
   enemyPicks: PropTypes.array.isRequired,
-  onClickNext: PropTypes.func.isRequired
+  onClickNext: PropTypes.func.isRequired,
+  locale: PropTypes.string.isRequired
 }
 
 export default BattleStage

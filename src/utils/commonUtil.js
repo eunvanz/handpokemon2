@@ -182,6 +182,7 @@ export const deepCopyArray = array => {
 
 export const getHonorBurf = user => {
   const result = [0, 0, 0, 0, 0, 0]
+  if (!user.enabledHonors) return result
   user.enabledHonors.forEach(honor => {
     for (let i = 0; i < result.length; i++) {
       result[i] += honor.burf[i]
@@ -195,4 +196,8 @@ export const getHonorBurfTotal = honorBurf => {
   const honorTotal = honorBurf ? honorBurf.reduce((accm, burf) => accm + burf, 0) : 0
   console.log('honorTotal', honorTotal)
   return honorTotal
+}
+
+export const getMsg = (message, locale) => {
+  return message[locale] || message.en
 }

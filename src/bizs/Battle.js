@@ -103,7 +103,7 @@ export default class Battle {
       if (afterHp === 0) attackerPick.kills++
       defenderPick.restHp = afterHp
       attackerPick.point += afterHp === 0 ? beforeHp : pureDamage
-      defenderPick.point += pureDamage
+      defenderPick.point += afterHp === 0 ? beforeHp : pureDamage
     }
     if (this._areAllDead(defenderPicks)) {
       this.isFinished = true
@@ -152,8 +152,11 @@ export default class Battle {
   }
   _getArmorPct (armor, dex) {
     let pct = 0.001 + armor * 0.003 + dex * 0.0005
-    if (pct > 0.8) pct = 0.8
-    // TODO: 완벽방어 확률 추가
+    if (pct > 0.8) {
+      const restPct = pct - 0.8
+      pct = 0.8
+      if (_.random(0.0, 1.0) < restPct) pct = 1
+    }
     return pct
   }
   _getSpecialDamage (attackMon, defenseMon) {

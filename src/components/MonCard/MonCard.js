@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import shallowCompare from 'react-addons-shallow-compare'
 import { firebaseConnect } from 'react-redux-firebase'
 import numeral from 'numeral'
+import { compose } from 'recompose'
 
 import MonCost from '../MonCost'
 import MonAttr from '../MonAttr'
@@ -21,6 +22,8 @@ import { toggleFavorite } from 'services/CollectionService'
 import { colors } from 'constants/colors'
 
 import unloader from './assets/unloader.png'
+
+import withIntl from 'hocs/withIntl'
 
 class MonCard extends React.Component {
   constructor (props) {
@@ -46,7 +49,9 @@ class MonCard extends React.Component {
   shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
   }
-  _showMonModal () {
+  _showMonModal (e) {
+    e.preventDefault()
+    e.stopPropagation()
     this.setState({ showMonModal: true })
   }
   _handleOnSelect () {
@@ -76,7 +81,7 @@ class MonCard extends React.Component {
   render () {
     const { mon, pick, className, type, isSelectable, onUnselect, isToggleable, isSelected,
       isNotMine, firebase, showStatusBadge, isDummy, onClickShield, onClickSetDefenderBtn,
-      isCustomSize, disableChangeBtn, user, kills, point, isMom, ...restProps } = this.props
+      isCustomSize, disableChangeBtn, user, kills, point, isMom, locale, messages, dispatch, ...restProps } = this.props
     const tobeMon = mon ? mon.tobe : null
     const renderSetDefenderBtn = () => {
       return <Button
@@ -117,7 +122,7 @@ class MonCard extends React.Component {
         <div className='c-item'
           style={{
             cursor: 'pointer',
-            border: this.state.isSelected ? '2px solid #ff9800' : '1px solid #e2e2e2',
+            border: this.state.isSelected ? '1px solid #ff9800' : '1px solid #e2e2e2',
             marginBottom: '8px',
             borderRadius: '2px',
             boxShadow: '1px 1px 1px rgba(0, 0, 0, 0.1)',
@@ -135,6 +140,10 @@ class MonCard extends React.Component {
             {
               showStatusBadge &&
               <StatusBadge icon='fa fa-heart' side='right' isActive={this.state.isFavorite} activeColor={colors.pink} onClick={this._handleOnClickFavorite} />
+            }
+            {
+              isSelectable &&
+              <StatusBadge icon='fa fa-info' side='right' isActive activeColor={colors.blueGray} onClick={this._showMonModal} />
             }
             <MonCost cost={isDummy ? 0 : (type === 'collection' || type === 'defender') ? tobeMon.mon[tobeMon.monId].cost : tobeMon.cost}
               style={{ marginBottom: '5px' }} />
@@ -159,7 +168,7 @@ class MonCard extends React.Component {
           pick &&
           renderLevelUpInfo()
         }
-        { !isDummy && <MonModal mon={mon} type={this.props.type} show={this.state.showMonModal} isNotMine={isNotMine} user={user}
+        { !isDummy && <MonModal locale={locale} mon={mon} type={this.props.type} show={this.state.showMonModal} isNotMine={isNotMine} user={user}
           close={() => this.setState({ showMonModal: false })} />
         }
         {
@@ -194,7 +203,9 @@ MonCard.propTypes = {
   isSelected: PropTypes.bool,
   kills: PropTypes.number,
   point: PropTypes.number,
-  isMom: PropTypes.bool
+  isMom: PropTypes.bool,
+  locale: PropTypes.string.isRequired,
+  messages: PropTypes.object.isRequired
 }
 
-export default firebaseConnect()(MonCard)
+export default compose(firebaseConnect(), withIntl)(MonCard)

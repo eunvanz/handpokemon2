@@ -6,6 +6,8 @@ import numeral from 'numeral'
 
 import { isScreenSize } from 'utils/commonUtil'
 
+import { ATTR_MATCH, ATTR_IDX } from 'constants/rules'
+
 import Loading from 'components/Loading'
 import Img from 'components/Img'
 import MonCard from 'components/MonCard'
@@ -24,12 +26,50 @@ class ChooseEnemy extends React.Component {
       chosenIdx: null,
       showUserModal: false
     }
+    this._getAttrBonus = this._getAttrBonus.bind(this)
+    this._getAttrMatchAdjustedVar = this._getAttrMatchAdjustedVar.bind(this)
   }
   shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
   }
+  _getAttrBonus (enemyPicks) {
+    const { userPicks } = this.props
+    const userTotal = userPicks.reduce((accm, pick) => accm + pick.total + pick.addedTotal, 0)
+    const userRatios = userPicks.map(pick => (pick.total + pick.addedTotal) / userTotal)
+    const enemyTotal = enemyPicks.reduce((accm, pick) => accm + pick.total + pick.addedTotal, 0)
+    const enemyRatios = enemyPicks.map(pick => (pick.total + pick.addedTotal) / enemyTotal)
+    let userAttrBonus = 0
+    let enemyAttrBonus = 0
+    userPicks.forEach((up, uidx) => {
+      enemyPicks.forEach((ep, eidx) => {
+        userAttrBonus += this._getAttrMatchAdjustedVar(up, ep) * (userRatios[uidx] + enemyRatios[eidx])
+        enemyAttrBonus += this._getAttrMatchAdjustedVar(ep, up) * (userRatios[uidx] + enemyRatios[eidx])
+      })
+    })
+    return { userAttrBonus: userAttrBonus / 6, enemyAttrBonus: enemyAttrBonus / 6 }
+  }
+  _getAttrMatchAdjustedVar (attackerPick, defenderPick) {
+    const srcCollection = attackerPick
+    const tgtCollection = defenderPick
+    const srcMainAttr = srcCollection.mon[srcCollection.monId].mainAttr
+    const srcSubAttr = srcCollection.mon[srcCollection.monId].subAttr
+    const tgtMainAttr = tgtCollection.mon[tgtCollection.monId].mainAttr
+    const tgtSubAttr = tgtCollection.mon[tgtCollection.monId].subAttr
+    const srcMainAttrIdx = ATTR_IDX.indexOf(srcMainAttr)
+    const srcSubAttrIdx = ATTR_IDX.indexOf(srcSubAttr)
+    const tgtMainAttrIdx = ATTR_IDX.indexOf(tgtMainAttr)
+    const tgtSubAttrIdx = ATTR_IDX.indexOf(tgtSubAttr)
+    let result = 1
+    result = ATTR_MATCH[srcMainAttrIdx][tgtMainAttrIdx]
+    if (tgtSubAttrIdx !== -1) result = result * ATTR_MATCH[srcMainAttrIdx][tgtSubAttrIdx]
+    if (srcSubAttrIdx !== -1) {
+      result = result * ATTR_MATCH[srcSubAttrIdx][tgtMainAttrIdx]
+      if (tgtSubAttrIdx !== -1) result = result * ATTR_MATCH[srcSubAttrIdx][tgtSubAttrIdx]
+    }
+    return result
+  }
   render () {
-    const { candidates, onClickChoose } = this.props
+    const { candidates, onClickChoose, userPicks } = this.props
     const { isHidden, chosenIdx, showUserModal } = this.state
     const renderMonCards = (defenders, user) => {
       const showIdx = _.random(0, defenders.length - 1)
@@ -67,7 +107,7 @@ class ChooseEnemy extends React.Component {
     const renderAllHiddenCard = (defenders) => {
       return defenders.map((defender, idx) => {
         return (
-          <MonCard key={idx} isDummy isNotMine type='collection' />
+          <MonCard key={defender.id} isDummy isNotMine type='collection' />
         )
       })
     }
@@ -87,6 +127,7 @@ class ChooseEnemy extends React.Component {
                     onClickChoose={() => this.setState({ isHidden: false, chosenIdx: idx })}
                     onClickNext={() => onClickChoose(idx)}
                     picks={defenders}
+                    attrBonusInfo={this._getAttrBonus(defenders)}
                   />
                 </div>
                 {isHidden && renderMonCards(defenders, user)}
@@ -99,7 +140,7 @@ class ChooseEnemy extends React.Component {
       })
     }
     const renderBody = () => {
-      if (candidates) {
+      if (userPicks && candidates) {
         return (
           <div className='text-center'>
             {renderCandidates()}
@@ -126,7 +167,8 @@ ChooseEnemy.contextTypes = {
 
 ChooseEnemy.propTypes = {
   candidates: PropTypes.array,
-  onClickChoose: PropTypes.func.isRequired
+  onClickChoose: PropTypes.func.isRequired,
+  userPicks: PropTypes.array
 }
 
 export default ChooseEnemy

@@ -948,3 +948,36 @@ export const honors = [{
   'reward': 5000,
   'burf': [8, 0, 0, 0, 0, 32]
 }]
+
+export const items = [
+  {
+    'type': 1, // 1: 포켓몬 보상, 2: 크레딧 충전
+    'name': { ko: '베이직+레어 채집권' },
+    'attrs': ['b', 'r'],
+    'cost': 10
+  },
+  {
+    'type': 1, // 1: 포켓몬 보상, 2: 크레딧 충전
+    'name': { ko: '레어 100% 채집권' },
+    'attrs': ['r'],
+    'cost': 30
+  },
+  {
+    'type': 1, // 1: 포켓몬 보상, 2: 크레딧 충전
+    'name': { ko: '엘리트 100% 채집권' },
+    'attrs': ['e'],
+    'cost': 2000
+  },
+  {
+    'type': 2, // 1: 포켓몬 보상, 2: 크레딧 충전
+    'name': { ko: '채집크레딧 충전권' },
+    'creditType': 'pick',
+    'cost': 50
+  },
+  {
+    'type': 2, // 1: 포켓몬 보상, 2: 크레딧 충전
+    'name': { ko: '시합크레딧 충전권' },
+    'creditType': 'battle',
+    'cost': 100
+  }
+]

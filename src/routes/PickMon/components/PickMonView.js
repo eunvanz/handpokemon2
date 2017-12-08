@@ -80,24 +80,23 @@ class PickMonView extends React.Component {
   }
   _initPick () {
     const { pickMonInfo, firebase, auth, user } = this.props
-    const { quantity, attrs, grades, evoluteCol, mixCols } = pickMonInfo
+    const { quantity, attrs, grades, evoluteCol, mixCols, isReward } = pickMonInfo
     console.log('pickMonInfo', pickMonInfo)
-    if (!evoluteCol && !mixCols && quantity > user.pickCredit) {  // 유저의 크레딧보다 더 많은 포켓몬을 채집하는 경우
+    if (!evoluteCol && !mixCols && !isReward && quantity > user.pickCredit) {  // 유저의 크레딧보다 더 많은 포켓몬을 채집하는 경우
       this.context.router.push('pick-district')
       return
     }
     this.setState({ mode: quantity === 1 && (!evoluteCol || _.compact(evoluteCol.mon[evoluteCol.monId].next).length > 1) ? 'single' : 'multi' })
     let pickedMons = []
     const pickFuncArr = []
-    if (!evoluteCol && !mixCols) { // 채집일때
-      console.log('채집', pickMonInfo)
+    if (!evoluteCol && !mixCols) { // 채집 또는 보상일때
       for (let i = 0; i < quantity; i++) {
         pickFuncArr.push(getPickMons(firebase, attrs, grades))
       }
-      return refreshUserCredits(firebase, auth.uid, user)
-      .then(() => {
-        return decreaseCredit(firebase, auth.uid, quantity, 'pick')
-      })
+      let dealCredit
+      if (isReward) dealCredit = () => Promise.resolve()
+      else dealCredit = () => refreshUserCredits(firebase, auth.uid, user).then(() => decreaseCredit(firebase, auth.uid, quantity, 'pick'))
+      return dealCredit()
       .then(() => {
         return Promise.all(pickFuncArr)
       })

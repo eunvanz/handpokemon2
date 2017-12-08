@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
 import validator from 'validator'
 import { fromJS } from 'immutable'
 import keygen from 'keygenerator'
@@ -194,7 +193,9 @@ class SignUpView extends React.Component {
     let profileImageUrl = DEFAULT_PROFILE_IMAGE_URL
     postProfileImage()
     .then(res => {
-      if (profileImageFile) profileImageUrl = res[0].File.downloadURL
+      if (profileImageFile) {
+        profileImageUrl = res[0].File.downloadURL
+      }
       let user = {
         email: formData.email,
         password: formData.password,
@@ -227,10 +228,10 @@ class SignUpView extends React.Component {
         this.context.router.push('/pick-district')
       })
     })
-    .catch(() => {
+    .catch((msg) => {
       showAlert({
         title: 'OOPS!',
-        text: '회원가입 도중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+        text: '회원가입 도중 오류가 발생했습니다. 잠시 후 다시 시도해주세요 - ' + msg,
         type: 'error'
       })
     })

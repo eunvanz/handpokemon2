@@ -1,4 +1,4 @@
-export const postImage = (firebase, storagePath, imageFiles) => {
+export const postImage = (firebase, storagePath, imageFiles, withThumbnail) => {
   return firebase.uploadFiles(storagePath, imageFiles, storagePath)
 }
 

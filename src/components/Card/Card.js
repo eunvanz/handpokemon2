@@ -8,12 +8,12 @@ class Card extends React.Component {
     return shallowCompare(this, nextProps, nextState)
   }
   render () {
-    const { header, body, headerBgColor, headerTextColor, clearPadding, stickyHeader, ...restProps } = this.props
+    const { header, body, headerBgColor, headerTextColor, clearPadding, stickyHeader, actionHeader, ...restProps } = this.props
     return (
       <StickyContainer>
         <div className='card' {...restProps}>
           {header && !stickyHeader &&
-            <div className='card-header' style={{ backgroundColor: headerBgColor || 'white', color: headerTextColor || '#333' }}>{header}</div>}
+            <div className={`card-header${actionHeader ? ' action-header' : ''}`} style={{ backgroundColor: headerBgColor || 'white', color: headerTextColor || '#333' }}>{header}</div>}
           {
             header && stickyHeader &&
             <Sticky topOffset={-70}>
@@ -40,7 +40,8 @@ Card.propTypes = {
   headerBgColor: PropTypes.string,
   headerTextColor: PropTypes.string,
   clearPadding: PropTypes.bool,
-  stickyHeader: PropTypes.bool
+  stickyHeader: PropTypes.bool,
+  actionHeader: PropTypes.bool
 }
 
 export default Card

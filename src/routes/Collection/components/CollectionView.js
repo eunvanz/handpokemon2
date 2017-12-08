@@ -5,6 +5,8 @@ import shallowCompare from 'react-addons-shallow-compare'
 import _ from 'lodash'
 import { Collapse } from 'react-bootstrap'
 import keygen from 'keygenerator'
+import { FormattedMessage } from 'react-intl'
+import { renderToString } from 'react-dom/server'
 
 import ContentContainer from 'components/ContentContainer'
 import Loading from 'components/Loading'
@@ -23,7 +25,7 @@ import { getUserByUserId, getUserRankingByUserId } from 'services/UserService'
 import { attrs } from 'constants/data'
 import { colors } from 'constants/colors'
 
-import { showAlert } from 'utils/commonUtil'
+import { showAlert, getMsg } from 'utils/commonUtil'
 
 class CollectionView extends React.Component {
   constructor (props) {
@@ -174,11 +176,23 @@ class CollectionView extends React.Component {
     // 교배시 두번째 대상 포켓몬까지 선택한 경우
     if (this.props.pickMonInfo && this.props.pickMonInfo.mixCols &&
       this.props.pickMonInfo.mixCols.length === 2 && prevProps.pickMonInfo.mixCols.length === 1) {
-      const { updatePickMonInfo, pickMonInfo } = this.props
+      const { updatePickMonInfo, pickMonInfo, locale, messages } = this.props
       const { mixCols } = pickMonInfo
       const asisMixCols = prevProps.pickMonInfo.mixCols
+      let title = getMsg(messages.collectionView.mixAlertTitle, locale)
+      title = title.replace('{name1}', `<span class='c-lightblue f-700'>${getMsg(mixCols[0].mon[mixCols[0].monId].name, locale)}</span>`)
+      title = title.replace('{name2}', `<span class='c-lightblue f-700'>${getMsg(mixCols[1].mon[mixCols[1].monId].name, locale)}</span>`)
       showAlert({
-        title: `<span class='c-lightblue f-700'>${mixCols[0].mon[mixCols[0].monId].name}</span>와(과) <span class='c-lightblue f-700'>${mixCols[1].mon[mixCols[1].monId].name}</span>을(를) 교배 하시겠습니까?`,
+        title,
+        // title: `${renderToString(<FormattedMessage
+        //   id={`collectionView.mixAlertTitle.${locale}`}
+        //   values={{
+        //     name1: <span className='c-lightblue f-700'>{getMsg(mixCols[0].mon[mixCols[0].monId].name, locale)}</span>,
+        //     name2: <span className='c-lightblue f-700'>{getMsg(mixCols[1].mon[mixCols[1].monId].name, locale)}</span>
+        //   }}
+        // />)}`,
+        // title: `${<span>test</span>}`,
+        // title: `<span class='c-lightblue f-700'>${getMsg(mixCols[0].mon[mixCols[0].monId].name, locale)}</span>와(과) <span class='c-lightblue f-700'>${getMsg(mixCols[1].mon[mixCols[1].monId].name, locale)}</span>을(를) 교배 하시겠습니까?`,
         text: '교배하는 포켓몬의 레벨이 1 하락하고, 레벨 1의 포켓몬의 경우 영원히 사라집니다.',
         showCancelButton: true,
         confirmButtonText: '예',
@@ -379,7 +393,7 @@ class CollectionView extends React.Component {
   }
   render () {
     const { filter, filteredCollections, filterCollapse, openFloatMenu, mode, userToView, defenders } = this.state
-    const { pickMonInfo, auth, params, user } = this.props
+    const { pickMonInfo, auth, params, user, locale } = this.props
     const { userId } = params
     const isMine = auth && userId === auth.uid
     const renderCollections = () => {
@@ -613,7 +627,7 @@ class CollectionView extends React.Component {
     const renderHeader = () => {
       if (mode === 'mix') {
         return (<div>
-          <h2 style={{ paddingRight: '60px' }}><span className='c-lightblue f-700'>{pickMonInfo.mixCols[0].mon[pickMonInfo.mixCols[0].monId].name}</span>와(과) 교배할 포켓몬을 선택해주세요.</h2>
+          <h2 style={{ paddingRight: '60px' }}><span className='c-lightblue f-700'>{getMsg(pickMonInfo.mixCols[0].mon[pickMonInfo.mixCols[0].monId].name, locale)}</span>와(과) 교배할 포켓몬을 선택해주세요.</h2>
           <ul className='actions' style={{ right: '20px' }}>
             <li><Button icon='zmdi zmdi-close' text='취소' color='deeporange' onClick={this._cancelMix} /></li>
           </ul>
@@ -651,7 +665,9 @@ CollectionView.propTypes = {
   pickMonInfo: PropTypes.object,
   showUserModal: PropTypes.func.isRequired,
   userModal: PropTypes.object.isRequired,
-  userCollections: PropTypes.array.isRequired
+  userCollections: PropTypes.array.isRequired,
+  locale: PropTypes.string.isRequired,
+  messages: PropTypes.object.isRequired
 }
 
 export default CollectionView

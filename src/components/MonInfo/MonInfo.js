@@ -8,6 +8,9 @@ import Stat from 'components/Stat'
 import Button from 'components/Button'
 
 import { getMonImage } from 'utils/monUtil'
+import { getMsg } from 'utils/commonUtil'
+
+import withIntl from 'hocs/withIntl'
 
 class MonInfo extends React.Component {
   constructor (props) {
@@ -20,7 +23,7 @@ class MonInfo extends React.Component {
     if (nextProps.showStat !== this.props.showStat) this.setState({ showStat: nextProps.showStat })
   }
   render () {
-    const { monObj, type, forModal, user } = this.props
+    const { monObj, type, forModal, user, locale } = this.props
     let honorBurf = [0, 0, 0, 0, 0, 0]
     const getHonorBurf = () => {
       const result = [0, 0, 0, 0, 0, 0]
@@ -64,7 +67,7 @@ class MonInfo extends React.Component {
             <div>
               <div className='row' style={{ marginBottom: '15px' }}>
                 <div className='col-xs-3 f-700'>이름</div>
-                <div className='col-xs-9'>{mon.mon ? monToView.name : '????'}</div>
+                <div className='col-xs-9'>{mon.mon ? getMsg(monToView.name, locale) : '????'}</div>
               </div>
               {mon.rank && <div className='row' style={{ marginBottom: '15px' }}>
                 <div className='col-xs-3 f-700'>랭크</div>
@@ -95,7 +98,7 @@ class MonInfo extends React.Component {
                 <div className='col-xs-9'>{monToView.evoLv > 0 ? `LV.${monToView.evoLv} 부터 가능` : '-'}</div>
               </div>
               <div className='row' style={{ marginBottom: '15px' }}>
-                <div className='col-xs-12'>{monToView.description} (designed by <span className='f-700 c-blue'>{getMonImage(mon).designer}</span>)</div>
+                <div className='col-xs-12'>{getMsg(monToView.description, locale)} (designed by <span className='f-700 c-blue'>{getMonImage(mon).designer}</span>)</div>
               </div>
             </div>
           }
@@ -155,7 +158,8 @@ MonInfo.propTypes = {
   type: PropTypes.string.isRequired,
   showStat: PropTypes.bool,
   forModal: PropTypes.bool,
-  user: PropTypes.object
+  user: PropTypes.object,
+  locale: PropTypes.string.isRequired
 }
 
-export default MonInfo
+export default withIntl(MonInfo)

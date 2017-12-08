@@ -5,6 +5,8 @@ import numeral from 'numeral'
 import Img from 'components/Img'
 import HonorBadge from 'components/HonorBadge'
 
+import { LEAGUE } from 'constants/rules'
+
 class UserInfo extends React.PureComponent {
   render () {
     const { user } = this.props
@@ -35,7 +37,7 @@ class UserInfo extends React.PureComponent {
           <div className='row' style={{ marginBottom: '15px' }}>
             <div className='col-xs-3 f-700'>리그</div>
             <div className='col-xs-9'>
-              {/* TODO */}
+              <span className='c-lightblue f-700'>{LEAGUE[user.league].name}</span>리그
             </div>
           </div>
           <div className='row' style={{ marginBottom: '15px' }}>
@@ -51,10 +53,28 @@ class UserInfo extends React.PureComponent {
               </div>
           </div>
           <div className='row' style={{ marginBottom: '15px' }}>
-            <div className='col-xs-3 f-700'>시합전적</div>
+            <div className='col-xs-3 f-700'>전체전적</div>
             <div className='col-xs-9'>
-              <span className='c-lightblue f-700'>{numeral(user.battleWin).format('0,0')}</span>승 <span className='c-lightblue f-700'>{numeral(user.battleLose).format('0,0')}</span>패
+              <span className='c-lightblue f-700'>{numeral(user.battleWin).format('0,0')}</span>승 <span className='c-lightblue f-700'>{numeral(user.battleLose).format('0,0')}</span>패 / 승률 <span className='c-lightblue f-700'>{numeral(user.battleWin / (user.battleLose + user.battleWin)).format('0.0%')}</span>
               </div>
+          </div>
+          <div className='row' style={{ marginBottom: '15px' }}>
+            <div className='col-xs-3 f-700'>공격전적</div>
+            <div className='col-xs-9'>
+              <span className='c-lightblue f-700'>{numeral(user.attackWin || 0).format('0,0')}</span>승 <span className='c-lightblue f-700'>{numeral(user.attackLose || 0).format('0,0')}</span>패 / 승률 <span className='c-lightblue f-700'>{numeral(user.attackWin / (user.attackLose + user.attackWin)).format('0.0%')}</span>
+              </div>
+          </div>
+          <div className='row' style={{ marginBottom: '15px' }}>
+            <div className='col-xs-3 f-700'>방어전적</div>
+            <div className='col-xs-9'>
+              <span className='c-lightblue f-700'>{numeral(user.defenseWin || 0).format('0,0')}</span>승 <span className='c-lightblue f-700'>{numeral(user.defenseLose || 0).format('0,0')}</span>패 / 승률 <span className='c-lightblue f-700'>{numeral(user.defenseWin / (user.defenseLose + user.defenseWin)).format('0.0%')}</span>
+              </div>
+          </div>
+          <div className='row' style={{ marginBottom: '15px' }}>
+            <div className='col-xs-3 f-700'>연승정보</div>
+            <div className='col-xs-9'>
+              현재 <span className='c-lightblue f-700'>{numeral(user.winInRow || 0).format('0,0')}</span>연승 중 / 최고 <span className='c-lightblue f-700'>{numeral(user.maxWinInRow || 0).format('0,0')}</span>연승 기록
+            </div>
           </div>
           <div className='row' style={{ marginBottom: '15px' }}>
             <div className='col-xs-12'>{user.introduce === '' ? '자기소개가 없습니다.' : user.introduce}</div>

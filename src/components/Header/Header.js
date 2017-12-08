@@ -77,15 +77,15 @@ class Header extends React.Component {
             <ul className='hi-menu'>
               {
                 !this.props.auth &&
-                <li><Link to='/sign-in'><i className='him-icon zmdi zmdi-sign-in' /></Link></li>
-              }
-              {
-                !this.props.auth &&
                 <li><Link to='/sign-up'><i className='him-icon zmdi zmdi-account-add' /></Link></li>
               }
               {
+                !this.props.auth &&
+                <li><Link to='/sign-in'><i className='him-icon zmdi zmdi-power' /></Link></li>
+              }
+              {
                 this.props.auth &&
-                <li><Link to='/sign-up'><i className='him-icon zmdi zmdi-settings' /></Link></li>
+                <li><Link to='/settings'><i className='him-icon zmdi zmdi-settings' /></Link></li>
               }
               {
                 this.props.auth &&

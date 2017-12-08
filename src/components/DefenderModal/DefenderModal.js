@@ -8,7 +8,11 @@ import CustomModal from '../CustomModal'
 import MonCard from '../MonCard'
 import Button from '../Button'
 
+import withIntl from 'hocs/withIntl'
+
 import { LEAGUE } from 'constants/rules'
+
+import { getHonorBurf, getHonorBurfTotal, getMsg } from 'utils/commonUtil'
 
 class DefenderModal extends React.Component {
   constructor (props) {
@@ -18,7 +22,7 @@ class DefenderModal extends React.Component {
       tobe: props.defenders,
       asisTotalCost: props.defenders.reduce((accm, defender) => accm + defender.mon[defender.monId].cost, 0),
       totalCost: props.defenders.reduce((accm, defender) => accm + defender.mon[defender.monId].cost, 0),
-      totalBattle: props.defenders.reduce((accm, defender) => accm + defender.total, 0)
+      totalBattle: props.defenders.reduce((accm, defender) => accm + defender.total + defender.addedTotal, 0)
     }
     this._handleOnClickApply = this._handleOnClickApply.bind(this)
     this._handleOnClickSetDefender = this._handleOnClickSetDefender.bind(this)
@@ -100,7 +104,7 @@ class DefenderModal extends React.Component {
     return asisTotalCost - tgtCost + srcCost <= maxCost
   }
   render () {
-    const { show, close, isLoading, currentCol, user } = this.props
+    const { show, close, isLoading, currentCol, user, locale, messages } = this.props
     const { tobe } = this.state
     const renderMonCards = () => {
       const result = []
@@ -115,6 +119,7 @@ class DefenderModal extends React.Component {
             className={`col-md-4 col-sm-4 col-xs-6`}
             isCustomSize
             key={idx}
+            user={user}
             disableChangeBtn={!this._isChangeable(col.mon[col.monId].cost)}
           />
         )
@@ -129,6 +134,7 @@ class DefenderModal extends React.Component {
             className={`col-md-4 col-sm-4 col-xs-6`}
             isCustomSize
             key={i}
+            user={user}
             disableChangeBtn={!this._isChangeable(0)}
           />
         )
@@ -141,7 +147,7 @@ class DefenderModal extends React.Component {
           {
             currentCol && !this._isJustForCheck() &&
             <div className='col-xs-12 m-b-20'>
-              <span className='c-lightblue f-700'>{currentCol.mon[currentCol.monId].name} LV.{currentCol.level}</span>을(를) 배치할 위치를 선택해주세요.
+              <span className='c-lightblue f-700'>{getMsg(currentCol.mon[currentCol.monId].name, locale)} LV.{currentCol.level}</span>을(를) 배치할 위치를 선택해주세요.
             </div>
           }
           {renderMonCards()}
@@ -150,7 +156,7 @@ class DefenderModal extends React.Component {
               총 코스트: <span className='c-lightblue f-700'>{this.state.totalCost}</span>/{this._getMaxCost()}
             </div>
             <div>
-              총 전투력: <span className='c-lightblue f-700'>{numeral(this.state.totalBattle).format('0,0')}</span>
+              총 전투력: <span className='c-lightblue f-700'>{numeral(this.state.totalBattle + getHonorBurfTotal(getHonorBurf(user)) * 3).format('0,0')}</span>
             </div>
           </div>
         </div>
@@ -202,7 +208,9 @@ DefenderModal.propTypes = {
   defenders: PropTypes.array.isRequired,
   isLoading: PropTypes.bool,
   currentCol: PropTypes.object,
-  user: PropTypes.object.isRequired
+  user: PropTypes.object.isRequired,
+  messages: PropTypes.object.isRequired,
+  locale: PropTypes.string.isRequired
 }
 
-export default DefenderModal
+export default withIntl(DefenderModal)

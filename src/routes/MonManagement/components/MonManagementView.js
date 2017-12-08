@@ -116,7 +116,8 @@ class MonManagementView extends React.Component {
     let { formData, editMode, designer } = this.state
     // ''은 null로 교체
     formData = convertEmptyStringToNullInObj(formData)
-    const mon = Object.assign({}, new Mon(), formData)
+    const { description, name, skill, ...restFormData } = formData
+    const mon = Object.assign({}, new Mon(), restFormData, { description: { ko: description }, name: { ko: name }, skill: { ko: skill } })
     const monImageFile = document.getElementById('monImage').files[0]
     let postMonImageFile = () => Promise.resolve()
     if (monImageFile) monImageFile.filename = keygen._()
@@ -172,13 +173,14 @@ class MonManagementView extends React.Component {
     const { formData } = this.state
     const { firebase } = this.props
     let newFormData = null
-    deleteImage(firebase, monImage.filter(item => item.seq === seq)[0].fullPath)
+    // deleteImage(firebase, monImage.filter(item => item.seq === seq)[0].fullPath) // 현재 잘 안되고 있음 (Error: Firebase.child failed: First argument was an invalid path: "monImages/udumdesin.png". Paths must be non-empty strings and can't contain ".", "#", "$", "[", or "]")
+    Promise.resolve()
     .then(() => {
       const newMonImage = _.remove(monImage, image => {
         return image.seq !== seq
       })
       newFormData = Object.assign({}, formData, { monImage: newMonImage })
-      updateMon(firebase, newFormData)
+      return updateMon(firebase, newFormData)
       .then(() => {
         this.setState({ formData: newFormData })
       })
@@ -186,10 +188,10 @@ class MonManagementView extends React.Component {
     // .then(() => {
     //   this.setState({ formData: newFormData })
     // })
-    .catch(() => {
+    .catch((err) => {
       showAlert({
         title: '삭제실패',
-        text: '삭제 중 에러가 발생했습니다.',
+        text: '삭제 중 에러가 발생했습니다. - ' + err,
         type: 'error'
       })
     })
@@ -243,7 +245,7 @@ class MonManagementView extends React.Component {
             <div className='list-group-item media' key={idx}>
               <div className='media-body'>
                 <div className='lgi-heading' style={{ cursor: 'pointer' }}
-                  onClick={() => this._handleOnClickMon(mon.id)}>{mon.no}. {mon.name} <MonAttr mainAttr={mon.mainAttr} subAttr={mon.subAttr} grade={mon.grade} /></div>
+                  onClick={() => this._handleOnClickMon(mon.id)}>{mon.no}. {mon.name.ko} <MonAttr mainAttr={mon.mainAttr} subAttr={mon.subAttr} grade={mon.grade} /></div>
               </div>
             </div>
           )

@@ -19,7 +19,7 @@ export default isAuthRequired => ComposedComponent => {
     }
     render () {
       const { user, ...props } = this.props
-      if (isAuthRequired && !user) return null
+      if (isAuthRequired && (!user || !user.nickname)) return null // !user.nickname 조건은 user가 비어있는 객체 {}로 올 수 있기 때문
       return (
         <ComposedComponent user={user} {...props} />
       )

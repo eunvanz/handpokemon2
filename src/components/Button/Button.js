@@ -2,7 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
 import keygen from 'keygenerator'
-import classNames from 'classNames'
 
 class Button extends React.Component {
   constructor (props) {
@@ -25,7 +24,7 @@ class Button extends React.Component {
   }
   render () {
     const style = {
-      button: { padding: '8px 14px 8px 14px', fontSize: `${this.props.size === 'xs' ? '12px' : '15px'}`, fontWeight: '700' },
+      button: { padding: '8px 14px 8px 14px', fontSize: `${this.props.size === 'xs' ? '12px' : '14px'}`, fontWeight: '700' },
       icon: this.props.iconRight ? { margin: this.props.loading ? '0px' : '3px 0px 0px 6px' } : { margin: this.props.loading ? '0px' : '3px 6px 0px 0px' }
     }
     const getTextStyle = () => {

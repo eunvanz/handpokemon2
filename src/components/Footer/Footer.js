@@ -15,7 +15,7 @@ class Footer extends React.Component {
   render () {
     return (
       <div id='footer'>
-        Copyright © 2018 CIVASOUL
+        made with &#9829; for Pokémon® by CIVASOUL
       </div>
     )
   }

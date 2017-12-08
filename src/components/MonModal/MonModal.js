@@ -83,7 +83,7 @@ class MonModal extends React.Component {
     })
   }
   render () {
-    const { mon, show, close, type, updatePickMonInfo, pickMonInfo, isNotMine, user, ...restProps } = this.props
+    const { mon, show, close, type, updatePickMonInfo, pickMonInfo, isNotMine, user, locale, ...restProps } = this.props
     const tobeMon = mon.tobe
     const renderLevel = () => {
       if (mon.asis) {
@@ -131,7 +131,7 @@ class MonModal extends React.Component {
               renderLevel()
             }
           </div>
-          <MonInfo monObj={mon} showStat={this.state.showStat} type={type} forModal user={user} />
+          <MonInfo monObj={mon} showStat={this.state.showStat} type={type} forModal user={user} locale={locale} />
         </div>
       )
     }
@@ -171,7 +171,8 @@ MonModal.propTypes = {
   updatePickMonInfo: PropTypes.func.isRequired,
   pickMonInfo: PropTypes.object,
   isNotMine: PropTypes.bool,
-  user: PropTypes.object
+  user: PropTypes.object,
+  locale: PropTypes.string
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(MonModal)

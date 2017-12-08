@@ -164,8 +164,8 @@ class ChoosePick extends React.Component {
     if (pick.length === 3) return this.setState({ sortedCollections: pick })
     const { collections } = this.props
     const { maxCost } = this.state
-    const adjustCollections = collections.map(col => Object.assign({}, col, { totalIdx: col.total + col.addedTotal }))
-    const originCollections = _.orderBy(adjustCollections.filter(c => !c.isDefender), ['isFavorite', 'totalIdx'], ['desc', 'desc'])
+    const adjustCollections = collections.map(col => Object.assign({}, col, { totalIdx: col.total + col.addedTotal }, { isChosen: _.find(pick, p => col.id === p.id) != undefined }))
+    const originCollections = _.orderBy(adjustCollections.filter(c => !c.isDefender), ['isChosen', 'isFavorite', 'totalIdx'], ['desc', 'desc', 'desc'])
     const restPick = 2 - pick.length
     const availableCost = maxCost - cost - restPick
     const filteredCollections = originCollections.filter(c => (c.mon[c.monId].cost <= availableCost) ||
@@ -219,7 +219,7 @@ class ChoosePick extends React.Component {
     this.setState({ filterCollapse: Object.assign({}, filterCollapse, { [key]: !filterCollapse[key] }) })
   }
   render () {
-    const { user } = this.props
+    const { user, messages, locale } = this.props
     const { currentCost, maxCost, sortedCollections, chosenPick, filterCollapse, filter } = this.state
     const renderFilterBody = () => {
       const grades = {
@@ -343,10 +343,12 @@ class ChoosePick extends React.Component {
           {
             sortedCollections.map((col, idx) => {
               return (
-                <MonCard isSelectable onSelect={() => this._handleOnSelectMon(col)}
+                <MonCard isSelectable isNotMine onSelect={() => this._handleOnSelectMon(col)}
                   onUnselect={() => this._handleOnUnselectMon(col)} user={user}
                   isSelected={this._findColInChosenPick(col) != null}
-                  key={col.id} mon={{ asis: null, tobe: col }} type='collection' />
+                  key={col.id} mon={{ asis: null, tobe: col }} type='collection'
+                  locale={locale} messages={messages}  
+                />
               )
             })
           }
@@ -394,7 +396,9 @@ ChoosePick.contextTypes = {
 ChoosePick.propTypes = {
   collections: PropTypes.array.isRequired,
   user: PropTypes.object.isRequired,
-  onClickNext: PropTypes.func.isRequired
+  onClickNext: PropTypes.func.isRequired,
+  locale: PropTypes.string.isRequired,
+  messages: PropTypes.object.isRequired
 }
 
 export default ChoosePick

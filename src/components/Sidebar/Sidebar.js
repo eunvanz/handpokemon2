@@ -6,20 +6,26 @@ import numeral from 'numeral'
 import { firebaseConnect } from 'react-redux-firebase'
 import $ from 'jquery'
 import shallowCompare from 'react-addons-shallow-compare'
+import Visibility from 'visibilityjs'
+import { compose } from 'recompose'
 
 import { DEFAULT_PROFILE_IMAGE_URL } from 'constants/urls'
 import { PICK_CREDIT_REFRESH, BATTLE_CREDIT_REFRESH, ADVENTURE_CREDIT_REFRESH,
   MAX_PICK_CREDIT, MAX_BATTLE_CREDIT, MAX_ADVENTURE_CREDIT } from 'constants/rules'
-import { honors } from 'constants/data'
+import { honors, items } from 'constants/data'
 
 import Badge from 'components/Badge'
 
 import { refreshUserCredits, updateUserIndexes } from 'services/UserService'
 import { postHonor } from 'services/HonorService'
+import { updateMon } from 'services/MonService'
+import { postItem } from 'services/ItemService'
 
-import { convertTimeToMMSS, getAuthUserFromFirebase } from 'utils/commonUtil'
+import { convertTimeToMMSS, getAuthUserFromFirebase, getMsg } from 'utils/commonUtil'
 
 import { receiveCreditInfo } from 'store/creditInfo'
+
+import withMons from 'hocs/withMons'
 
 class Sidebar extends React.Component {
   constructor (props) {
@@ -28,13 +34,43 @@ class Sidebar extends React.Component {
     this._handleCredit = this._handleCredit.bind(this)
     this._increaseCredit = this._increaseCredit.bind(this)
     this._handleOnClickPostHonor = this._handleOnClickPostHonor.bind(this)
+    this._handleOnClickRestructureMon = this._handleOnClickRestructureMon.bind(this)
     this.state = {
       pickCreditTimer: null,
       battleCreditTimer: null,
-      adventureCreditTimer: null
+      adventureCreditTimer: null,
+      hiddenMillis: 0
     }
     this.timeouts = {}
-    this.intervals = {}
+    this.intervals = {} // 크레딧이 0 이상일 경우의 interval
+    this.timers = {} // 크레딧이 0일 경우의 interval
+  }
+  componentDidMount () {
+    Visibility.change((e, state) => {
+      if (state === 'visible') {
+        this._refreshUserCredits()
+      }
+    })
+    const $ = window.$
+    function scrollBar (selector, theme, mousewheelaxis) {
+      $(selector).mCustomScrollbar({
+        theme: theme,
+        scrollInertia: 100,
+        axis:'yx',
+        mouseWheel: {
+          enable: true,
+          axis: mousewheelaxis,
+          preventDefault: true
+        }
+      })
+    }
+    setTimeout(() => {
+      if (!$('html').hasClass('ismobile')) {
+        if ($('.c-overflow')[0]) {
+          scrollBar('.c-overflow', 'minimal-dark', 'y')
+        }
+      }
+    }, 1000)
   }
   shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
@@ -74,7 +110,7 @@ class Sidebar extends React.Component {
   _handleCredit (creditInfo, type) {
     const { pickCredit, lastPick, battleCredit, lastLeague, adventureCredit, lastAdventure } = creditInfo
     const { receiveCreditInfo } = this.props
-    const { timeouts } = this
+    const { timeouts, timers } = this
     const handleByType = type => { // type = 'pick', 'battle', 'adventure'
       const currentTime = new Date().getTime()
       const interval = () => {
@@ -96,17 +132,23 @@ class Sidebar extends React.Component {
         receiveCreditInfo({ [`${type}Credit`]: 0 })
         this._startCreditTimer(type, interval()) // 크레딧이 0인경우 타이머 실행
       } else if (credit() < max()) { // 크레딧이 1부터 max사이인 경우 state에 세팅 후 interval후에 크레딧 증가로직 시작
+        this.setState({ [`${type}CreditTimer`]: null })
+        if (this.timers[type]) clearInterval(timers[type])
+
         receiveCreditInfo({ [`${type}CreditTimer`]: null, [`${type}Credit`]: credit() })
         timeouts[type] = setTimeout(() => this._increaseCredit(type, credit()), interval())
-      } else receiveCreditInfo({ [`${type}CreditTimer`]: null, [`${type}Credit`]: credit() }) // 크레딧이 max인 경우는 그냥 세팅
+      } else {
+        this.setState({ [`${type}CreditTimer`]: null })
+        if (this.timers[type]) clearInterval(timers[type])
+        
+        receiveCreditInfo({ [`${type}CreditTimer`]: null, [`${type}Credit`]: credit() }) // 크레딧이 max인 경우는 그냥 세팅
+      }
     }
     handleByType(type)
   }
   _increaseCredit (type, asisCredit) { // UI상으로면 크레딧을 업데이트
     const { intervals } = this
-    console.log('intervals[type]', intervals[type])
     if (intervals[type]) clearInterval(intervals[type])
-    console.log('intervals[type]', intervals[type])
     const { receiveCreditInfo } = this.props
     let interval
     let max
@@ -129,35 +171,48 @@ class Sidebar extends React.Component {
     if (max > asisCredit + i) {
       intervals[type] = setInterval(() => {
         increaseStateCredit() // 정해진 interval로 1씩 증가시킴
-        console.log('intervals[type]', intervals[type])
-        console.log('asisCredit', asisCredit)
-        console.log('i', i)
-        console.log('max', max)
         if (max < asisCredit + i) clearInterval(intervals[type]) // max값에 도달했을 때 timer 중단
       }, interval)
     }
   }
   _startCreditTimer (type, interval) {
-    const timer = setInterval(() => {
+    const { timers } = this
+    if (this.timers[type]) clearInterval(timers[type])
+    this.timers[type] = setInterval(() => {
       const timeString = convertTimeToMMSS(interval)
       this.setState({ [`${type}CreditTimer`]: timeString })
       interval = interval - 1000
       if (interval < 0) {
         setTimeout(() => this._increaseCredit(type, 0), interval) // 1초에서 0초로 바뀔 때 화면의 크레딧을 1로 만듦
         this.setState({ [`${type}CreditTimer`]: null })
-        clearInterval(timer)
+        clearInterval(timers[type])
       }
     }, 1000)
   }
   _handleOnClickPostHonor () {
     const { firebase } = this.props
-    const reducer = honors.reduce((prom, honor) => {
-      return prom.then(() => postHonor(firebase, honor))
+    // const reducer = honors.reduce((prom, honor) => {
+    //   return prom.then(() => postHonor(firebase, honor))
+    // }, Promise.resolve())
+    // reducer()
+    const reducer = items.reduce((prom, item) => {
+      return prom.then(() => postItem(firebase, item))
     }, Promise.resolve())
     reducer()
   }
+  _handleOnClickRestructureMon () {
+    const { mons, firebase } = this.props
+    mons.forEach(mon => {
+      console.log('before', mon)
+      const newMon = Object.assign({}, mon, { name: { ko: mon.name }, description: { ko: mon.description }, skill: { ko: mon.skill } })
+      updateMon(firebase, newMon)
+      .then(() => {
+        console.log('업데이트 완료', newMon)
+      })
+    })
+  }
   render () {
-    const { user, auth } = this.props
+    const { user, auth, messages, locale } = this.props
     const { pickCreditTimer, battleCreditTimer, adventureCreditTimer } = this.state
     const { pickCredit, battleCredit, adventureCredit } = this.props.creditInfo
     const renderCreditBadge = type => {
@@ -203,24 +258,27 @@ class Sidebar extends React.Component {
             </div>
             <ul className='main-menu'>
               <li className='f-700'>
-                <Link to='/' onClick={() => $('.ma-backdrop').click()}><i className='fa fa-home' style={{ fontSize: '22px' }} /> 홈</Link>
+                <Link to='/' onClick={() => $('.ma-backdrop').click()}><i className='fa fa-home' style={{ fontSize: '22px' }} /> {messages.sidebar.home[locale]}</Link>
               </li>
               {
                 auth &&
                 <li className='f-700'>
-                  <Link to='/honor' onClick={() => $('.ma-backdrop').click()}><i className='fa fa-bookmark' style={{ fontSize: '22px' }} /> 내 업적</Link>
+                  <Link to='/honor' onClick={() => $('.ma-backdrop').click()}><i className='fa fa-bookmark' style={{ fontSize: '22px' }} /> {messages.sidebar.achievements[locale]}</Link>
                 </li>
               }
               {
                 auth &&
                 <li className='f-700'>
-                  <Link to={`/collection/${auth.uid}`} onClick={() => $('.ma-backdrop').click()}><i className='zmdi zmdi-apps' style={{ fontSize: '22px' }} /> 내 콜렉션</Link>
+                  <Link to={`/collection/${auth.uid}`} onClick={() => $('.ma-backdrop').click()}><i className='zmdi zmdi-apps' style={{ fontSize: '22px' }} /> {getMsg(messages.sidebar.collections, locale)}</Link>
                 </li>
               }
               {
                 auth &&
                 <li className='f-700'>
-                  <Link to={`/inventory/${auth.uid}`} onClick={() => $('.ma-backdrop').click()}><i className='fa fa-gift' style={{ fontSize: '22px' }} /> 내 선물함</Link>
+                  <Link to='/giftbox' onClick={() => $('.ma-backdrop').click()}>
+                    <i className='fa fa-gift' style={{ fontSize: '22px' }} /> 내 선물함
+                    {user.inventory && user.inventory.length > 0 && <Badge color='lightblue' text={String(user.inventory.length)} />}
+                  </Link>
                 </li>
               }
               <li className='f-700'>
@@ -242,7 +300,7 @@ class Sidebar extends React.Component {
                 </Link>
               </li>
               <li className='f-700'>
-                <Link to='/'>
+                <Link to='/item-shop' onClick={() => $('.ma-backdrop').click()}>
                   <i className='fa fa-shopping-cart' style={{ fontSize: '22px' }} /> 상점
                   {
                     user && <Badge color='amber' text={`${numeral(user.pokemoney || 0).format('0,0')}P`} />
@@ -266,7 +324,7 @@ class Sidebar extends React.Component {
                 </ul>
               </li>
               <li className='f-700'>
-                <Link to='/'><i className='fa fa-paint-brush' style={{ fontSize: '22px' }} /> 포켓몬 공작소</Link>
+                <Link to='/workshop'><i className='fa fa-paint-brush' style={{ fontSize: '22px' }} /> 포켓몬 공작소</Link>
               </li>
               <li className='f-700'>
                 <Link to='/'><i className='fa fa-book' style={{ fontSize: '22px' }} /> 게임가이드</Link>
@@ -276,9 +334,12 @@ class Sidebar extends React.Component {
               </li>
               {/* <li className='f-700'>
                 <a onClick={() => updateUserIndexes(this.props.firebase)}><i className='fa fa-lock' style={{ fontSize: '22px' }} /> 일회용</a>
-              </li>
-              <li className='f-700'>
-                <a onClick={this._handleOnClickPostHonor}><i className='fa fa-lock' style={{ fontSize: '22px' }} /> 칭호등록</a>
+                </li> */}
+              {/* <li className='f-700'>
+                <a onClick={this._handleOnClickPostHonor}><i className='fa fa-lock' style={{ fontSize: '22px' }} /> 아이템생성</a>
+              </li> */}
+              {/* <li className='f-700'>
+                <a onClick={this._handleOnClickRestructureMon}><i className='fa fa-lock' style={{ fontSize: '22px' }} /> 몬구조변환</a>
               </li> */}
             </ul>
           </div>
@@ -297,7 +358,10 @@ Sidebar.propTypes = {
   firebase: PropTypes.object.isRequired,
   auth: PropTypes.object,
   creditInfo: PropTypes.object,
-  receiveCreditInfo: PropTypes.func.isRequired
+  receiveCreditInfo: PropTypes.func.isRequired,
+  messages: PropTypes.object.isRequired,
+  locale: PropTypes.string.isRequired,
+  mons: PropTypes.array
 }
 
 // const authConnected = connect(({ firebase }) => ({ auth: pathToJS(firebase, 'auth') }))(Sidebar)
@@ -318,6 +382,6 @@ const mapDispatchToProps = {
 
 // const wrappedSidebar = connect(({ firebase }) => ({ auth: pathToJS(firebase, 'auth') }))(Sidebar)
 
-const wrappedSidebar = firebaseConnect()(Sidebar)
+const wrappedSidebar = compose(firebaseConnect(), withMons)(Sidebar)
 
 export default connect(mapStateToProps, mapDispatchToProps)(wrappedSidebar)

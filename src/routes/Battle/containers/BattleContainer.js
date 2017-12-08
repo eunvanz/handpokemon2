@@ -6,6 +6,8 @@ import BattleView from '../components/BattleView'
 
 import withAuth from 'hocs/withAuth'
 import withUserCollections from 'hocs/withUserCollections'
+import withCreditInfo from 'hocs/withCreditInfo'
+import withItems from 'hocs/withItems'
 
 import { fetchCandidates, setEnemyPicks, setUserPicks, setBattleLog, clearBattle } from '../modules/battle'
 
@@ -25,6 +27,7 @@ const mapStateToProps = (state) => {
   }
 }
 
-const wrappedBattleView = compose(firebaseConnect(), withAuth(true), withUserCollections)(BattleView)
+const wrappedBattleView = compose(firebaseConnect(), withAuth(true), withUserCollections,
+  withCreditInfo, withItems)(BattleView)
 
 export default connect(mapStateToProps, mapDispatchToProps)(wrappedBattleView)

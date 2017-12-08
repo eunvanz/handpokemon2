@@ -10,6 +10,10 @@ import Collection from './Collection'
 import Ranking from './Ranking'
 import Honor from './Honor'
 import Battle from './Battle'
+import Giftbox from './Giftbox'
+import ItemShop from './ItemShop'
+import Workshop from './Workshop'
+import Setting from './Setting'
 
 /*  Note: Instead of using JSX, we recommend using react-router
     PlainRoute objects to build route definitions.   */
@@ -27,7 +31,11 @@ export const createRoutes = (store) => ({
     Collection(store),
     Ranking(store),
     Honor(store),
-    Battle(store)
+    Battle(store),
+    Giftbox(store),
+    ItemShop(store),
+    Workshop(store),
+    Setting(store)
   ]
 })
 

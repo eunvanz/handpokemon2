@@ -1,3 +1,5 @@
+import keygen from 'keygenerator'
+
 export default class User {
   constructor () {
     this.regDate = new Date().toISOString()
@@ -31,5 +33,7 @@ export default class User {
     this.winInRow = 0
     this.battleSpeed = 2
     this.inventory = []
+    this.maxWinInRow = 0
+    this.recommenderCode = keygen._()
   }
 }

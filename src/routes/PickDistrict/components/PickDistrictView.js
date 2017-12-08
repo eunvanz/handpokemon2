@@ -40,7 +40,6 @@ class PickDistrictView extends React.Component {
   }
   render () {
     const { creditInfo } = this.props
-    console.log('creditInfo @ pickDistrictView', creditInfo)
     const renderAttrBadges = attrs => {
       return attrs.map(attr =>
         <AttrBadge

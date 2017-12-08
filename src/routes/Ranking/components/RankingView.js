@@ -25,13 +25,23 @@ class RankingView extends React.Component {
       userRank: null
     }
     this._loadMoreItems = this._loadMoreItems.bind(this)
+    this._init = this._init.bind(this)
   }
   shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
   }
   componentDidMount () {
+    this._init()
+  }
+  componentDidUpdate (prevProps, prevState) {
+    if (prevProps.params.type !== this.props.params.type) {
+      this._init()
+    }
+  }
+  _init () {
     const { firebase, params, auth } = this.props
     const { type } = params
+    window.scrollTo(0, 0)
     getUserRanking(firebase, type, 1)
     .then(userList => {
       const lastUser = userList[userList.length - 1]
@@ -39,16 +49,19 @@ class RankingView extends React.Component {
         userList,
         lastPoint: type === 'collection' ? lastUser.colPoint_leaguePoint : lastUser.leaguePoint_colPoint,
         lastUserId: lastUser.id,
-        isLoading: false
+        isLoading: false,
+        page: 1,
+        userRank: null,
+        isLastPage: false
       })
       return Promise.resolve()
     })
     .then(() => {
       if (auth) {
         return getUserRankingByUserId(firebase, params.type, auth.uid)
-        .then(userRank => {
-          this.setState({ userRank })
-        })
+          .then(userRank => {
+            this.setState({ userRank })
+          })
       }
     })
   }
@@ -97,7 +110,9 @@ class RankingView extends React.Component {
       return <RankingElement isHeader type={type} />
     }
     const renderBody = () => {
-      if (userList) {
+      if (!userList) {
+        return <Loading text='랭킹목록을 불러오는 중...' height={nullContainerHeight} />
+      } else {
         return (
           <ListContainer
             elements={renderElements()}
@@ -107,8 +122,6 @@ class RankingView extends React.Component {
             header={renderHeader()}
           />
         )
-      } else {
-        return <Loading text='랭킹목록을 불러오는 중...' height={nullContainerHeight} />
       }
     }
     return (

@@ -4,6 +4,8 @@ import shallowCompare from 'react-addons-shallow-compare'
 import numeral from 'numeral'
 import $ from 'jquery'
 
+import UserModal from 'components/UserModal'
+
 import { isScreenSize } from 'utils/commonUtil'
 
 import { colors } from 'constants/colors'
@@ -16,7 +18,8 @@ class RankingElement extends React.Component {
       fontSize: isScreenSize.xs() ? '14px' : '16px',
       padding: isScreenSize.xs() ? '15px 5px' : '15px 30px',
       width: [isScreenSize.xs() ? '20%' : isScreenSize.sm() ? '15%' : '10%', isScreenSize.xs() ? '50%' : isScreenSize.sm() ? '35%' : '20%', isScreenSize.xs() ? '30%' : isScreenSize.sm() ? '25%' : '20%', isScreenSize.xs() ? '30%' : isScreenSize.sm() ? '25%' : '20%', '10%', '10%', '10%'],
-      showProfile: !isScreenSize.smallerThan(414) // 아이폰6+ 부터 트레이너 프로필 이미지 보여줌
+      showProfile: !isScreenSize.smallerThan(414), // 아이폰6+ 부터 트레이너 프로필 이미지 보여줌
+      showUserModal: false
     }
     this._adjustStyle = this._adjustStyle.bind(this)
   }
@@ -42,14 +45,14 @@ class RankingElement extends React.Component {
   }
   render () {
     const { user, rank, type, isMine, isHeader, isEnemy, style, ...props } = this.props
-    const { lineHeight, fontSize, padding, width, showProfile } = this.state
+    const { lineHeight, fontSize, padding, width, showProfile, showUserModal } = this.state
     return (
       <div className='list-group-item media' style={Object.assign({}, { height: '70px', padding, fontSize, border: isMine ? `1px solid ${colors.amber}` : isEnemy ? `1px solid ${colors.red}` : '' }, style)} {...props}>
         <div className='pull-left text-center' style={{ width: width[0], lineHeight }}>{isHeader ? <strong>순위</strong> : numeral(rank).format('0,0')}</div>
         <div className={`pull-left ${isHeader ? 'text-center' : ''}`} style={{ width: width[1] }}>
           {isHeader
             ? <strong style={{ lineHeight }}>트레이너</strong>
-            : <div onClick={() => this.context.router.push(`/collection/${user.id}`)} style={{ cursor: 'pointer' }}>
+            : <div onClick={() => this.setState({ showUserModal: true })} style={{ cursor: 'pointer' }}>
               <img className='lgi-img' src={user.profileImage} style={{ display: showProfile ? 'inline' : 'none' }} />
               <span style={{ paddingLeft: '10px', lineHeight }}>{user.nickname}</span>
             </div>
@@ -60,6 +63,12 @@ class RankingElement extends React.Component {
         <div className='pull-left text-center hidden-sm hidden-xs' style={{ width: width[4], lineHeight }}><span className={type === 'battle' && !isHeader ? 'c-lightblue' : ''}>{isHeader ? <strong>승</strong> : numeral(user.battleWin).format('0,0')}</span>{isHeader ? '' : '승'}</div>
         <div className='pull-left text-center hidden-sm hidden-xs' style={{ width: width[5], lineHeight }}><span className={type === 'battle' && !isHeader ? 'c-lightblue' : ''}>{isHeader ? <strong>패</strong> : numeral(user.battleLose).format('0,0')}</span>{isHeader ? '' : '패'}</div>
         <div className='pull-left text-center hidden-sm hidden-xs' style={{ width: width[6], lineHeight }}><span className={type === 'battle' && !isHeader ? 'c-lightblue' : ''}>{isHeader ? <strong>승률</strong> : numeral(user.battleWin * 100 / (user.battleWin + user.battleLose)).format('0.0')}</span>{isHeader ? '' : '%'}</div>
+        <UserModal
+          user={user}
+          showCollectionButton
+          show={showUserModal}
+          close={() => this.setState({ showUserModal: false })}
+        />
       </div>
     )
   }

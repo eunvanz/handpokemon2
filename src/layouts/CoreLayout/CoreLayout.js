@@ -1,40 +1,23 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Helmet from 'react-helmet'
-import { connect } from 'react-redux'
 import { fromJS, is } from 'immutable'
 import { compose } from 'recompose'
 import { firebaseConnect } from 'react-redux-firebase'
 
 import Header from 'components/Header'
 import Sidebar from 'components/Sidebar'
-import MessageModal from 'components/MessageModal'
-import UserModal from 'components/UserModal'
 import Footer from 'components/Footer'
 
-import { closeMessageModal } from 'store/messageModal'
-import { closeUserModal } from 'store/userModal'
-
 import withAuth from 'hocs/withAuth'
-import withUserCollections from 'hocs/withUserCollections'
-import withMons from 'hocs/withMons'
-
-const mapStateToProps = state => ({
-  messageModal: state.messageModal,
-  userModal: state.userModal
-})
-
-const mapDispatchToProps = {
-  closeMessageModal,
-  closeUserModal
-}
+import withIntl from 'hocs/withIntl'
 
 class CoreLayout extends React.Component {
   shouldComponentUpdate (nextProps, nextState) {
     return !is(fromJS(nextProps), fromJS(this.props)) || !is(fromJS(nextState), fromJS(this.state))
   }
   render () {
-    const { children, messageModal, closeMessageModal, userModal, closeUserModal } = this.props
+    const { children, messages, locale } = this.props
     return (
       <div>
         <Helmet
@@ -77,19 +60,11 @@ class CoreLayout extends React.Component {
         />
         <Header />
         <section id='main'>
-          <Sidebar />
+          <Sidebar messages={messages} locale={locale} />
           <section id='content' className='core-layout__viewport'>
-            {children}
+            {React.Children.map(children, child => React.cloneElement(child, { messages, locale }))}
           </section>
-          <Footer />
-          <MessageModal
-            {...messageModal}
-            close={closeMessageModal}
-          />
-          <UserModal
-            {...userModal}
-            close={closeUserModal}
-          />
+          <Footer messages={messages} locale={locale} />
         </section>
       </div>
     )
@@ -98,16 +73,14 @@ class CoreLayout extends React.Component {
 
 CoreLayout.propTypes = {
   children : PropTypes.element.isRequired,
-  messageModal: PropTypes.object.isRequired,
-  closeMessageModal: PropTypes.func.isRequired,
-  userModal: PropTypes.object.isRequired,
-  closeUserModal: PropTypes.func.isRequired
+  messages: PropTypes.object.isRequired,
+  locale: PropTypes.string.isRequired
 }
 
-const wrappedCoreLayout = compose(withAuth(false), firebaseConnect(({ auth }) => {
-  const defaultPaths = ['/honors', '/mons']
+const wrappedCoreLayout = compose(withIntl, withAuth(false), firebaseConnect(({ auth }) => {
+  const defaultPaths = ['/honors', '/mons', '/items']
   if (auth) defaultPaths.push(`/collections/${auth.uid}`)
   return defaultPaths
 }))(CoreLayout)
 
-export default connect(mapStateToProps, mapDispatchToProps)(wrappedCoreLayout)
+export default wrappedCoreLayout

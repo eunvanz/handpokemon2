@@ -44,21 +44,36 @@ export const refreshUserCredits = (firebase, uid, user) => {
   const curTime = new Date().getTime()
   const { pickCredit, battleCredit, adventureCredit, lastPick, lastLeague, lastAdventure } = user
 
+  // 현재시간과 마지막 크레딧 사용 시간과의 차이를 계산
   const pickTimeGap = curTime - lastPick
   const battleTimeGap = curTime - lastLeague
   const adventureTimeGap = curTime - lastAdventure
+  console.log('pickTimeGap', pickTimeGap)
 
+  // 현재시간과 마지막 크레딧 사용 시간과의 차이를 크레딧 리프레쉬 시간 단위로 나누어서 더해줄 크레딧을 계산
   const pickCreditToAdd = Math.floor(pickTimeGap / PICK_CREDIT_REFRESH)
   const battleCreditToAdd = Math.floor(battleTimeGap / BATTLE_CREDIT_REFRESH)
   const adventureCreditToAdd = Math.floor(adventureTimeGap / ADVENTURE_CREDIT_REFRESH)
+  console.log('pickCreditToAdd', pickCreditToAdd)
 
+  const isPickCreditMax = pickCredit + pickCreditToAdd >= MAX_PICK_CREDIT
+  const isBattleCreditMax = battleCredit + battleCreditToAdd >= MAX_BATTLE_CREDIT
+  const isAdventureCreditMax = adventureCredit + adventureCreditToAdd >= MAX_ADVENTURE_CREDIT
+  console.log('isPickCreditMax', isPickCreditMax)
+
+  // 위의 나머지가 다음 크레딧 증가를 실행시킬 시간
   const pickRest = pickTimeGap - (PICK_CREDIT_REFRESH * pickCreditToAdd)
   const battleRest = battleTimeGap - (BATTLE_CREDIT_REFRESH * battleCreditToAdd)
   const adventureRest = adventureTimeGap - (ADVENTURE_CREDIT_REFRESH * adventureCreditToAdd)
+  console.log('pickRest', pickRest)
 
-  const lastPickToUpdate = curTime - pickRest
-  const lastLeagueToUpdate = curTime - battleRest
-  const lastAdventureToUpdate = curTime - adventureRest
+  // 위의 시간이 지난 후 업데이트를 해줘야 하기 때문에 마지막 크레딧 사용 시간을 현재시간 - 위의 사간 을 적용
+  // 이미 크래딧과 더할 크레딧을 더한 값이 MAX값일 경우에는 현재시간을 적용
+  const lastPickToUpdate = isPickCreditMax ? curTime : curTime - pickRest
+  const lastLeagueToUpdate = isBattleCreditMax ? curTime : curTime - battleRest
+  const lastAdventureToUpdate = isAdventureCreditMax ? curTime : curTime - adventureRest
+  console.log('lastPickToUpdate', lastPickToUpdate)
+  console.log('curTime', curTime)
 
   const updateObj = {}
   updateObj.lastPick = lastPickToUpdate
@@ -219,24 +234,75 @@ export const updateUserRanking = (firebase, type, userId, rank) => {
 }
 
 export const setUserPath = (firebase, userId, path, value) => {
-  console.log('value', value)
-  console.log('userId', userId)
-  console.log('path', path)
   return firebase.ref(`/users/${userId}/${path}`).set(value)
 }
 
-export const updateUserToLose = (firebase, userId, user, type, point) => {
+export const updateUserInventory = (firebase, userId, item, type, cnt) => {
+  const inventoryRef = firebase.ref(`/users/${userId}/inventory`)
+  return inventoryRef.transaction(inventory => {
+    const newInventory = inventory || []
+    if (type === 'save') {
+      for (let i = 0; i < cnt; i++) {
+        newInventory.push(item)
+      }
+    } else if (type === 'use') {
+      for (let i = 0; i < cnt; i++) {
+        newInventory.splice(_.findIndex(newInventory, e => e.id === item.id), 1)
+      }
+    }
+    return newInventory
+  })
+}
+
+export const updateUserPokemoney = (firebase, userId, value) => {
+  const pokemoneyRef = firebase.ref(`/users/${userId}/pokemoney`)
+  return pokemoneyRef.transaction(pokemoney => {
+    return pokemoney + value
+  })
+}
+
+export const updateUserToLose = (firebase, userId, type, point) => {
   // type should be attackLose or defenseLose
-  const updateObj = {
-    [`/users/${userId}/battleLose`]: user.battleLose + 1,
-    [`/users/${userId}/${type}`]: (user[type] || 0) + 1,
-    [`/users/${userId}/leaguePoint`]: user.leaguePoint + point
-  }
-  return updater(firebase, updateObj)
+  const userRef = firebase.ref(`/users/${userId}`)
+  return userRef.once('value')
+  .then(snapshot => {
+    const user = snapshot.val()
+    const updateObj = {
+      [`/users/${userId}/battleLose`]: user.battleLose + 1,
+      [`/users/${userId}/${type}`]: (user[type] || 0) + 1,
+      [`/users/${userId}/leaguePoint`]: user.leaguePoint - point,
+      [`/users/${userId}/colPoint_leaguePoint`]: convertNumberToStringForIndex([user.colPoint, user.leaguePoint - point]),
+      [`/users/${userId}/leaguePoint_colPoint`]: convertNumberToStringForIndex([user.leaguePoint - point, user.colPoint])
+    }
+    if (type === 'attackLose') updateObj[`/users/${userId}/winInRow`] = 0
+    return updater(firebase, updateObj)
+  })
+}
+
+export const updateUserToWin = (firebase, userId, type, point, winInRow) => {
+  // type should be attackWin or defenseWin
+  const userRef = firebase.ref(`/users/${userId}`)
+  return userRef.once('value')
+    .then(snapshot => {
+      const user = snapshot.val()
+      const updateObj = {
+        [`/users/${userId}/battleWin`]: user.battleWin + 1,
+        [`/users/${userId}/${type}`]: (user[type] || 0) + 1,
+        [`/users/${userId}/leaguePoint`]: user.leaguePoint + point,
+        [`/users/${userId}/colPoint_leaguePoint`]: convertNumberToStringForIndex([user.colPoint, user.leaguePoint + point]),
+        [`/users/${userId}/leaguePoint_colPoint`]: convertNumberToStringForIndex([user.leaguePoint + point, user.colPoint])
+      }
+      if (type === 'attackWin') {
+        updateObj[`/users/${userId}/winInRow`] = winInRow + 1
+        updateObj[`/users/${userId}/maxWinInRow`] = winInRow + 1 > (user.maxWinInRow || 0) ? winInRow + 1 : (user.maxWinInRow || 0)
+        updateObj[`/users/${userId}/attackLose`] = user.attackLose - 1
+        updateObj[`/users/${userId}/battleLose`] = user.battleLose - 1
+      }
+      return updater(firebase, updateObj)
+    })
 }
 
 export const getUsersByLeagueForBattle = (firebase, league) => {
-  console.log('league', league)
   const ref = firebase.ref('users')
   return ref.orderByChild('league').equalTo(league).once('value')
   .then(snapshot => Promise.resolve(snapshot.val()))
