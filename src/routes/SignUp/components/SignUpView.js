@@ -302,7 +302,6 @@ class SignUpView extends React.Component {
               helper={this.state.helper.email}
               onBlur={this._checkEmailField}
               length={4}
-              fontSize='md'
             />
             <LabelInput
               label='비밀번호'
@@ -317,7 +316,6 @@ class SignUpView extends React.Component {
               helper={this.state.helper.password}
               onBlur={this._checkPasswordField}
               length={4}
-              fontSize='md'
             />
             <LabelInput
               label='비밀번호 확인'
@@ -332,7 +330,6 @@ class SignUpView extends React.Component {
               helper={this.state.helper.passwordConfirm}
               onBlur={this._checkPasswordConfirmField}
               length={4}
-              fontSize='md'
             />
             <LabelInput
               label='닉네임'
@@ -347,7 +344,6 @@ class SignUpView extends React.Component {
               helper={this.state.helper.nickname}
               onBlur={this._checkNicknameField}
               length={4}
-              fontSize='md'
             />
           </div>
         )

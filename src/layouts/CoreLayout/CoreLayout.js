@@ -4,20 +4,32 @@ import Helmet from 'react-helmet'
 import { fromJS, is } from 'immutable'
 import { compose } from 'recompose'
 import { firebaseConnect } from 'react-redux-firebase'
+import { connect } from 'react-redux'
 
 import Header from 'components/Header'
 import Sidebar from 'components/Sidebar'
 import Footer from 'components/Footer'
+import UserModal from 'components/UserModal'
 
 import withAuth from 'hocs/withAuth'
 import withIntl from 'hocs/withIntl'
+
+import { closeUserModal } from 'store/userModal'
+
+const mapStateToProps = state => ({
+  userModal: state.userModal
+})
+
+const mapDispatchToProps = {
+  closeUserModal
+}
 
 class CoreLayout extends React.Component {
   shouldComponentUpdate (nextProps, nextState) {
     return !is(fromJS(nextProps), fromJS(this.props)) || !is(fromJS(nextState), fromJS(this.state))
   }
   render () {
-    const { children, messages, locale } = this.props
+    const { children, messages, locale, userModal, closeUserModal } = this.props
     return (
       <div>
         <Helmet
@@ -66,6 +78,10 @@ class CoreLayout extends React.Component {
           </section>
           <Footer messages={messages} locale={locale} />
         </section>
+        <UserModal
+          {...userModal}
+          close={closeUserModal}
+        />
       </div>
     )
   }
@@ -74,7 +90,9 @@ class CoreLayout extends React.Component {
 CoreLayout.propTypes = {
   children : PropTypes.element.isRequired,
   messages: PropTypes.object.isRequired,
-  locale: PropTypes.string.isRequired
+  locale: PropTypes.string.isRequired,
+  userModal: PropTypes.object.isRequired,
+  closeUserModal: PropTypes.func.isRequired
 }
 
 const wrappedCoreLayout = compose(withIntl, withAuth(false), firebaseConnect(({ auth }) => {
@@ -83,4 +101,4 @@ const wrappedCoreLayout = compose(withIntl, withAuth(false), firebaseConnect(({ 
   return defaultPaths
 }))(CoreLayout)
 
-export default wrappedCoreLayout
+export default connect(mapStateToProps, mapDispatchToProps)(wrappedCoreLayout)

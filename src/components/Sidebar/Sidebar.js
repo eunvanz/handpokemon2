@@ -46,11 +46,16 @@ class Sidebar extends React.Component {
     this.timers = {} // 크레딧이 0일 경우의 interval
   }
   componentDidMount () {
-    Visibility.change((e, state) => {
-      if (state === 'visible') {
-        this._refreshUserCredits()
-      }
-    })
+    // 화면이 디스플레이에 다시 노출 시 크레딧 리프레시
+    if (this.props.auth) {
+      Visibility.change((e, state) => {
+        if (state === 'visible') {
+          this._refreshUserCredits()
+        }
+      })
+    }
+
+    // 사이드 바 스크롤 적용
     const $ = window.$
     function scrollBar (selector, theme, mousewheelaxis) {
       $(selector).mCustomScrollbar({

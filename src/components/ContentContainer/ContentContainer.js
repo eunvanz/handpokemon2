@@ -16,7 +16,7 @@ class ContentContainer extends React.Component {
         {
           this.props.title &&
           <div className='block-header'>
-            <h1 style={{ fontSize: '23px' }}>{this.props.title}</h1>
+            <h1 style={{ fontSize: '20px' }}>{this.props.title}</h1>
           </div>
         }
         <Card stickyHeader={this.props.stickyHeader} actionHeader={this.props.actionHeader} headerBgColor={this.props.headerBgColor} header={this.props.header} body={this.props.body} clearPadding={this.props.clearPadding} />

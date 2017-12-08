@@ -43,7 +43,7 @@ class LabelInput extends React.Component {
         }
         <div className={`${this.props.length ? `col-sm-offset-${(12 - this.props.length) / 2}` : ''} col-sm-${this.props.length ? this.props.length : 10} ${this.props.floating ? 'fg-float' : ''}`} style={{ float: 'none' }}>
           <div className={`fg-line ${this.props.floating && this.props.value !== '' ? 'fg-toggled' : ''}`}>
-            <input type={this.props.type} className={`form-control input-${this.props.fontSize}`} name={this.props.name}
+            <input type={this.props.type} className={`form-control${this.props.fontSize ? ` input-${this.props.fontSize}` : ''}`} name={this.props.name}
               id={this.props.id} placeholder={this.props.placeholder} onChange={this.props.onChange}
               value={this.props.value} onBlur={this.props.onBlur} disabled={this.props.disabled} step={this.props.step}
             />
@@ -83,7 +83,8 @@ LabelInput.propTypes = {
   floating: PropTypes.bool,
   labelElement: PropTypes.element,
   fontSize: PropTypes.string,
-  step: PropTypes.number
+  step: PropTypes.number,
+  disabled: PropTypes.bool
 }
 
 export default LabelInput

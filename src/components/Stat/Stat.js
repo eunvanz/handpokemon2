@@ -21,10 +21,10 @@ class Stat extends React.Component {
     return (
       <div className='row' style={{ marginBottom: '10px' }}>
         <p className='col-xs-12 f-700' style={{ marginBottom: '0px' }}>{label} : {renderStatStack()}</p>
-        <div className='col-xs-9' style={{ paddingTop: '9px' }}>
+        <div className='col-xs-10' style={{ paddingTop: '9px' }}>
           <ProgressBar max={300} value={[preValue, value, addedValue1, addedValue2]} color={[colors.green, colors.amber, colors.orange, colors.lightBlue]} />
         </div>
-        <div className='col-xs-3 f-700'><span className='c-blue'>{preValue + value + addedValue1 + addedValue2}</span></div>
+        <div className='col-xs-2 f-700'><span className='c-blue'>{preValue + value + addedValue1 + addedValue2}</span></div>
       </div>
     )
   }

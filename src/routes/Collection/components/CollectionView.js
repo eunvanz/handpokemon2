@@ -5,8 +5,6 @@ import shallowCompare from 'react-addons-shallow-compare'
 import _ from 'lodash'
 import { Collapse } from 'react-bootstrap'
 import keygen from 'keygenerator'
-import { FormattedMessage } from 'react-intl'
-import { renderToString } from 'react-dom/server'
 
 import ContentContainer from 'components/ContentContainer'
 import Loading from 'components/Loading'
@@ -184,15 +182,6 @@ class CollectionView extends React.Component {
       title = title.replace('{name2}', `<span class='c-lightblue f-700'>${getMsg(mixCols[1].mon[mixCols[1].monId].name, locale)}</span>`)
       showAlert({
         title,
-        // title: `${renderToString(<FormattedMessage
-        //   id={`collectionView.mixAlertTitle.${locale}`}
-        //   values={{
-        //     name1: <span className='c-lightblue f-700'>{getMsg(mixCols[0].mon[mixCols[0].monId].name, locale)}</span>,
-        //     name2: <span className='c-lightblue f-700'>{getMsg(mixCols[1].mon[mixCols[1].monId].name, locale)}</span>
-        //   }}
-        // />)}`,
-        // title: `${<span>test</span>}`,
-        // title: `<span class='c-lightblue f-700'>${getMsg(mixCols[0].mon[mixCols[0].monId].name, locale)}</span>와(과) <span class='c-lightblue f-700'>${getMsg(mixCols[1].mon[mixCols[1].monId].name, locale)}</span>을(를) 교배 하시겠습니까?`,
         text: '교배하는 포켓몬의 레벨이 1 하락하고, 레벨 1의 포켓몬의 경우 영원히 사라집니다.',
         showCancelButton: true,
         confirmButtonText: '예',
@@ -210,7 +199,8 @@ class CollectionView extends React.Component {
     const { pickMonInfo, updatePickMonInfo, firebase, params } = this.props
     if (pickMonInfo && pickMonInfo.mixCols && pickMonInfo.mixCols.length === 1) updatePickMonInfo(null)
     if (!this._isMine()) {
-      firebase.unWatchEvent('value', `/userCollections/${params.userId}`)
+      console.log(`userCollections/${params.userId}`)
+      firebase.unWatchEvent('value', `userCollections/${params.userId}`)
     }
   }
   _initCollectionState () {
