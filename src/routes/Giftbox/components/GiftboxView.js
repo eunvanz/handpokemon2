@@ -24,7 +24,11 @@ class GiftboxView extends React.Component {
           else newInventory.push(Object.assign({}, item, { cnt: 1 }))
         })
       }
-      if (newInventory.length === 0) return <CenterMidContaner bodyComponent={<div>{getMsg(messages.giftboxView.empty, locale)}</div>} />
+      if (newInventory.length === 0) {
+        return <CenterMidContaner bodyComponent={
+          <div>{getMsg(messages.giftboxView.empty, locale)} <i className='far fa-frown' /></div>
+        } />
+      }
       return newInventory.map((item, idx) => <ItemCard auth={auth} user={user} key={idx} item={item} showCount />)
     }
     const renderBody = () => {

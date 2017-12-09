@@ -11,8 +11,6 @@ import ko from 'react-intl/locale-data/ko'
 import ja from 'react-intl/locale-data/ja'
 import zh from 'react-intl/locale-data/zh'
 
-// import LoadingContainer from 'components/LoadingContainer'
-
 addLocaleData([...en, ...ko, ...ja, ...zh])
 let locale = (navigator.languages && navigator.languages[0]) || navigator.language || navigator.userLanguage || 'en'
 
@@ -23,7 +21,7 @@ export default ComposedComponent => {
     }
     render () {
       const { messages, ...props } = this.props
-      if (!messages) return <div>Loading...</div>
+      if (!messages) return <div>Loading, Please Wait...</div>
       return (
         <IntlProvider locale={locale} messages={flatten(messages)}>
           <ComposedComponent messages={messages} locale={locale.slice(0, 2)} {...props} />

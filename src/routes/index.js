@@ -14,6 +14,7 @@ import Giftbox from './Giftbox'
 import ItemShop from './ItemShop'
 import Workshop from './Workshop'
 import Setting from './Setting'
+import StageManagement from './StageManagement'
 
 /*  Note: Instead of using JSX, we recommend using react-router
     PlainRoute objects to build route definitions.   */
@@ -21,7 +22,7 @@ import Setting from './Setting'
 export const createRoutes = (store) => ({
   path        : '/',
   component   : CoreLayout,
-  indexRoute  : Home,
+  indexRoute  : Home(store),
   childRoutes : [
     SignUp(store),
     SignIn(store),
@@ -35,7 +36,8 @@ export const createRoutes = (store) => ({
     Giftbox(store),
     ItemShop(store),
     Workshop(store),
-    Setting(store)
+    Setting(store),
+    StageManagement(store)
   ]
 })
 

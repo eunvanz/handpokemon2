@@ -25,7 +25,7 @@ GeneralRoulette.contextTypes = {
 
 GeneralRoulette.propTypes = {
   id: PropTypes.string.isRequired,
-  images: PropTypes.array.isRequired,
+  images: PropTypes.array,
   style: PropTypes.object,
   size: PropTypes.number.isRequired,
   innerSize: PropTypes.number

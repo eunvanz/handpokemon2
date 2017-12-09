@@ -138,7 +138,7 @@ class MonModal extends React.Component {
     const renderFooter = () => {
       return (
         <div className='text-right'>
-          <Button text='뒤집기' icon='fa fa-refresh'
+          <Button text='뒤집기' icon='fa fa-sync'
             onClick={() => this.setState({ showStat: !this.state.showStat })} />
           <Button link text='닫기' onClick={close} />
         </div>

@@ -1,21 +1,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router'
-import { connect } from 'react-redux'
-import { firebaseConnect, pathToJS } from 'react-redux-firebase'
+import { firebaseConnect } from 'react-redux-firebase'
 
-import { showAlert, isMobile } from 'utils/commonUtil'
+import { showAlert } from 'utils/commonUtil'
 
 import { logout } from 'services/UserService'
 
 import logo from './assets/logo.png'
 
-const mapStateToProps = (state) => ({
-  auth: pathToJS(state.firebase, 'auth')
-})
-
-const mapDispatchToProps = {
-}
+import withAuth from 'hocs/withAuth'
 
 class Header extends React.Component {
   constructor (props) {
@@ -24,12 +18,6 @@ class Header extends React.Component {
     }
     this._handleOnClickLogout = this._handleOnClickLogout.bind(this)
   }
-  // componentDidMount () {
-  //   const authUser = getSessionUser()
-  //   if (authUser) { // 세션에 authUser가 있을 경우 store에 세팅하고 db에서 user 가져옴
-  //     this.props.fetchUserById(authUser.id)
-  //   }
-  // }
   _handleOnClickLogout () {
     showAlert({
       title: '로그아웃 하시겠습니까?',
@@ -43,12 +31,13 @@ class Header extends React.Component {
       // expireSessionUser()
       return logout(this.props.firebase)
       .then(() => {
-        showAlert({
-          title: '다음에 또 보자구!',
-          text: '로그아웃 되었습니다.',
-          type: 'success'
-        })
         this.context.router.push('/')
+        // showAlert({
+        //   title: '다음에 또 보자구!',
+        //   text: '로그아웃 되었습니다.',
+        //   type: 'success'
+        // })
+        location.reload()
       })
       .catch(() => {
         showAlert({
@@ -110,4 +99,4 @@ Header.propTypes = {
 
 const wrappedHeader = firebaseConnect()(Header)
 
-export default connect(mapStateToProps, mapDispatchToProps)(wrappedHeader)
+export default withAuth(false)(wrappedHeader)

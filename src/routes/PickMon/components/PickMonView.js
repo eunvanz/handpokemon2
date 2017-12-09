@@ -13,13 +13,13 @@ import HonorModal from 'components/HonorModal'
 
 import { getPickMons, getNextMons } from 'services/MonService'
 import { postCollection } from 'services/CollectionService'
-import { decreaseCredit, refreshUserCredits, setUserPath } from 'services/UserService'
+import { decreaseCredit, refreshUserCredits, setUserPath, updateUserPokemoney } from 'services/UserService'
 
 import { PICK_MON_ROULETTE_DELAY, getMixGrades } from 'constants/rules'
 import { attrs as allAttrs } from 'constants/data'
 
 import { mergePickResults } from 'utils/monUtil'
-import { showAlert, countAttrsInCollections, convertMapToArr } from 'utils/commonUtil'
+import { showAlert, countAttrsInCollections, convertMapToArr, getMsg } from 'utils/commonUtil'
 
 class PickMonView extends React.Component {
   constructor (props) {
@@ -73,7 +73,6 @@ class PickMonView extends React.Component {
     }
   }
   componentWillUnmount () {
-    console.log('pickMonInfo @ componentWillUnmount in PickMonView', this.props.pickMonInfo)
     const isClickedMix = this.props.pickMonInfo && this.props.pickMonInfo.mixCols && this.props.pickMonInfo.mixCols.length === 1
     if (isClickedMix) return // 채집 결과의 MonModal에서 교배하기 버튼 눌렀을 경우 예외처리
     else this.props.clearPickMonInfo()
@@ -258,6 +257,8 @@ class PickMonView extends React.Component {
     console.log('honorsNotGot', honorsNotGot)
     const honorsNotGotType1 = []
     const honorsNotGotType2 = []
+    const updateUserHonorInfoProms = []
+    let gotPokemoney = 0
     honorsNotGot.forEach(honor => {
       if (honor.type === 1) {
         honorsNotGotType1.push(honor)
@@ -268,6 +269,11 @@ class PickMonView extends React.Component {
     for (const honorNotGotType1 of honorsNotGotType1) {
       if (honorNotGotType1.condition < user.colPoint) {
         messages.push('콜렉션 점수 상승으로 아래 칭호를 획득했습니다.')
+        if (honorNotGotType1.condition === 100) { // 100점 달성 시 추천인 포키머니 보상
+          gotPokemoney += 200
+          updateUserHonorInfoProms.push(updateUserPokemoney(firebase, user.recommender.id, 100))
+          window.swal('야호!', '추천인 코드 입력 보상으로 약속했던 추가 포키머니를 받았다!', 'success')
+        }
         honorsForModal.push(honorNotGotType1)
         isTobeGotHonorsChanged = true
         tobeGotHonors.push(honorNotGotType1)
@@ -281,16 +287,15 @@ class PickMonView extends React.Component {
         tobeGotHonors.push(honorNotGotType2)
       }
     }
-    const updateUserHonorInfoProms = []
     if (isEnabledHonorsChanged) {
       updateUserHonorInfoProms.push(setUserPath(firebase, auth.uid, 'enabledHonors', tobeEnabledHonors))
     }
     if (isTobeGotHonorsChanged) {
       updateUserHonorInfoProms.push(setUserPath(firebase, auth.uid, 'gotHonors', tobeGotHonors))
-      const gotPokemoney = _.difference(tobeGotHonors, gotHonors).reduce((accm, honor) => {
+      gotPokemoney += _.difference(tobeGotHonors, gotHonors).reduce((accm, honor) => {
         return accm + honor.reward
       }, 0)
-      updateUserHonorInfoProms.push(setUserPath(firebase, auth.uid, 'pokemoney', user.pokemoney + gotPokemoney))
+      updateUserHonorInfoProms.push(updateUserPokemoney(firebase, auth.uid, gotPokemoney))
     }
     if (updateUserHonorInfoProms.length > 0) {
       Promise.all(updateUserHonorInfoProms)
@@ -307,7 +312,7 @@ class PickMonView extends React.Component {
   }
   render () {
     const { mode } = this.state
-    const { user, pickMonInfo, auth, location, honorModal, hideHonorModal } = this.props
+    const { user, pickMonInfo, auth, location, honorModal, hideHonorModal, messages, locale } = this.props
     if (!auth) return null
     const renderBtnComponent = () => {
       return (
@@ -360,7 +365,7 @@ class PickMonView extends React.Component {
     const renderBody = () => {
       return (
         <div className='text-center'>
-          <h4>야호! 새로운 포켓몬을 발견했어!<br />과연 어떤 친구일까?</h4>
+          <h4>{getMsg(messages.pickMonView.yaho, locale)}<br />{getMsg(messages.pickMonView.curious, locale)}</h4>
           {this.state.pickedIdx > -1 && this.state.mode === 'single' && renderRoulette()}
           {
             this.state.multiPicks && this.state.mode === 'multi' &&
@@ -411,7 +416,9 @@ PickMonView.propTypes = {
   hideHonorModal: PropTypes.func.isRequired,
   honorModal: PropTypes.object.isRequired,
   honors: PropTypes.array,
-  userCollections: PropTypes.array
+  userCollections: PropTypes.array,
+  messages: PropTypes.object.isRequired,
+  locale: PropTypes.string.isRequired
 }
 
 export default PickMonView

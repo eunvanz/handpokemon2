@@ -4,6 +4,7 @@ import numeral from 'numeral'
 import { compose } from 'recompose'
 import keygen from 'keygenerator'
 import { firebaseConnect } from 'react-redux-firebase'
+import { toast } from 'react-toastify'
 
 import Img from 'components/Img'
 import CustomModal from 'components/CustomModal'
@@ -42,7 +43,8 @@ class ItemCard extends React.Component {
       }) // 아이템을 넣다가 오류났을 경우 보상로직
     })
     .then(() => {
-      window.swal({ text: getMsg(messages.itemCard.successToBuy, locale) })
+      // window.swal({ text: getMsg(messages.itemCard.successToBuy, locale) })
+      toast(getMsg(messages.itemCard.successToBuy, locale))
       this.setState({ isLoading: false, showUseItemModal: false })
     })
     .catch(msg => {
@@ -87,7 +89,8 @@ class ItemCard extends React.Component {
       })
       .then(() => {
         this.setState({ isLoading: false, showUseItemModal: false })
-        window.swal({ text: getMsg(messages.itemCard.successToUse, locale) })
+        toast.info(getMsg(messages.itemCard.successToUse, locale))
+        // window.swal({ text: getMsg(messages.itemCard.successToUse, locale) })
       })
     }
   }

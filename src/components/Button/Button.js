@@ -41,9 +41,9 @@ class Button extends React.Component {
         onClick={this.props.disabled ? null : this.props.onClick}
         data-dismiss={this.props['data-dismiss']} style={Object.assign({}, style.button, this.props.style)}
       >
-        {this.props.icon && !this.props.iconRight && <i className={this.props.loading ? 'fa fa-circle-o-notch fa-spin fa-fw' : this.props.icon} style={style.icon} />}
+        {this.props.icon && !this.props.iconRight && <i className={this.props.loading ? 'fa fa-sync fa-spin' : this.props.icon} style={style.icon} />}
         <span style={getTextStyle()}>{this.props.loading ? '진행 중...' : this.props.text}</span>
-        {this.props.icon && this.props.iconRight && <i className={this.props.loading ? 'fa fa-circle-o-notch fa-spin fa-fw' : this.props.icon} style={style.icon} />}
+        {this.props.icon && this.props.iconRight && <i className={this.props.loading ? 'fa fa-sync fa-spin' : this.props.icon} style={style.icon} />}
       </button>
     )
   }

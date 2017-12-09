@@ -109,7 +109,8 @@ class ChoosePick extends React.Component {
         generation: false,
         isEvolutable: false
       },
-      showFilterModal: false
+      showFilterModal: false,
+      isLoading: false
     }
     this._filterByAvailableCost = this._filterByAvailableCost.bind(this)
     this._handleOnSelectMon = this._handleOnSelectMon.bind(this)
@@ -177,9 +178,11 @@ class ChoosePick extends React.Component {
     return _.find(chosenPick, p => p.id === col.id)
   }
   _handleOnClickNext () {
+    this.setState({ isLoading: true })
     const { onClickNext } = this.props
     const { chosenPick } = this.state
     if (chosenPick.length !== 3) {
+      this.setState({ isLoading: false })
       return window.swal({ text: '3마리의 포켓몬을 선택해주세요.' })
     }
     onClickNext(chosenPick)
@@ -220,7 +223,7 @@ class ChoosePick extends React.Component {
   }
   render () {
     const { user, messages, locale } = this.props
-    const { currentCost, maxCost, sortedCollections, chosenPick, filterCollapse, filter } = this.state
+    const { currentCost, maxCost, sortedCollections, chosenPick, filterCollapse, filter, isLoading } = this.state
     const renderFilterBody = () => {
       const grades = {
         names: ['전체', 'BASIC', 'SPECIAL', 'RARE', 'S.RARE', 'ELITE', 'LEGEND'],
@@ -347,7 +350,7 @@ class ChoosePick extends React.Component {
                   onUnselect={() => this._handleOnUnselectMon(col)} user={user}
                   isSelected={this._findColInChosenPick(col) != null}
                   key={col.id} mon={{ asis: null, tobe: col }} type='collection'
-                  locale={locale} messages={messages}  
+                  locale={locale} messages={messages}
                 />
               )
             })
@@ -373,7 +376,7 @@ class ChoosePick extends React.Component {
         <div>
           <h2 style={{ paddingRight: '60px' }}>총 전투력: <span className='c-lightblue f-700'>{chosenPick ? numeral(chosenPick.reduce((accm, p) => accm + p.total + p.addedTotal, 0) + getHonorBurfTotal(getHonorBurf(user)) * chosenPick.length).format('0,0') : 0}</span> (코스트: <span className='c-lightblue f-700'>{currentCost}</span> / {maxCost})</h2>
           <ul className='actions' style={{ right: '20px' }}>
-            <li><Button icon='fa fa-check' text='선택완료' color='green' disabled={chosenPick.length !== 3} onClick={this._handleOnClickNext} /></li>
+            <li><Button loading={isLoading} icon='fa fa-check' text='선택완료' color='green' disabled={chosenPick.length !== 3} onClick={this._handleOnClickNext} /></li>
           </ul>
         </div>
       )

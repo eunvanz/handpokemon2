@@ -5,6 +5,7 @@ import { fromJS, is } from 'immutable'
 import { compose } from 'recompose'
 import { firebaseConnect } from 'react-redux-firebase'
 import { connect } from 'react-redux'
+import { ToastContainer, toast } from 'react-toastify'
 
 import Header from 'components/Header'
 import Sidebar from 'components/Sidebar'
@@ -62,6 +63,10 @@ class CoreLayout extends React.Component {
             },
             {
               'rel': 'stylesheet',
+              'href': '/vendors/fontawesome/web-fonts-with-css/css/fontawesome-all.min.css'
+            },
+            {
+              'rel': 'stylesheet',
               'href': '/css/inc/app_1.css'
             },
             {
@@ -81,6 +86,16 @@ class CoreLayout extends React.Component {
         <UserModal
           {...userModal}
           close={closeUserModal}
+        />
+        <ToastContainer
+          position={toast.POSITION.BOTTOM_RIGHT}
+          toastClassName='dark-toast'
+          progressClassName='transparent-progress'
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          pauseOnHover
         />
       </div>
     )

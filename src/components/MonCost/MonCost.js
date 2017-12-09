@@ -1,6 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import { colors } from 'constants/colors'
+
 class MonCost extends React.Component {
   render () {
     const { cost, ...rest } = this.props
@@ -11,11 +13,11 @@ class MonCost extends React.Component {
       let key = 0
       for (let i = 0; i < 5; i++) {
         if (cost <= 5) {
-          fullStar = <i key={key++} className='fa fa-star fa-2' />
-          emptyStar = <i key={key++} className='fa fa-star-o fa-2' />
+          fullStar = <i key={key++} className='fa fa-star' />
+          emptyStar = <i key={key++} className='fa fa-star' style={{ color: colors.lightGray }} />
         } else {
-          fullStar = <i key={key++} className='fa fa-star fa-2 c-amber' />
-          emptyStar = <i key={key++} className='fa fa-star fa-2' />
+          fullStar = <i key={key++} className='fa fa-star c-amber' />
+          emptyStar = <i key={key++} className='fa fa-star' />
         }
         if (cost === 5 || cost === 10) {
           resultComponent.push(fullStar)

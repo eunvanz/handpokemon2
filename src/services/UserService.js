@@ -17,10 +17,21 @@ export const isDupNickname = (firebase, nickname) => {
   .then(snapshot => Promise.resolve(snapshot.val()))
 }
 
+export const isValidRecommenderCode = (firebase, code) => {
+  const ref = firebase.ref('users')
+  return ref.orderByChild('recommenderCode').equalTo(code).once('value')
+  .then(snapshot => Promise.resolve(snapshot.val()))
+}
+
 export const signUp = (firebase, user) => {
   const { password, ...userToSave } = user
   // 랭킹기록 해야함
   return firebase.createUser({ email: user.email, password }, userToSave)
+}
+
+export const signUpWithSocialAccount = (firebase, uid, user) => {
+  const ref = firebase.ref(`/users/${uid}`)
+  return ref.set(user).then(() => Promise.resolve(user))
 }
 
 export const getUserIdByEmail = (firebase, email) => {

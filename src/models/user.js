@@ -34,6 +34,7 @@ export default class User {
     this.battleSpeed = 2
     this.inventory = []
     this.maxWinInRow = 0
-    this.recommenderCode = keygen._()
+    this.recommenderCode = keygen.password()
+    this.isSocialAccount = false
   }
 }

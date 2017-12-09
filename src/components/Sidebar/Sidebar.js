@@ -21,11 +21,12 @@ import { postHonor } from 'services/HonorService'
 import { updateMon } from 'services/MonService'
 import { postItem } from 'services/ItemService'
 
-import { convertTimeToMMSS, getAuthUserFromFirebase, getMsg } from 'utils/commonUtil'
+import { convertTimeToMMSS, getAuthUserFromFirebase, getMsg, getThumbnailImageUrl } from 'utils/commonUtil'
 
 import { receiveCreditInfo } from 'store/creditInfo'
 
 import withMons from 'hocs/withMons'
+import withAuth from 'hocs/withAuth'
 
 class Sidebar extends React.Component {
   constructor (props) {
@@ -83,7 +84,7 @@ class Sidebar extends React.Component {
   componentDidUpdate (prevProps, prevState) {
     const { user } = this.props
     const { timeouts } = this
-    if (prevProps.user && !prevProps.user.nickname && user && user.nickname) { // user가 로그인 했을경우 크레딧을 리프레시해서 가져옴
+    if ((!prevProps.user && user) || (prevProps.user && !prevProps.user.nickname && user && user.nickname)) { // user가 로그인 했을경우 크레딧을 리프레시해서 가져옴
       this._refreshUserCredits()
     } else if (prevProps.user && user) { // 크레딧에 변화가 있을 경우 다시 시간 계산해서 interval 및 timeout 실행
       if (prevProps.user.pickCredit !== user.pickCredit) {
@@ -103,6 +104,7 @@ class Sidebar extends React.Component {
   }
   _refreshUserCredits () {
     const { firebase, auth, user, receiveCreditInfo } = this.props
+    if (!auth) return
     refreshUserCredits(firebase, auth.uid, user)
     .then(creditInfo => {
       const { pickCredit, battleCredit, adventureCredit } = creditInfo
@@ -247,9 +249,9 @@ class Sidebar extends React.Component {
             <div className='s-profile'>
               <a data-ma-action='profile-menu-toggle'>
                 <div className='sp-pic'>
-                  <img src={user ? user.profileImage : DEFAULT_PROFILE_IMAGE_URL} className='mCS_img_loaded' />
+                  <img src={user ? (user.profileImageKey ? getThumbnailImageUrl(user.profileImage) : user.profileImage) : DEFAULT_PROFILE_IMAGE_URL} className='mCS_img_loaded' />
                 </div>
-                <div className='sp-info' style={{ marginTop: '16px' }}>
+                <div className='sp-info' style={{ marginTop: '18px' }}>
                   {user ? user.nickname : '로그인을 해주세요.'} {user && <i className='zmdi zmdi-caret-down' />}
                 </div>
               </a>
@@ -263,50 +265,50 @@ class Sidebar extends React.Component {
             </div>
             <ul className='main-menu'>
               <li className='f-700'>
-                <Link to='/' onClick={() => $('.ma-backdrop').click()}><i className='fa fa-home' style={{ fontSize: '22px' }} /> {messages.sidebar.home[locale]}</Link>
+                <Link to='/' onClick={() => $('.ma-backdrop').click()}><i><i className='fa fa-home' style={{ fontSize: '18px' }} /></i> {getMsg(messages.sidebar.home, locale)}</Link>
               </li>
               {
                 auth &&
                 <li className='f-700'>
-                  <Link to='/honor' onClick={() => $('.ma-backdrop').click()}><i className='fa fa-bookmark' style={{ fontSize: '22px' }} /> {messages.sidebar.achievements[locale]}</Link>
+                  <Link to='/honor' onClick={() => $('.ma-backdrop').click()}><i><i className='fa fa-bookmark' style={{ fontSize: '18px' }} /></i> {getMsg(messages.sidebar.achievements, locale)}</Link>
                 </li>
               }
               {
                 auth &&
                 <li className='f-700'>
-                  <Link to={`/collection/${auth.uid}`} onClick={() => $('.ma-backdrop').click()}><i className='zmdi zmdi-apps' style={{ fontSize: '22px' }} /> {getMsg(messages.sidebar.collections, locale)}</Link>
+                  <Link to={`/collection/${auth.uid}`} onClick={() => $('.ma-backdrop').click()}><i><i className='fa fa-th' style={{ fontSize: '18px' }} /></i> {getMsg(messages.sidebar.collections, locale)}</Link>
                 </li>
               }
               {
                 auth &&
                 <li className='f-700'>
                   <Link to='/giftbox' onClick={() => $('.ma-backdrop').click()}>
-                    <i className='fa fa-gift' style={{ fontSize: '22px' }} /> 내 선물함
+                    <i><i className='fa fa-gift' style={{ fontSize: '18px' }} /></i> 내 선물함
                     {user.inventory && user.inventory.length > 0 && <Badge color='lightblue' text={String(user.inventory.length)} />}
                   </Link>
                 </li>
               }
               <li className='f-700'>
                 <Link to='/pick-district' onClick={() => $('.ma-backdrop').click()}>
-                  <i className='fa fa-paw' style={{ fontSize: '22px' }} /> 포켓몬 채집
+                  <i><i className='fa fa-paw' style={{ fontSize: '18px' }} /></i> 포켓몬 채집
                   {renderCreditBadge('pick')}
                 </Link>
               </li>
               <li className='f-700'>
                 <Link to='/'>
-                  <i className='fa fa-map-o' style={{ fontSize: '22px' }} /> 포켓몬 탐험
+                  <i><i className='fa fa-compass' style={{ fontSize: '18px' }} /></i> 포켓몬 탐험
                   {renderCreditBadge('adventure')}
                 </Link>
               </li>
               <li className='f-700'>
                 <Link to='/battle' onClick={() => $('.ma-backdrop').click()}>
-                  <i className='fa fa-gamepad' style={{ fontSize: '22px' }} /> 포켓몬 시합
+                  <i><i className='fa fa-gamepad' style={{ fontSize: '18px' }} /></i> 포켓몬 시합
                   {renderCreditBadge('battle')}
                 </Link>
               </li>
               <li className='f-700'>
                 <Link to='/item-shop' onClick={() => $('.ma-backdrop').click()}>
-                  <i className='fa fa-shopping-cart' style={{ fontSize: '22px' }} /> 상점
+                  <i><i className='fa fa-shopping-cart' style={{ fontSize: '18px' }} /></i> 상점
                   {
                     user && <Badge color='amber' text={`${numeral(user.pokemoney || 0).format('0,0')}P`} />
                   }
@@ -314,7 +316,7 @@ class Sidebar extends React.Component {
               </li>
               <li className='sub-menu f-700'>
                 <a style={{ cursor: 'pointer' }}
-                  data-ma-action='submenu-toggle'><i className='fa fa-trophy' style={{ fontSize: '22px' }} /> 랭킹</a>
+                  data-ma-action='submenu-toggle'><i><i className='fa fa-trophy-alt' style={{ fontSize: '18px' }} /></i> 랭킹</a>
                 <ul style={{ display: 'none' }}>
                   <li><Link to='/ranking/collection' onClick={() => $('.ma-backdrop').click()}>콜렉션 랭킹</Link></li>
                   <li><Link to='/ranking/battle' onClick={() => $('.ma-backdrop').click()}>시합 랭킹</Link></li>
@@ -322,29 +324,32 @@ class Sidebar extends React.Component {
               </li>
               <li className='sub-menu f-700'>
                 <a style={{ cursor: 'pointer' }}
-                  data-ma-action='submenu-toggle'><i className='fa fa-comments' style={{ fontSize: '22px' }} /> 커뮤니티</a>
+                  data-ma-action='submenu-toggle'><i><i className='fa fa-comments' style={{ fontSize: '18px' }} /></i> 커뮤니티</a>
                 <ul style={{ display: 'none' }}>
                   <li><Link to='/'>공지사항</Link></li>
                   <li><Link to='/'>게시판</Link></li>
                 </ul>
               </li>
               <li className='f-700'>
-                <Link to='/workshop'><i className='fa fa-paint-brush' style={{ fontSize: '22px' }} /> 포켓몬 공작소</Link>
+                <Link to='/workshop'><i><i className='fa fa-paint-brush' style={{ fontSize: '18px' }} /></i> 포켓몬 공작소</Link>
               </li>
               <li className='f-700'>
-                <Link to='/'><i className='fa fa-book' style={{ fontSize: '22px' }} /> 게임가이드</Link>
+                <Link to='/'><i><i className='fa fa-book' style={{ fontSize: '18px' }} /></i> 게임가이드</Link>
               </li>
               <li className='f-700'>
-                <Link to='/forbidden-area'><i className='fa fa-lock' style={{ fontSize: '22px' }} /> 포켓몬관리</Link>
+                <Link to='/forbidden-area'><i><i className='fa fa-lock' style={{ fontSize: '18px' }} /></i> 포켓몬관리</Link>
+              </li>
+              <li className='f-700'>
+                <Link to='/stage-management'><i><i className='fa fa-lock' style={{ fontSize: '18px' }} /></i> 스테이지관리</Link>
               </li>
               {/* <li className='f-700'>
-                <a onClick={() => updateUserIndexes(this.props.firebase)}><i className='fa fa-lock' style={{ fontSize: '22px' }} /> 일회용</a>
+                <a onClick={() => updateUserIndexes(this.props.firebase)}><i className='fa fa-lock' style={{ fontSize: '18px' }} /> 일회용</a>
                 </li> */}
               {/* <li className='f-700'>
-                <a onClick={this._handleOnClickPostHonor}><i className='fa fa-lock' style={{ fontSize: '22px' }} /> 아이템생성</a>
+                <a onClick={this._handleOnClickPostHonor}><i className='fa fa-lock' style={{ fontSize: '18px' }} /> 아이템생성</a>
               </li> */}
               {/* <li className='f-700'>
-                <a onClick={this._handleOnClickRestructureMon}><i className='fa fa-lock' style={{ fontSize: '22px' }} /> 몬구조변환</a>
+                <a onClick={this._handleOnClickRestructureMon}><i className='fa fa-lock' style={{ fontSize: '18px' }} /> 몬구조변환</a>
               </li> */}
             </ul>
           </div>
@@ -376,7 +381,6 @@ Sidebar.propTypes = {
 
 const mapStateToProps = (state) => {
   return {
-    ...getAuthUserFromFirebase(state),
     creditInfo: state.creditInfo
   }
 }
@@ -387,6 +391,6 @@ const mapDispatchToProps = {
 
 // const wrappedSidebar = connect(({ firebase }) => ({ auth: pathToJS(firebase, 'auth') }))(Sidebar)
 
-const wrappedSidebar = compose(firebaseConnect(), withMons)(Sidebar)
+const wrappedSidebar = compose(firebaseConnect(), withAuth(false), withMons)(Sidebar)
 
 export default connect(mapStateToProps, mapDispatchToProps)(wrappedSidebar)

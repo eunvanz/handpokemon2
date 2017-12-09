@@ -8,7 +8,7 @@ import GeneralRoulette from 'components/GeneralRoulette'
 import Img from 'components/Img'
 import MonUnit from './MonUnit'
 
-import { isScreenSize } from 'utils/commonUtil'
+import { isScreenSize, getMsg } from 'utils/commonUtil'
 
 import { colors } from 'constants/colors'
 import { fontSizeByDamage } from 'constants/styles'
@@ -63,7 +63,7 @@ class BattleStage extends React.Component {
     return shallowCompare(this, nextProps, nextState)
   }
   _initAnimation () {
-    const { battleLog, onClickNext } = this.props
+    const { battleLog, onClickNext, messages, locale } = this.props
     const { damages } = this.state
     const $ = window.$
     const monSize = $('#user-1 img').width()
@@ -138,8 +138,11 @@ class BattleStage extends React.Component {
             if (idx + 1 < battleLog.turns.length) {
               runTurn(idx + 1)
             } else {
-              const html = `<span class="c-blue f-700" style="font-size: 16px;">${this.props[battleLog.winner].nickname}</span>님이 승리했습니다.`
-              window.swal({ html, confirmButtonText: '확인' }).then(() => onClickNext(speed)).catch(() => onClickNext(speed))
+              const type = battleLog.winner === 'user' ? 'success' : 'error'
+              const title = battleLog.winner === 'user' ? getMsg(messages.battleView.goodjob, locale) : getMsg(messages.battleView.lost, locale)
+              const html = getMsg(messages.battleView.winnerIs, locale).replace('{name}', `<span class="c-blue f-700" style="font-size: 16px;">${this.props[battleLog.winner].nickname}</span>`)
+              window.swal({ title, html, confirmButtonText: '확인', type })
+              .then(() => onClickNext(speed)).catch(() => onClickNext(speed))
             }
           }, (2 * movementSpeed + afterAttackDelay + termToNext) * speedVar)
   
@@ -319,7 +322,8 @@ BattleStage.propTypes = {
   enemy: PropTypes.object.isRequired,
   enemyPicks: PropTypes.array.isRequired,
   onClickNext: PropTypes.func.isRequired,
-  locale: PropTypes.string.isRequired
+  locale: PropTypes.string.isRequired,
+  messages: PropTypes.object.isRequired
 }
 
 export default BattleStage

@@ -13,14 +13,16 @@ import Loading from 'components/Loading'
 import AvatarImgInput from 'components/AvatarImgInput'
 import WarningText from 'components/WarningText'
 
-import { isDupEmail, isDupNickname, signUp, getUserIdByEmail } from 'services/UserService'
+import { isDupEmail, isDupNickname, signUp, getUserIdByEmail, signUpWithSocialAccount,
+  isValidRecommenderCode } from 'services/UserService'
 import { getStartPick } from 'services/MonService'
 import { postImage } from 'services/ImageService'
 import { postCollection } from 'services/CollectionService'
 
 import { DEFAULT_PROFILE_IMAGE_URL, PROFILE_IMAGE_ROOT } from 'constants/urls'
 
-import { showAlert, dataURItoBlob, isIE, getSeqPromise, isStringLength } from 'utils/commonUtil'
+import { showAlert, dataURItoBlob, isIE, getSeqPromise, isStringLength, getMsg, isScreenSize,
+  flattenFirebaseObject } from 'utils/commonUtil'
 
 import User from 'models/user'
 
@@ -28,31 +30,36 @@ class SignUpView extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
+      isSocialAccount: props.user !== null,
       step: 1,
       formData: {
         email: '',
         password: '',
         passwordConfirm: '',
         nickname: '',
-        introduce: ''
+        introduce: '',
+        recommenderCode: ''
       },
       isValid: { // 0: 입력 전, 1: 유효, -1: 유효하지 않음
-        email: 0,
-        password: 0,
-        passwordConfirm: 0,
-        nickname: 0
+        email: props.user && props.user.email ? 1 : 0,
+        password: props.user && props.user.email ? 1 : 0,
+        passwordConfirm: props.user && props.user.email ? 1 : 0,
+        nickname: 0,
+        recommenderCode: 0
       },
       helper: {
         email: null,
         password: null,
         passwordConfirm: null,
-        nickname: null
+        nickname: null,
+        recommenderCode: null
       },
       startPick: null,
       loading: false,
       profileImageFile: null,
       isApplicable: false,
-      signUpProcess: false
+      signUpProcess: false,
+      recommender: null
     }
     this._handleOnChangeInput = this._handleOnChangeInput.bind(this)
     this._checkEmailField = this._checkEmailField.bind(this)
@@ -64,6 +71,11 @@ class SignUpView extends React.Component {
     this._handleOnClickPrev = this._handleOnClickPrev.bind(this)
     this._checkNicknameField = this._checkNicknameField.bind(this)
     this._handleOnClickPick = this._handleOnClickPick.bind(this)
+    this._handleOnClickSignInWith = this._handleOnClickSignInWith.bind(this)
+    this._checkRecommenderCode = this._checkRecommenderCode.bind(this)
+  }
+  componentDidUpdate (prevProps, prevState) {
+    if (this.props.user && this.props.user.nickname) this.context.router.push('/')
   }
   _handleOnChangeInput (e) {
     let { name, value } = e.target
@@ -72,6 +84,7 @@ class SignUpView extends React.Component {
     this.setState({ formData: formData.set(name, value).toJS() })
   }
   _checkEmailField () {
+    if (this.state.isSocialAccount) return true
     const { firebase } = this.props
     let email = this.state.formData.email
     let message = ''
@@ -136,6 +149,7 @@ class SignUpView extends React.Component {
     })
   }
   _checkPasswordField () {
+    if (this.state.isSocialAccount) return true
     const password = this.state.formData.password
     let message = ''
     if (validator.isEmpty(password)) message = '비밀번호를 입력해주세요.'
@@ -150,6 +164,7 @@ class SignUpView extends React.Component {
     }
   }
   _checkPasswordConfirmField () {
+    if (this.state.isSocialAccount) return true
     const password = this.state.formData.passwordConfirm
     let message = ''
     if (validator.isEmpty(password)) message = '비밀번호를 입력해주세요.'
@@ -163,6 +178,22 @@ class SignUpView extends React.Component {
       this._setValidAndHelper('passwordConfirm', null, 'success')
       return true
     }
+  }
+  _checkRecommenderCode () {
+    const { firebase } = this.props
+    const code = this.state.formData.recommenderCode
+    isValidRecommenderCode(firebase, code)
+    .then(user => {
+      if (user) {
+        const recommender = flattenFirebaseObject(user)
+        this.setState({ recommender: recommender })
+        this._setValidAndHelper('recommenderCode', null, 'success')
+        return true
+      } else {
+        this._setValidAndHelper('recommenderCode', '존재하지 않는 코드입니다.', 'error')
+        return false
+      }
+    })
   }
   _setValidAndHelper (field, message, has) {
     const isValid = fromJS(this.state.isValid)
@@ -184,36 +215,39 @@ class SignUpView extends React.Component {
   }
   _processSignUp () {
     this.setState({ signUpProcess: true })
-    const { firebase } = this.props
-    const { formData, profileImageFile } = this.state
+    const { firebase, auth } = this.props
+    const { formData, profileImageFile, isSocialAccount, recommender } = this.state
     let postProfileImage = () => Promise.resolve()
     if (profileImageFile) {
       postProfileImage = () => postImage(firebase, PROFILE_IMAGE_ROOT, [profileImageFile])
     }
     let profileImageUrl = DEFAULT_PROFILE_IMAGE_URL
+    let profileImageKey = null
     postProfileImage()
     .then(res => {
       if (profileImageFile) {
         profileImageUrl = res[0].File.downloadURL
+        profileImageKey = res[0].key
       }
       let user = {
-        email: formData.email,
+        email: isSocialAccount ? this.props.user.providerData[0].email : formData.email,
         password: formData.password,
         nickname: formData.nickname,
         profileImage: profileImageUrl,
-        introduce: formData.introduce
+        profileImageKey: profileImageKey,
+        introduce: formData.introduce,
+        isSocialAccount,
+        recommender
       }
       user = Object.assign({}, new User(), user)
+      if (isSocialAccount) return signUpWithSocialAccount(firebase, auth.uid, user)
       return signUp(firebase, user)
     })
     .then(user => {
-      console.log('user', user)
       return getUserIdByEmail(firebase, user.email)
     })
     .then(userId => {
-      console.log('userId', userId)
       const { startPick } = this.state
-      console.log('startPick', startPick)
       const promArr = startPick.map(col => () => postCollection(firebase, userId, col, 'signUp'))
       return getSeqPromise(promArr)
     })
@@ -264,12 +298,16 @@ class SignUpView extends React.Component {
     getStartPick(firebase)
     .then(startPick => {
       this.setState({ startPick })
-      console.log('startPick', startPick)
       this.setState({ loading: false })
       if (!this.state.isApplicable) this.setState({ isApplicable: true })
     })
   }
+  _handleOnClickSignInWith (provider) {
+    const { firebase } = this.props
+    firebase.login({ provider })
+  }
   render () {
+    const { messages, locale } = this.props
     const renderPickedMon = () => {
       const { startPick, loading } = this.state
       if (loading) return <Loading height={242} />
@@ -284,53 +322,72 @@ class SignUpView extends React.Component {
       })
     }
     const renderTab = () => {
-      const { step } = this.state
+      const { step, isSocialAccount } = this.state
       let resultComponent = null
       if (step === 1) {
         resultComponent = (
           <div className='form-horizontal'>
-            <LabelInput
-              label='이메일주소'
-              id='email'
-              name='email'
-              type='email'
-              placeholder='example@handpokemon.com'
-              onChange={this._handleOnChangeInput}
-              value={this.state.formData.email}
-              has={this._getHas('email')}
-              feedback
-              helper={this.state.helper.email}
-              onBlur={this._checkEmailField}
-              length={4}
-            />
-            <LabelInput
-              label='비밀번호'
-              id='password'
-              name='password'
-              type='password'
-              placeholder='6~20자의 영문, 숫자 및 특수문자'
-              onChange={this._handleOnChangeInput}
-              value={this.state.formData.password}
-              has={this._getHas('password')}
-              feedback
-              helper={this.state.helper.password}
-              onBlur={this._checkPasswordField}
-              length={4}
-            />
-            <LabelInput
-              label='비밀번호 확인'
-              id='passwordConfirm'
-              name='passwordConfirm'
-              type='password'
-              placeholder='6~20자의 영문, 숫자 및 특수문자'
-              onChange={this._handleOnChangeInput}
-              value={this.state.formData.passwordConfirm}
-              has={this._getHas('passwordConfirm')}
-              feedback
-              helper={this.state.helper.passwordConfirm}
-              onBlur={this._checkPasswordConfirmField}
-              length={4}
-            />
+            {
+              !isSocialAccount &&
+              <div>
+                <LabelInput
+                  label='이메일주소'
+                  id='email'
+                  name='email'
+                  type='email'
+                  placeholder='example@handpokemon.com'
+                  onChange={this._handleOnChangeInput}
+                  value={this.state.formData.email}
+                  has={this._getHas('email')}
+                  feedback
+                  helper={this.state.helper.email}
+                  onBlur={this._checkEmailField}
+                  length={4}
+                />
+                {
+                  this.state.formData.email.length === 0 &&
+                  <div className='form-group'>
+                    <div className='col-sm-offset-4 col-sm-8 m-b-25' style={{ padding: isScreenSize.xs() ? '0px' : null }}>
+                      <p className='m-b-10'>{getMsg(messages.signUpView.signUpWith, locale)}</p>
+                      <Button icon='zmdi zmdi-google' text='google' color='red' style={{ width: '120px' }}
+                        onClick={() => this._handleOnClickSignInWith('google')}
+                      />
+                      <Button className='m-l-5' icon='zmdi zmdi-facebook' text='facebook' color='blue' style={{ width: '120px' }}
+                        onClick={() => this._handleOnClickSignInWith('facebook')}
+                      />
+                    </div>
+                  </div>
+                }
+                <LabelInput
+                  label='비밀번호'
+                  id='password'
+                  name='password'
+                  type='password'
+                  placeholder='6~20자의 영문, 숫자 및 특수문자'
+                  onChange={this._handleOnChangeInput}
+                  value={this.state.formData.password}
+                  has={this._getHas('password')}
+                  feedback
+                  helper={this.state.helper.password}
+                  onBlur={this._checkPasswordField}
+                  length={4}
+                />
+                <LabelInput
+                  label='비밀번호 확인'
+                  id='passwordConfirm'
+                  name='passwordConfirm'
+                  type='password'
+                  placeholder='6~20자의 영문, 숫자 및 특수문자'
+                  onChange={this._handleOnChangeInput}
+                  value={this.state.formData.passwordConfirm}
+                  has={this._getHas('passwordConfirm')}
+                  feedback
+                  helper={this.state.helper.passwordConfirm}
+                  onBlur={this._checkPasswordConfirmField}
+                  length={4}
+                />
+              </div>
+            }
             <LabelInput
               label='닉네임'
               id='nickname'
@@ -350,6 +407,20 @@ class SignUpView extends React.Component {
       } else if (step === 2) {
         resultComponent = (
           <div>
+            <LabelInput
+              label='추천인 코드'
+              id='recommenderCode'
+              name='recommenderCode'
+              type='text'
+              onChange={this._handleOnChangeInput}
+              value={this.state.formData.recommenderCode}
+              has={this._getHas('recommenderCode')}
+              feedback
+              helper={this.state.helper.recommenderCode}
+              onBlur={this._checkRecommenderCode}
+              length={6}
+              floating
+            />
             <p className='col-sm-offset-3 col-sm-6 f-700'>자기소개</p>
             <div className='col-sm-offset-3 col-sm-6'>
               <TextArea
@@ -445,7 +516,11 @@ SignUpView.contextTypes = {
 
 SignUpView.propTypes = {
   firebase: PropTypes.object.isRequired,
-  receiveUser: PropTypes.func.isRequired
+  receiveUser: PropTypes.func.isRequired,
+  user: PropTypes.object,
+  auth: PropTypes.object,
+  messages: PropTypes.object.isRequired,
+  locale: PropTypes.string.isRequired
 }
 
 export default SignUpView

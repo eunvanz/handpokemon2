@@ -41,7 +41,7 @@ class WorkshopCard extends React.Component {
     const renderLikeButton = () => {
       return (
         <div className='c-info text-center' style={{ margin: '5px 0px', position: 'relative' }}>
-          <Button link onClick={onClickLike} icon={auth && findIndex(item.whoLikes, e => e === auth.uid) > -1 ? 'fa fa-heart' : 'fa fa-heart-o'} text={numeral(item.likes).format('0,0')} size='lg' style={{ padding: '4px 14px', color: colors.pink }} />
+          <Button link onClick={onClickLike} icon={auth && findIndex(item.whoLikes, e => e === auth.uid) > -1 ? 'fas fa-heart' : 'far fa-heart'} text={numeral(item.likes).format('0,0')} size='lg' style={{ padding: '4px 14px', color: colors.pink }} />
         </div>
       )
     }

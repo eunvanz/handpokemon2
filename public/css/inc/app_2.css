@@ -3447,3 +3447,12 @@ html.ie9 .mCS-minimal-dark.mCSB_scrollTools_onDrag .mCSB_dragger .mCSB_dragger_b
   border-color: #d7d7d7;
   color: #a8a8a8;
 }
+
+.dark-toast {
+  background-color: #323232;
+  color: #fff;
+}
+
+.transparent-progress {
+  background: rgba(255, 255, 255, 0.5)
+}

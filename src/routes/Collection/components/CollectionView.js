@@ -199,7 +199,6 @@ class CollectionView extends React.Component {
     const { pickMonInfo, updatePickMonInfo, firebase, params } = this.props
     if (pickMonInfo && pickMonInfo.mixCols && pickMonInfo.mixCols.length === 1) updatePickMonInfo(null)
     if (!this._isMine()) {
-      console.log(`userCollections/${params.userId}`)
       firebase.unWatchEvent('value', `userCollections/${params.userId}`)
     }
   }

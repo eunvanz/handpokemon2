@@ -1,19 +1,20 @@
-import { connect } from 'react-redux'
 import { firebaseConnect } from 'react-redux-firebase'
+import { connect } from 'react-redux'
+import { compose } from 'recompose'
 
 import SignInView from '../components/SignInView'
 
 import { getAuthUserFromFirebase } from 'utils/commonUtil'
 
-const mapDispatchToProps = {
+import withIntl from 'hocs/withIntl'
+
+const wrappedSignInView = compose(
+  firebaseConnect(),
+  withIntl
+)(SignInView)
+
+const mapStateToProps = state => {
+  return { ...getAuthUserFromFirebase(state) }
 }
 
-const mapStateToProps = (state) => {
-  return ({
-    ...getAuthUserFromFirebase(state)
-  })
-}
-
-const wrappedSignInView = firebaseConnect()(SignInView)
-
-export default connect(mapStateToProps, mapDispatchToProps)(wrappedSignInView)
+export default connect(mapStateToProps, null)(wrappedSignInView)

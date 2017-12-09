@@ -188,16 +188,28 @@ export const getHonorBurf = user => {
       result[i] += honor.burf[i]
     }
   })
-  console.log('getHonorBurf', result)
   return result
 }
 
 export const getHonorBurfTotal = honorBurf => {
   const honorTotal = honorBurf ? honorBurf.reduce((accm, burf) => accm + burf, 0) : 0
-  console.log('honorTotal', honorTotal)
   return honorTotal
 }
 
 export const getMsg = (message, locale) => {
   return message[locale] || message.en
+}
+
+export const getImageNameFromUrl = url => {
+  return url.substring(url.indexOf('%2F') + 3, url.indexOf('?alt'))
+}
+
+export const getThumbnailImageUrl = url => {
+  const imageName = getImageNameFromUrl(url)
+  return url.replace(imageName, `thumb_${imageName}`)
+}
+
+export const flattenFirebaseObject = obj => {
+  const key = Object.keys(obj)[0]
+  return Object.assign({}, obj[key], { id: key })
 }

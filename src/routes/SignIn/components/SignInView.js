@@ -3,10 +3,13 @@ import PropTypes from 'prop-types'
 import { Link } from 'react-router'
 import { fromJS } from 'immutable'
 import validator from 'validator'
+import { toast } from 'react-toastify'
 
 import { signIn } from 'services/UserService'
 
-import { showAlert } from 'utils/commonUtil'
+import { showAlert, getMsg, isScreenSize } from 'utils/commonUtil'
+
+import Button from 'components/Button'
 
 class SignInView extends React.Component {
   constructor (props) {
@@ -24,8 +27,18 @@ class SignInView extends React.Component {
     this._checkEmailField = this._checkEmailField.bind(this)
     this._checkPasswordField = this._checkPasswordField.bind(this)
     this._loginProcess = this._loginProcess.bind(this)
+    this._handleOnClickSignInWith = this._handleOnClickSignInWith.bind(this)
   }
   componentDidMount () {
+    const { auth, user } = this.props
+    let isSocialAccount = false
+    if (auth && auth.providerData[0].providerId !== 'password') isSocialAccount = true
+    if (isSocialAccount) {
+      if (!user.nickname) {
+        // 소셜계정이지만 아직 회원가입을 안했을 때의 처리
+        this.context.router.push('sign-up')
+      }
+    }
     if (this.props.user) this.context.router.push('/') // 로그인 상태일 경우 메인화면으로
     const $ = window.$
     $('body').on('focus', '.fg-line .form-control', function () {
@@ -104,7 +117,12 @@ class SignInView extends React.Component {
       })
     })
   }
+  _handleOnClickSignInWith (provider) {
+    const { firebase } = this.props
+    firebase.login({ provider })
+  }
   render () {
+    const { messages, locale } = this.props
     return (
       <div className='text-center'
         style={{ backgroundColor: '#f3f3f3', height: `${300}px`, minHeight: '300px' }}>
@@ -136,8 +154,17 @@ class SignInView extends React.Component {
             <a onClick={this.state.isLoading ? null : this._handleOnClickLogin}
               className={`btn btn-login btn-success btn-float waves-effect waves-circle waves-float`}
               style={{ lineHeight: '2.5em', marginTop: '-50px', cursor: this.state.isLoading ? 'default' : 'pointer' }}>
-              <i className={this.state.isLoading ? 'fa fa-circle-o-notch fa-spin fa-fw' : 'zmdi zmdi-arrow-forward'} />
+              <i className={this.state.isLoading ? 'zmdi zmdi-refresh zmdi-hc-spin' : 'zmdi zmdi-arrow-forward'} />
             </a>
+            <div>
+              <p>{getMsg(messages.signInView.signInWith, locale)}</p>
+              <Button className='m-l-5' icon='zmdi zmdi-google' text='google' color='red' style={{ width: isScreenSize.xs() ? null : '120px' }} size={isScreenSize.xs() ? 'xs' : null} block={isScreenSize.xs()}
+                onClick={() => this._handleOnClickSignInWith('google')}
+              />
+              <Button className='m-l-5' icon='zmdi zmdi-facebook' text='facebook' color='blue' style={{ width: isScreenSize.xs() ? null : '120px' }} size={isScreenSize.xs() ? 'xs' : null} block={isScreenSize.xs()}
+                onClick={() => this._handleOnClickSignInWith('facebook')}
+              />
+            </div>
           </div>
           <div className='lcb-navigation'>
             <Link to='/sign-up' data-ma-block='#l-register'
@@ -163,7 +190,10 @@ SignInView.contextTypes = {
 
 SignInView.propTypes = {
   firebase: PropTypes.object.isRequired,
-  user: PropTypes.object
+  user: PropTypes.object,
+  messages: PropTypes.object.isRequired,
+  locale: PropTypes.string.isRequired,
+  auth: PropTypes.object
 }
 
 export default SignInView

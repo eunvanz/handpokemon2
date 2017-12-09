@@ -5,6 +5,7 @@ import validator from 'validator'
 import { fromJS } from 'immutable'
 import keygen from 'keygenerator'
 import { findIndex } from 'lodash'
+import { toast } from 'react-toastify'
 
 import ContentContainer from 'components/ContentContainer'
 import Button from 'components/Button'
@@ -76,7 +77,7 @@ class WorkshopView extends React.Component {
       else return updateWorkshop(firebase, workshop)
     })
     .then(() => {
-      window.swal({ text: getMsg(messages.workshop.registerComplete, locale) })
+      toast(getMsg(messages.workshop.registerComplete, locale))
       this.setState({ isLoading: false, showRegisterModal: false })
     })
     .catch(msg => {

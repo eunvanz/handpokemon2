@@ -15,6 +15,8 @@ import Pick from 'bizs/Pick'
 import { setUserPath, updateUserToLose, decreaseCredit, updateUserToWin,
   getUserRankingByUserId } from 'services/UserService'
 
+import { getMsg } from 'utils/commonUtil'
+
 class BattleView extends React.Component {
   constructor (props) {
     super(props)
@@ -41,24 +43,25 @@ class BattleView extends React.Component {
     clearBattle()
   }
   _handleOnClickReady () {
-    const { fetchCandidates, auth, user, firebase } = this.props
-    // 유저의 패배를 기록
+    const { user } = this.props
+    this.setState({ step: 2, chosenEnemy: null, winInRow: user.winInRow, battleResultInfo: null })
+  }
+  _handleOnClickPickNext (userPick) {
+    const { setUserPicks, firebase, auth, fetchCandidates, messages, locale, user } = this.props
     decreaseCredit(firebase, auth.uid, 1, 'battle')
     .then(() => {
-      this.setState({ step: 2, chosenEnemy: null, winInRow: user.winInRow, battleResultInfo: null })
       return updateUserToLose(firebase, auth.uid, 'attackLose', 5)
     })
     .then(() => {
       return fetchCandidates(firebase, user.league)
     })
-    .catch(err => {
-      return window.swal({ text: '에러가 발생했습니다. - ' + err })
+    .then(() => {
+      setUserPicks(userPick)
+      this.setState({ step: 3 })
     })
-  }
-  _handleOnClickPickNext (userPick) {
-    const { setUserPicks } = this.props
-    setUserPicks(userPick)
-    this.setState({ step: 3 })
+    .catch(msg => {
+      window.swal({ text: `${getMsg(messages.common.fail, locale)} - ${msg}` })
+    })
   }
   _handleOnClickChooseEnemy (idx) {
     const { candidates, setEnemyPicks } = this.props
@@ -138,9 +141,9 @@ class BattleView extends React.Component {
       const lastBattleResultInfo = Object.assign({}, battleResultInfo, tobeResultInfo)
       this.setState({ battleResultInfo: lastBattleResultInfo })
     })
-    // .catch(err => {
-    //   window.swal({ text: `에러가 발생했습니다. - ${err}` })
-    // })
+    .catch(err => {
+      window.swal({ text: `에러가 발생했습니다. - ${err}` })
+    })
   }
   render () {
     const { step, chosenEnemy, winInRow, battleResultInfo } = this.state
@@ -164,7 +167,7 @@ class BattleView extends React.Component {
         )
       } else if (step === 5) {
         return (
-          <BattleStage battleLog={battleLog} userPicks={userPicks} user={user} enemy={chosenEnemy} enemyPicks={enemyPicks} locale={locale} onClickNext={this._handleOnClickCompleteBattle} />
+          <BattleStage battleLog={battleLog} userPicks={userPicks} user={user} enemy={chosenEnemy} enemyPicks={enemyPicks} locale={locale} messages={messages} onClickNext={this._handleOnClickCompleteBattle} />
         )
       } else if (step === 6) {
         return (

@@ -69,12 +69,12 @@ class MonManagementView extends React.Component {
     this._initFormData()
   }
   _handleOnClickMon (id) {
+    const mon = this.props.mons.filter(mon => mon.id === id)[0]
     this.setState({
       showForm: true,
       editMode: 'update',
-      formData: this.props.mons.filter(mon => mon.id === id)[0]
+      formData: Object.assign({}, mon, { name: mon.name.ko, description: mon.description.ko, skill: mon.skill.ko })
     })
-    console.log('updateMon', this.props.mons.filter(mon => mon.id === id)[0])
   }
   _handleOnChangeInput (e) {
     e.preventDefault()
@@ -102,7 +102,6 @@ class MonManagementView extends React.Component {
       const { hp, power, armor, sPower, sArmor, dex } = newFormData
       const total = hp + power + armor + sPower + sArmor + dex
       if (formData.grade) {
-        console.log('formData.grade', formData.grade)
         const cost = getStandardCost(formData.grade, total)
         newFormData = Object.assign({}, newFormData, { cost })
       }
@@ -113,11 +112,11 @@ class MonManagementView extends React.Component {
   _handleOnClickSave () {
     this.setState({ isLoading: true })
     const { firebase, mons } = this.props
-    let { formData, editMode, designer } = this.state
+    const { formData, editMode, designer } = this.state
     // ''은 null로 교체
-    formData = convertEmptyStringToNullInObj(formData)
-    const { description, name, skill, ...restFormData } = formData
-    const mon = Object.assign({}, new Mon(), restFormData, { description: { ko: description }, name: { ko: name }, skill: { ko: skill } })
+    const newFormData = convertEmptyStringToNullInObj(formData)
+    const { name, description, skill, ...restFormData } = newFormData
+    const mon = Object.assign({}, new Mon(), restFormData, { name: { ko: name }, description: { ko: description }, skill: { ko: skill } })
     const monImageFile = document.getElementById('monImage').files[0]
     let postMonImageFile = () => Promise.resolve()
     if (monImageFile) monImageFile.filename = keygen._()
@@ -127,7 +126,8 @@ class MonManagementView extends React.Component {
       if (monImageFile) {
         const monImageURL = res[0].File.downloadURL
         const fullPath = res[0].File.fullPath
-        const monImage = { fullPath, url: monImageURL, seq: formData.monImage && formData.monImage.length > 0 ? _.last(formData.monImage).seq + 1 : 0, designer }
+        const key = res[0].key
+        const monImage = { fullPath, key, url: monImageURL, seq: formData.monImage && formData.monImage.length > 0 ? _.last(formData.monImage).seq + 1 : 0, designer }
         if (editMode === 'write' || !formData.monImage) {
           mon.monImage = []
         }
@@ -139,14 +139,11 @@ class MonManagementView extends React.Component {
     .then(mon => { // 진화 전 포켓몬 선택했을경우 처리, postMon의 경우 post결과 mon을 파라미터로 가져옴
       if (formData.prev) {
         const monId = mon ? mon.id : formData.id
-        console.log('formData.prev', formData.prev)
         let nextOfPrev = mons.filter(mon => mon.id === formData.prev)[0].next
-        console.log('nextOfPrev1', nextOfPrev)
         if (!nextOfPrev) nextOfPrev = []
         if (nextOfPrev.indexOf(monId) > -1) {
           // 이미 진화 전 포켓몬의 next포켓몬으로 등록되어있는 경우 아무것도 안함
         } else nextOfPrev.push(monId)
-        console.log('nextOfPrev2', nextOfPrev)
         return updateMon(firebase, { id: formData.prev, next: nextOfPrev, evoLv: parseInt(formData.requiredLv) })
       }
       return Promise.resolve()
@@ -173,7 +170,7 @@ class MonManagementView extends React.Component {
     const { formData } = this.state
     const { firebase } = this.props
     let newFormData = null
-    // deleteImage(firebase, monImage.filter(item => item.seq === seq)[0].fullPath) // 현재 잘 안되고 있음 (Error: Firebase.child failed: First argument was an invalid path: "monImages/udumdesin.png". Paths must be non-empty strings and can't contain ".", "#", "$", "[", or "]")
+    if (monImage.filter(item => item.seq === seq)[0].key) deleteImage(firebase, monImage.filter(item => item.seq === seq)[0].fullPath, `monImages/${monImage.filter(item => item.seq === seq)[0].item.key}`) // 현재 잘 안되고 있음 (Error: Firebase.child failed: First argument was an invalid path: "monImages/udumdesin.png". Paths must be non-empty strings and can't contain ".", "#", "$", "[", or "]")
     Promise.resolve()
     .then(() => {
       const newMonImage = _.remove(monImage, image => {
@@ -201,7 +198,7 @@ class MonManagementView extends React.Component {
     const { firebase } = this.props
     deleteMon(firebase, formData)
     .then(() => {
-      const promArr = formData.monImage.map(image => () => deleteImage(firebase, image.fullPath))
+      const promArr = formData.monImage.map(image => () => deleteImage(firebase, image.fullPath, image.key))
       return Promise.all(promArr)
     })
     .then(() => {
@@ -275,7 +272,6 @@ class MonManagementView extends React.Component {
       const { monImage } = this.state.formData
       if (monImage) {
         return monImage.map((image, idx) => {
-          console.log('renderMonImage', monImage)
           return (
             <div className='col-sm-2 text-center' key={idx}>
               <Img src={image.url} width='100%' />
@@ -523,7 +519,7 @@ class MonManagementView extends React.Component {
                 id='prev'
                 defaultValue='진화 전 포켓몬'
                 options={this.props.mons.map(mon => {
-                  return { name: mon.name, value: mon.id }
+                  return { name: mon.name.ko, value: mon.id }
                 })}
                 onChange={this._handleOnChangeInput}
                 value={this.state.formData.prev}

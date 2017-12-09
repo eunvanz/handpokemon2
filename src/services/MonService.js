@@ -1,5 +1,5 @@
 import { convertMapToArr } from 'utils/commonUtil'
-import { convertMonToCol } from 'utils/monUtil'
+import { convertMonToCol, levelUpCollection } from 'utils/monUtil'
 
 import _ from 'lodash'
 
@@ -23,6 +23,41 @@ export const getStartPick = firebase => {
     }
     const startPick = _.shuffle(keys.filter((key, idx) => idxSet.has(idx)).map(key => convertMonToCol(basicMons[key])))
     return Promise.resolve(startPick)
+  })
+}
+
+export const getStagePick = (firebase, totalAbility) => {
+  const monsRef = firebase.ref('mons')
+  return monsRef.orderByChild('total').once('value')
+  .then(snapshot => {
+    const allPicks = []
+    snapshot.forEach(snap => {
+      const monId = snap.key
+      const mon = snap.val()
+      mon.id = monId
+      allPicks.push(mon)
+    })
+    const resultPicks = []
+    for (let i = 0; i < 3; i++) {
+      let cut
+      if (i === 0) cut = totalAbility - allPicks[0].total - allPicks[1].total
+      else if (i === 1) cut = totalAbility - resultPicks[0].total - allPicks[0].total
+      else if (i === 2) cut = totalAbility - resultPicks[0].total - resultPicks[1].total
+      let filteredPicks = allPicks.filter(pick => pick.total < cut)
+      filteredPicks = filteredPicks.filter(pick => _.find(resultPicks, e => e.id === pick.id) == null)
+      const length = filteredPicks.length
+      const pickIdx = _.random(0, length - 1)
+      resultPicks.push(filteredPicks[pickIdx])
+    }
+    let resultTotal = resultPicks.reduce((accm, pick) => accm + pick.total, 0)
+    const resultCollectionPicks = resultPicks.map(pick => convertMonToCol(pick))
+    while (resultTotal < totalAbility) {
+      // totalAbility를 넘어설때 까지 레벨업
+      const idx = _.random(0, 2)
+      resultCollectionPicks[idx] = levelUpCollection(resultCollectionPicks[idx])
+      resultTotal = resultCollectionPicks.reduce((accm, pick) => accm + pick.total + pick.addedTotal, 0)
+    }
+    return Promise.resolve(resultCollectionPicks)
   })
 }
 

@@ -11,17 +11,17 @@ export default isAuthRequired => ComposedComponent => {
     componentDidMount () {
       if (isAuthRequired) {
         const { user } = this.props
-        if (!user) this.context.router.push('/sign-in')
+        if (!user || !user.nickname) this.context.router.push('/sign-in')
       }
     }
     shouldComponentUpdate (nextProps, nextState) {
       return shallowCompare(this, nextProps, nextState)
     }
     render () {
-      const { user, ...props } = this.props
-      if (isAuthRequired && (!user || !user.nickname)) return null // !user.nickname 조건은 user가 비어있는 객체 {}로 올 수 있기 때문
+      const { user, auth, ...props } = this.props
+      if (isAuthRequired && (!user || !user.nickname)) return <div /> // !user.nickname 조건은 user가 비어있는 객체 {}로 올 수 있기 때문
       return (
-        <ComposedComponent user={user} {...props} />
+        <ComposedComponent user={user && user.nickname ? user : null} auth={user && user.nickname ? auth : null} {...props} />
       )
     }
   }

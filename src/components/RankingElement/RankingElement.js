@@ -5,8 +5,9 @@ import numeral from 'numeral'
 import $ from 'jquery'
 
 import UserModal from 'components/UserModal'
+import Img from 'components/Img'
 
-import { isScreenSize } from 'utils/commonUtil'
+import { isScreenSize, getThumbnailImageUrl } from 'utils/commonUtil'
 
 import { colors } from 'constants/colors'
 
@@ -53,7 +54,7 @@ class RankingElement extends React.Component {
           {isHeader
             ? <strong style={{ lineHeight }}>트레이너</strong>
             : <div onClick={() => this.setState({ showUserModal: true })} style={{ cursor: 'pointer' }}>
-              <img className='lgi-img' src={user.profileImage} style={{ display: showProfile ? 'inline' : 'none' }} />
+              <Img className='lgi-img' src={user.profileImageKey ? getThumbnailImageUrl(user.profileImage) : user.profileImage} style={{ display: showProfile ? 'inline' : 'none' }} />
               <span style={{ paddingLeft: '10px', lineHeight }}>{user.nickname}</span>
             </div>
           }
