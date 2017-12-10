@@ -17,11 +17,16 @@ import { setUserPath, updateUserToLose, decreaseCredit, updateUserToWin,
 
 import { getMsg } from 'utils/commonUtil'
 
+import User from 'models/user'
+
+import doctorOh from '../../Adventure/components/assets/doctor_oh.png'
+
 class BattleView extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      step: 1,
+      isAdventure: props.location.query.type && props.location.query.type === 'adventure',
+      step: props.location.query.type === 'adventure' ? 2 : 1,
       chosenEnemy: null,
       winInRow: props.user.winInRow || 0,
       battleResultInfo: null
@@ -34,6 +39,16 @@ class BattleView extends React.Component {
     this._handleOnClickCompleteBattle = this._handleOnClickCompleteBattle.bind(this)
     this._handleOnClickContinueBattle = this._handleOnClickContinueBattle.bind(this)
     this._generateBattleResult = this._generateBattleResult.bind(this)
+    this._getTrainerForAdventure = this._getTrainerForAdventure.bind(this)
+    this._getStage = this._getStage.bind(this)
+  }
+  componentDidUpdate (prevProps, prevState) {
+    if (prevProps.location.query.type !== this.props.location.query.type) {
+      this.setState({
+        isAdventure: this.props.location.query.type && this.props.location.query.type === 'adventure',
+        step: this.props.location.query.type === 'adventure' ? 2 : 1
+      })
+    }
   }
   shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
@@ -47,21 +62,48 @@ class BattleView extends React.Component {
     this.setState({ step: 2, chosenEnemy: null, winInRow: user.winInRow, battleResultInfo: null })
   }
   _handleOnClickPickNext (userPick) {
-    const { setUserPicks, firebase, auth, fetchCandidates, messages, locale, user } = this.props
-    decreaseCredit(firebase, auth.uid, 1, 'battle')
+    const { isAdventure } = this.state
+    const { setUserPicks, firebase, auth, fetchCandidates, messages, locale, user, setEnemyPicks } = this.props
+    decreaseCredit(firebase, auth.uid, 1, isAdventure ? 'adventure' : 'battle')
     .then(() => {
-      return updateUserToLose(firebase, auth.uid, 'attackLose', 5)
+      return !isAdventure ? updateUserToLose(firebase, auth.uid, 'attackLose', 5) : Promise.resolve()
     })
     .then(() => {
-      return fetchCandidates(firebase, user.league)
+      return !isAdventure ? fetchCandidates(firebase, user.league) : Promise.resolve()
     })
     .then(() => {
       setUserPicks(userPick)
-      this.setState({ step: 3 })
+      let state
+      if (isAdventure) {
+        setEnemyPicks(this._getEnemyPicksForAdventure())
+        state = {
+          step: 4,
+          chosenEnemy: this._getTrainerForAdventure()
+        }
+      } else {
+        state = {
+          step: 3
+        }
+      }
+      this.setState(state)
     })
     .catch(msg => {
       window.swal({ text: `${getMsg(messages.common.fail, locale)} - ${msg}` })
     })
+  }
+  _getTrainerForAdventure () { // 탐험모드일때 사용
+    const { user, messages, locale } = this.props
+    if ((user.stage || 1) <= 50) {
+      return Object.assign({}, new User(), { nickname: getMsg(messages.adventure.trainerName[0], locale), profileImage: doctorOh })
+    }
+  }
+  _getEnemyPicksForAdventure () {
+    return this._getStage().picks
+  }
+  _getStage () {
+    const { stages, user } = this.props
+    const stage = stages[stages.length - (user.stage || 1)]
+    return stage
   }
   _handleOnClickChooseEnemy (idx) {
     const { candidates, setEnemyPicks } = this.props
@@ -88,9 +130,10 @@ class BattleView extends React.Component {
   }
   _handleOnClickCompleteBattle (speed) {
     const { auth, firebase } = this.props
+    const { isAdventure } = this.state
     setUserPath(firebase, auth.uid, 'battleSpeed', speed)
     this.setState({ step: 6 })
-    this._generateBattleResult()
+    if (!isAdventure) this._generateBattleResult()
   }
   _handleOnClickContinueBattle () {
     this.setState({ step: 1, chosenEnemy: null })
@@ -146,7 +189,7 @@ class BattleView extends React.Component {
     })
   }
   render () {
-    const { step, chosenEnemy, winInRow, battleResultInfo } = this.state
+    const { step, chosenEnemy, winInRow, battleResultInfo, isAdventure } = this.state
     const { user, candidates, userCollections, battleLog, userPicks, enemyPicks, auth, creditInfo, locale, items, firebase, messages } = this.props
     const renderBody = () => {
       if (step === 1) {
@@ -155,7 +198,7 @@ class BattleView extends React.Component {
         )
       } else if (step === 2) {
         return (
-          <ChoosePick collections={userCollections} onClickNext={this._handleOnClickPickNext} user={user} locale={locale} messages={messages} />
+          <ChoosePick collections={userCollections} onClickNext={this._handleOnClickPickNext} user={user} locale={locale} messages={messages} isAdventure={isAdventure} maxCost={isAdventure ? this._getStage().maxCost : null} />
         )
       } else if (step === 3) {
         return (
@@ -171,8 +214,8 @@ class BattleView extends React.Component {
         )
       } else if (step === 6) {
         return (
-          <BattleResult user={user} winInRow={winInRow} enemy={chosenEnemy} auth={auth} locale={locale} items={items} firebase={firebase}
-            battleLog={battleLog} onClickContinue={this._handleOnClickContinueBattle} battleResultInfo={battleResultInfo} />
+          <BattleResult user={user} winInRow={winInRow} enemy={chosenEnemy} auth={auth} locale={locale} items={items} firebase={firebase} stage={isAdventure ? this._getStage() : null}
+            battleLog={battleLog} onClickContinue={this._handleOnClickContinueBattle} battleResultInfo={battleResultInfo} isAdventure={isAdventure} messages={messages} />
           // <BattleResult user={user} winInRow={winInRow} enemy={chosenEnemy} onMount={this._handleOnMountBattleResultView}
           //   battleLog={battleLog} onClickContinue={this._handleOnClickContinueBattle} />
         )
@@ -203,7 +246,9 @@ BattleView.propTypes = {
   creditInfo: PropTypes.object.isRequired,
   locale: PropTypes.string.isRequired,
   items: PropTypes.array.isRequired,
-  messages: PropTypes.object.isRequired
+  messages: PropTypes.object.isRequired,
+  location: PropTypes.object,
+  stages: PropTypes.array.isRequired
 }
 
 export default BattleView

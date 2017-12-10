@@ -41,7 +41,7 @@ class WorkshopCard extends React.Component {
     const renderLikeButton = () => {
       return (
         <div className='c-info text-center' style={{ margin: '5px 0px', position: 'relative' }}>
-          <Button link onClick={onClickLike} icon={auth && findIndex(item.whoLikes, e => e === auth.uid) > -1 ? 'fas fa-heart' : 'far fa-heart'} text={numeral(item.likes).format('0,0')} size='lg' style={{ padding: '4px 14px', color: colors.pink }} />
+          <Button link onClick={onClickLike} icon={auth && findIndex(item.whoLikes, e => e === auth.uid) > -1 ? 'fas fa-heart c-pink' : 'far fa-heart c-pink'} text={numeral(item.likes).format('0,0')} size='lg' style={{ padding: '4px 14px' }} />
         </div>
       )
     }
@@ -99,7 +99,7 @@ class WorkshopCard extends React.Component {
                 Designed By <span className='c-lightblue f-700'>{item.designer}</span>
               </div>
               <div className='c-info text-center' style={{ margin: '5px 0px', position: 'relative' }}>
-                <FormattedDate value={new Date(item.regDate)} year='numeric' month='numeric' day='numeric' /> 등록
+                {getMsg(messages.common.regDate, locale)} <FormattedDate value={new Date(item.regDate)} year='numeric' month='numeric' day='numeric' />
               </div>
             </div>
           }

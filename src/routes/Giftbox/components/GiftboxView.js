@@ -6,15 +6,23 @@ import _ from 'lodash'
 import ContentContainer from 'components/ContentContainer'
 import ItemCard from 'components/ItemCard'
 import CenterMidContaner from 'components/CenterMidContainer'
+import LoadingContainer from 'components/LoadingContainer'
 
 import { getMsg } from 'utils/commonUtil'
 
 class GiftboxView extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      isUsingItem: false
+    }
+  }
   shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
   }
   render () {
     const { user, messages, locale, auth } = this.props
+    const { isUsingItem } = this.state
     const renderItems = () => {
       let newInventory = []
       if (user.inventory) {
@@ -24,12 +32,15 @@ class GiftboxView extends React.Component {
           else newInventory.push(Object.assign({}, item, { cnt: 1 }))
         })
       }
-      if (newInventory.length === 0) {
+      if (newInventory.length === 0 && !isUsingItem) {
         return <CenterMidContaner bodyComponent={
           <div>{getMsg(messages.giftboxView.empty, locale)} <i className='far fa-frown' /></div>
         } />
+      } else if (newInventory.length === 0 && isUsingItem) {
+        return <LoadingContainer text={getMsg(messages.giftboxView.using, locale)} />
       }
-      return newInventory.map((item, idx) => <ItemCard auth={auth} user={user} key={idx} item={item} showCount />)
+      return newInventory.map((item, idx) => <ItemCard auth={auth} user={user}
+        key={idx} item={item} onClickUse={() => this.setState({ isUsingItem: true })} showCount />)
     }
     const renderBody = () => {
       return (

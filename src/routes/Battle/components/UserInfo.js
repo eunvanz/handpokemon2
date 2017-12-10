@@ -22,7 +22,8 @@ class UserInfo extends React.Component {
   }
   render () {
     const { showUserModal } = this.state
-    const { isHidden, isChosen, user, onClickChoose, onClickNext, picks, isForResult, attrBonusInfo, battleResultInfo } = this.props
+    const { isHidden, isChosen, user, onClickChoose, onClickNext, picks, isForResult, attrBonusInfo, battleResultInfo,
+    isForStage, noButtons } = this.props
     return (
       <div className='text-center'>
         {
@@ -56,11 +57,11 @@ class UserInfo extends React.Component {
           </div>
         }
         {
-          isHidden &&
+          isHidden && !isForStage &&
           <Button text='선택' size='xs' block color='orange' onClick={onClickChoose} />
         }
         {
-          !isHidden && isChosen &&
+          ((!isHidden && isChosen) || isForStage) && !noButtons &&
           <Button text='다음단계로' size='xs' block color='green' onClick={onClickNext} />
         }
         {
@@ -92,7 +93,9 @@ UserInfo.propTypes = {
   picks: PropTypes.array,
   isForResult: PropTypes.bool,
   attrBonusInfo: PropTypes.object,
-  battleResultInfo: PropTypes.object
+  battleResultInfo: PropTypes.object,
+  isForStage: PropTypes.bool,
+  noButtons: PropTypes.bool
 }
 
 export default UserInfo

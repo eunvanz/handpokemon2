@@ -36,5 +36,6 @@ export default class User {
     this.maxWinInRow = 0
     this.recommenderCode = keygen.password()
     this.isSocialAccount = false
+    this.stage = 1
   }
 }

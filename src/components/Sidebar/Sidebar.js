@@ -76,7 +76,7 @@ class Sidebar extends React.Component {
           scrollBar('.c-overflow', 'minimal-dark', 'y')
         }
       }
-    }, 1000)
+    }, 5000)
   }
   shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
@@ -295,7 +295,7 @@ class Sidebar extends React.Component {
                 </Link>
               </li>
               <li className='f-700'>
-                <Link to='/'>
+                <Link to='/adventure' onClick={() => $('.ma-backdrop').click()}>
                   <i><i className='fa fa-compass' style={{ fontSize: '18px' }} /></i> 포켓몬 탐험
                   {renderCreditBadge('adventure')}
                 </Link>
@@ -327,11 +327,13 @@ class Sidebar extends React.Component {
                   data-ma-action='submenu-toggle'><i><i className='fa fa-comments' style={{ fontSize: '18px' }} /></i> 커뮤니티</a>
                 <ul style={{ display: 'none' }}>
                   <li><Link to='/'>공지사항</Link></li>
-                  <li><Link to='/'>게시판</Link></li>
+                  <li><Link to='/board-list/free' onClick={() => $('.ma-backdrop').click()}>게시판</Link></li>
                 </ul>
               </li>
               <li className='f-700'>
-                <Link to='/workshop'><i><i className='fa fa-paint-brush' style={{ fontSize: '18px' }} /></i> 포켓몬 공작소</Link>
+                <Link to='/workshop' onClick={() => $('.ma-backdrop').click()}>
+                  <i><i className='fa fa-paint-brush' style={{ fontSize: '18px' }} /></i> 포켓몬 공작소
+                </Link>
               </li>
               <li className='f-700'>
                 <Link to='/'><i><i className='fa fa-book' style={{ fontSize: '18px' }} /></i> 게임가이드</Link>

@@ -8,6 +8,7 @@ import withAuth from 'hocs/withAuth'
 import withUserCollections from 'hocs/withUserCollections'
 import withCreditInfo from 'hocs/withCreditInfo'
 import withItems from 'hocs/withItems'
+import withStages from 'hocs/withStages'
 
 import { fetchCandidates, setEnemyPicks, setUserPicks, setBattleLog, clearBattle } from '../modules/battle'
 
@@ -28,6 +29,6 @@ const mapStateToProps = (state) => {
 }
 
 const wrappedBattleView = compose(firebaseConnect(), withAuth(true), withUserCollections,
-  withCreditInfo, withItems)(BattleView)
+  withCreditInfo, withItems, withStages)(BattleView)
 
 export default connect(mapStateToProps, mapDispatchToProps)(wrappedBattleView)

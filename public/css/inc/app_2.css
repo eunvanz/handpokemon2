@@ -3456,3 +3456,14 @@ html.ie9 .mCS-minimal-dark.mCSB_scrollTools_onDrag .mCSB_dragger .mCSB_dragger_b
 .transparent-progress {
   background: rgba(255, 255, 255, 0.5)
 }
+
+.toast button {
+  color: #fff;
+}
+
+.draft-editor {
+  border: 1px solid #ededed;
+  border-radius: 2px;
+  padding: 10px;
+  min-height: 40vh;
+}

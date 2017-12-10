@@ -88,6 +88,7 @@ class CoreLayout extends React.Component {
           close={closeUserModal}
         />
         <ToastContainer
+          className='toast'
           position={toast.POSITION.BOTTOM_RIGHT}
           toastClassName='dark-toast'
           progressClassName='transparent-progress'

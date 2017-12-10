@@ -10,7 +10,7 @@ class LoadingContainer extends React.PureComponent {
     const { text } = this.props
     return (
       <ContentContainer
-        style={{ marginTop: '68px' }}
+        style={{ marginTop: '63px' }}
         body={
           <CenterMidContainer
             bodyComponent={

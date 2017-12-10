@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import shallowCompare from 'react-addons-shallow-compare'
 import keygen from 'keygenerator'
+import clipboard from 'clipboard-js'
 
 import ContentContainer from 'components/ContentContainer'
 import TextArea from 'components/TextArea'
@@ -24,11 +25,13 @@ class SettingView extends React.Component {
       introduce: props.user.introduce,
       profileImage: props.user.profileImage,
       isImageEdited: false,
-      isTextEdited: false
+      isTextEdited: false,
+      isLoading: false
     }
     this._handleOnChangeInput = this._handleOnChangeInput.bind(this)
     this._handleOnClickApply = this._handleOnClickApply.bind(this)
     this._handleOnClickSendPasswordResetEmail = this._handleOnClickSendPasswordResetEmail.bind(this)
+    this._handleOnClickCodeCopy = this._handleOnClickCodeCopy.bind(this)
   }
   shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
@@ -38,6 +41,7 @@ class SettingView extends React.Component {
     this.setState({ [name]: value, isTextEdited: true })
   }
   _handleOnClickApply () {
+    this.setState({ isLoading: true })
     const { firebase, auth, user, messages, locale } = this.props
     const { introduce, isTextEdited, isImageEdited } = this.state
     const promArr = []
@@ -77,10 +81,11 @@ class SettingView extends React.Component {
     })
     .then(() => {
       toast(getMsg(messages.setting.success, locale))
-      this.setState({ isEdited: false })
+      this.setState({ isImageEdited: false, isTextEdited: false, isLoading: false })
       // window.swal(`${getMsg(messages.common.successShort, locale)}!`, getMsg(messages.common.success, locale), 'success')
     })
     .catch(msg => {
+      this.setState({ isLoading: false })
       window.swal(`${getMsg(messages.common.oops, locale)}`, `${getMsg(messages.common.fail, locale)} - ${msg}`, 'error')
     })
   }
@@ -90,9 +95,14 @@ class SettingView extends React.Component {
     this.context.router.push('/')
     firebase.resetPassword(auth.email)
   }
+  _handleOnClickCodeCopy () {
+    const { user, messages, locale } = this.props
+    clipboard.copy(user.recommenderCode)
+    toast(getMsg(messages.setting.copied, locale))
+  }
   render () {
     const { messages, locale, user } = this.props
-    const { profileImage, introduce, isImageEdited, isTextEdited } = this.state
+    const { profileImage, introduce, isImageEdited, isTextEdited, isLoading } = this.state
     const renderBody = () => {
       return (
         <div className='row'>
@@ -124,7 +134,7 @@ class SettingView extends React.Component {
             </div>
           }
           <p className='col-sm-offset-3 col-sm-6 f-700 m-t-30'>{getMsg(messages.signUp.recommenderCode, locale)}</p>
-          <p className='col-sm-offset-3 col-sm-6 f-700 c-lightblue'>{user.recommenderCode}</p>
+          <p onClick={this._handleOnClickCodeCopy} style={{ cursor: 'pointer' }} className='col-sm-offset-3 col-sm-6 f-700 c-lightblue'>{user.recommenderCode} <i className='far fa-copy c-gray' /></p>
           <p className='col-sm-offset-3 col-sm-6 c-gray'><small>{getMsg(messages.setting.recommenderDetail, locale)}</small></p>
         </div>
       )
@@ -135,7 +145,7 @@ class SettingView extends React.Component {
           <div>
             <h2 style={{ paddingRight: '60px' }}>{getMsg(messages.setting.guide, locale)}</h2>
             <ul className='actions' style={{ right: '20px' }}>
-              <li><Button disabled={!isImageEdited && !isTextEdited} icon='fa fa-check' text={getMsg(messages.common.apply, locale)} color='blue' onClick={this._handleOnClickApply} /></li>
+              <li><Button loading={isLoading} disabled={!isImageEdited && !isTextEdited} icon='fa fa-check' text={getMsg(messages.common.apply, locale)} color='blue' onClick={this._handleOnClickApply} /></li>
             </ul>
           </div>
         }

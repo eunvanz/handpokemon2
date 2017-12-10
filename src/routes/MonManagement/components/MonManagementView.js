@@ -170,7 +170,7 @@ class MonManagementView extends React.Component {
     const { formData } = this.state
     const { firebase } = this.props
     let newFormData = null
-    if (monImage.filter(item => item.seq === seq)[0].key) deleteImage(firebase, monImage.filter(item => item.seq === seq)[0].fullPath, `monImages/${monImage.filter(item => item.seq === seq)[0].item.key}`) // 현재 잘 안되고 있음 (Error: Firebase.child failed: First argument was an invalid path: "monImages/udumdesin.png". Paths must be non-empty strings and can't contain ".", "#", "$", "[", or "]")
+    // if (monImage.filter(item => item.seq === seq)[0].key) deleteImage(firebase, monImage.filter(item => item.seq === seq)[0].fullPath, `monImages/${monImage.filter(item => item.seq === seq)[0].item.key}`) // 현재 잘 안되고 있음 (Error: Firebase.child failed: First argument was an invalid path: "monImages/udumdesin.png". Paths must be non-empty strings and can't contain ".", "#", "$", "[", or "]")
     Promise.resolve()
     .then(() => {
       const newMonImage = _.remove(monImage, image => {

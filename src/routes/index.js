@@ -15,6 +15,8 @@ import ItemShop from './ItemShop'
 import Workshop from './Workshop'
 import Setting from './Setting'
 import StageManagement from './StageManagement'
+import Adventure from './Adventure'
+import BoardList from './BoardList'
 
 /*  Note: Instead of using JSX, we recommend using react-router
     PlainRoute objects to build route definitions.   */
@@ -37,7 +39,9 @@ export const createRoutes = (store) => ({
     ItemShop(store),
     Workshop(store),
     Setting(store),
-    StageManagement(store)
+    StageManagement(store),
+    Adventure(store),
+    BoardList(store)
   ]
 })
 

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 class Selectbox extends React.Component {
   render () {
-    const { options, id, onChange, defaultValue, value } = this.props
+    const { options, id, onChange, defaultValue, value, name } = this.props
     const renderOptions = () => {
       return options.map((option, idx) => {
         return <option key={idx} value={option.value}>{option.name}</option>
@@ -13,7 +13,7 @@ class Selectbox extends React.Component {
       <div className='form-group'>
         <div className='fg-line'>
           <div className='select'>
-            <select className='form-control' id={id} onChange={onChange} value={value}
+            <select className='form-control' id={id} name={name} onChange={onChange} value={value}
               style={{ cursor: 'pointer' }}>
               <option key='default' value=''>{defaultValue}</option>
               {renderOptions()}
@@ -27,10 +27,11 @@ class Selectbox extends React.Component {
 
 Selectbox.propTypes = {
   options: PropTypes.array.isRequired, // { name, value }
-  id: PropTypes.string.isRequired,
+  id: PropTypes.string,
   onChange: PropTypes.func.isRequired,
   defaultValue: PropTypes.string.isRequired,
-  value: PropTypes.string
+  value: PropTypes.string,
+  name: PropTypes.string
 }
 
 export default Selectbox

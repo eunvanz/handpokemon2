@@ -79,7 +79,7 @@ class MonCard extends React.Component {
     onClickShield(mon.tobe)
   }
   render () {
-    const { mon, pick, className, type, isSelectable, onUnselect, isToggleable, isSelected,
+    const { mon, pick, className, type, isSelectable, onUnselect, isToggleable, isSelected, noMonOfTheMatch,
       isNotMine, firebase, showStatusBadge, isDummy, onClickShield, onClickSetDefenderBtn,
       isCustomSize, disableChangeBtn, user, kills, point, isMom, locale, messages, dispatch, ...restProps } = this.props
     const tobeMon = mon ? mon.tobe : null
@@ -152,7 +152,7 @@ class MonCard extends React.Component {
               subAttr={isDummy ? null : (type === 'collection' || type === 'defender') ? tobeMon.mon[tobeMon.monId].subAttr : tobeMon.subAttr}
               style={{ marginBottom: '10px' }} isDummy={isDummy} />
             {
-              isMom &&
+              isMom && !noMonOfTheMatch &&
               <div className='text-center c-white' style={{ position: 'absolute', width: 'calc(100% + 10px)', backgroundColor: colors.red, fontSize: '14px', top: '-25px', left: '-5px' }}>MON OF THE MATCH</div>
             }
           </div>
@@ -205,7 +205,8 @@ MonCard.propTypes = {
   point: PropTypes.number,
   isMom: PropTypes.bool,
   locale: PropTypes.string.isRequired,
-  messages: PropTypes.object.isRequired
+  messages: PropTypes.object.isRequired,
+  noMonOfTheMatch: PropTypes.bool
 }
 
 export default compose(firebaseConnect(), withIntl)(MonCard)

@@ -139,7 +139,7 @@ class MonInfo extends React.Component {
           !forModal &&
           <div className='row'>
             <div className='col-xs-12 text-center'>
-              <Button text='뒤집기' icon='fa fa-refresh'
+              <Button text='뒤집기' icon='fa fa-sync'
                 onClick={() => this.setState({ showStat: !this.state.showStat })} />
             </div>
           </div>

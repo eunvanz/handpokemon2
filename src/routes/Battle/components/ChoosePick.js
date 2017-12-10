@@ -23,9 +23,10 @@ class ChoosePick extends React.Component {
   constructor (props) {
     super(props)
     const { user } = props
+    const { isAdventure } = props
     this.state = {
       currentCost: 0,
-      maxCost: LEAGUE[user.league].maxCost,
+      maxCost: isAdventure ? props.maxCost : LEAGUE[user.league].maxCost,
       sortedCollections: [],
       chosenPick: [],
       filter: {
@@ -401,7 +402,9 @@ ChoosePick.propTypes = {
   user: PropTypes.object.isRequired,
   onClickNext: PropTypes.func.isRequired,
   locale: PropTypes.string.isRequired,
-  messages: PropTypes.object.isRequired
+  messages: PropTypes.object.isRequired,
+  isAdventure: PropTypes.bool,
+  maxCost: PropTypes.number
 }
 
 export default ChoosePick

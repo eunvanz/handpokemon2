@@ -53,8 +53,9 @@ class ItemCard extends React.Component {
   }
   _handleOnClickUse (quantity) {
     this.setState({ isLoading: true })
-    const { item, updatePickMonInfo, firebase, auth, messages, locale } = this.props
+    const { item, updatePickMonInfo, firebase, auth, messages, locale, onClickUse } = this.props
     if (quantity > item.cnt) return window.swal({ text: `${getMsg(messages.itemCard.errorDuringUse)}` })
+    onClickUse()
     if (item.type === 1) {
       const pickMonInfo = {
         isReward: true,
@@ -191,7 +192,8 @@ ItemCard.propTypes = {
   auth: PropTypes.object,
   user: PropTypes.object,
   firebase: PropTypes.object.isRequired,
-  updatePickMonInfo: PropTypes.func.isRequired
+  updatePickMonInfo: PropTypes.func.isRequired,
+  onClickUse: PropTypes.func
 }
 
 export default compose(firebaseConnect(), withIntl, withPickMonInfo)(ItemCard)

@@ -22,7 +22,7 @@ class StageManagementView extends React.Component {
       minAbility: props.stages.length > 0 ? props.stages[props.stages.length - 1].total : 700,
       maxCost: 7,
       picks: [],
-      showForm: false,
+      showStageForm: false,
       editMode: 'write' // write, update
     }
     this._handleOnChangeInput = this._handleOnChangeInput.bind(this)
@@ -36,7 +36,7 @@ class StageManagementView extends React.Component {
     return shallowCompare(this, nextProps, nextState)
   }
   _handleOnClickWrite () {
-    this.setState({ editMode: 'write', showForm: true })
+    this.setState({ editMode: 'write', showStageForm: true })
     this._initFormData()
   }
   _handleOnClickGeneratePick () {
@@ -88,7 +88,7 @@ class StageManagementView extends React.Component {
       maxCost: stage.maxCost,
       picks: stage.picks,
       editMode: 'update',
-      showForm: true
+      showStageForm: true
     })
   }
   _handleOnClickDelete () {
@@ -230,7 +230,7 @@ class StageManagementView extends React.Component {
     return (
       <div>
         {
-          this.state.showForm &&
+          this.state.showStageForm &&
           <ContentContainer
             title='스테이지 등록'
             body={renderForm()}

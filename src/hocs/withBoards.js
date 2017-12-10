@@ -10,30 +10,30 @@ import { convertMapToArr } from 'utils/commonUtil'
 import LoadingContainer from 'components/LoadingContainer'
 
 export default ComposedComponent => {
-  class withStages extends React.Component {
+  class withBoards extends React.Component {
     shouldComponentUpdate (nextProps, nextState) {
       return shallowCompare(this, nextProps, nextState)
     }
     render () {
-      const { stages, ...props } = this.props
-      if (!stages || stages.length === 0) return <LoadingContainer text='스테이지 정보를 가져오는 중...' />
+      const { boards, ...props } = this.props
+      if (!boards || boards.length === 0) return <LoadingContainer text='게시판 정보를 가져오는 중...' />
       return (
-        <ComposedComponent stages={stages} {...props} />
+        <ComposedComponent boards={boards} {...props} />
       )
     }
   }
 
-  withStages.propTypes = {
-    stages: PropTypes.array
+  withBoards.propTypes = {
+    boards: PropTypes.array
   }
 
   const mapStateToProps = (state) => {
     return {
-      stages: orderBy(convertMapToArr(dataToJS(state.firebase, 'stages')), ['no'], ['desc'])
+      boards: orderBy(convertMapToArr(dataToJS(state.firebase, 'boards')), ['regDate'], ['desc'])
     }
   }
 
-  const wrappedWithMons = firebaseConnect(['/stages'])(withStages)
+  const wrappedWithBoards = firebaseConnect(['/boards'])(withBoards)
 
-  return connect(mapStateToProps, null)(wrappedWithMons)
+  return connect(mapStateToProps, null)(wrappedWithBoards)
 }

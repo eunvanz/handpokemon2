@@ -153,7 +153,7 @@ class ChooseEnemy extends React.Component {
     return (
       <div className='container container-alt' style={{ padding: isScreenSize.sm() || isScreenSize.xs() ? '0px' : '0px 15px' }}>
         <div className='block-header'>
-          <h1 style={{ fontSize: '23px' }}>대전 상대 선택</h1>
+          <h1 style={{ fontSize: '20px' }}>대전 상대 선택</h1>
         </div>
         {renderBody()}
       </div>
