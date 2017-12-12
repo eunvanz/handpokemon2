@@ -64,7 +64,7 @@ class BattleView extends React.Component {
   _handleOnClickPickNext (userPick) {
     const { isAdventure } = this.state
     const { setUserPicks, firebase, auth, fetchCandidates, messages, locale, user, setEnemyPicks } = this.props
-    decreaseCredit(firebase, auth.uid, 1, isAdventure ? 'adventure' : 'battle')
+    return decreaseCredit(firebase, auth.uid, 1, isAdventure ? 'adventure' : 'battle')
     .then(() => {
       return !isAdventure ? updateUserToLose(firebase, auth.uid, 'attackLose', 5) : Promise.resolve()
     })
@@ -86,9 +86,11 @@ class BattleView extends React.Component {
         }
       }
       this.setState(state)
+      return Promise.resolve()
     })
     .catch(msg => {
       window.swal({ text: `${getMsg(messages.common.fail, locale)} - ${msg}` })
+      return Promise.reject(msg)
     })
   }
   _getTrainerForAdventure () { // 탐험모드일때 사용

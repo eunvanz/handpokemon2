@@ -187,6 +187,9 @@ class ChoosePick extends React.Component {
       return window.swal({ text: '3마리의 포켓몬을 선택해주세요.' })
     }
     onClickNext(chosenPick)
+    .catch(msg => {
+      this.setState({ isLoading: false })
+    })
   }
   _handleOnChangeFilterInput (e) {
     const { filter } = this.state

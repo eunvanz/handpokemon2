@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 class Loading extends React.Component {
   render () {
     return (
-      <div className='text-center' style={{ height: `${this.props.height}px` }}>
+      <div className={`text-center${` ${this.props.className}`}`} style={{ height: `${this.props.height}px` }}>
         <div className='preloader' style={{ top: `${this.props.height / 2 - 20}px` }}>
           <svg className='pl-circular' viewBox='25 25 50 50'>
             <circle className='plc-path' cx='50' cy='50' r='20' />
@@ -18,7 +18,8 @@ class Loading extends React.Component {
 
 Loading.propTypes = {
   text: PropTypes.string,
-  height: PropTypes.number
+  height: PropTypes.number,
+  className: PropTypes.string
 }
 
 export default Loading

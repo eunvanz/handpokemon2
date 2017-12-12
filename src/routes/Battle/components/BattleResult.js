@@ -91,12 +91,12 @@ class BattleResult extends React.Component {
       const { mom } = battleLog
       const { attackerPicks, defenderPicks, attacker } = battleLog.turns[battleLog.turns.length - 1]
       const renderCards = (picks, user) => {
-        return picks.map(pick => {
+        return picks.map((pick, idx) => {
           let isMom = false
           if (pick.col.id === mom.col.id) isMom = true
           return (
             <MonCard
-              key={pick.col.id || pick.monId}
+              key={pick.col.id || pick.monId || idx}
               mon={{ tobe: pick.col }}
               isNotMine
               type='collection'

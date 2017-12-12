@@ -326,17 +326,15 @@ class Sidebar extends React.Component {
                 <a style={{ cursor: 'pointer' }}
                   data-ma-action='submenu-toggle'><i><i className='fa fa-comments' style={{ fontSize: '18px' }} /></i> 커뮤니티</a>
                 <ul style={{ display: 'none' }}>
-                  <li><Link to='/'>공지사항</Link></li>
+                  <li><Link to='/board-list/notice' onClick={() => $('.ma-backdrop').click()}>공지사항</Link></li>
                   <li><Link to='/board-list/free' onClick={() => $('.ma-backdrop').click()}>게시판</Link></li>
+                  <li><Link to='/board-list/guide' onClick={() => $('.ma-backdrop').click()}>게임가이드</Link></li>
                 </ul>
               </li>
               <li className='f-700'>
                 <Link to='/workshop' onClick={() => $('.ma-backdrop').click()}>
                   <i><i className='fa fa-paint-brush' style={{ fontSize: '18px' }} /></i> 포켓몬 공작소
                 </Link>
-              </li>
-              <li className='f-700'>
-                <Link to='/'><i><i className='fa fa-book' style={{ fontSize: '18px' }} /></i> 게임가이드</Link>
               </li>
               <li className='f-700'>
                 <Link to='/forbidden-area'><i><i className='fa fa-lock' style={{ fontSize: '18px' }} /></i> 포켓몬관리</Link>

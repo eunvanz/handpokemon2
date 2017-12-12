@@ -5,11 +5,11 @@ export default class Board {
     this.content = {}
     this.regDate = new Date().toISOString()
     this.modDate = new Date().toISOString()
-    this.replies = []
+    this.replies = null
     this.likes = 0
-    this.answers = []
+    this.answers = null
     this.whoLikes = []
-    this.title = []
+    this.title = {}
     this.views = 0
     this.preview = ''
   }

@@ -19,11 +19,11 @@ class CustomModal extends React.Component {
     this.setState({ showModal: nextProps.show })
   }
   componentDidUpdate () {
-    // $('.modal-backdrop').css('z-index', '1030').css('height', '100%')
-    // if (this.props.width) {
-    //   $('.modal-dialog').css('width', 'auto')
-    //   $(`#${this.props.id}>.modal-dialog`).css('max-width', this.props.width)
-    // }
+    $('.modal-backdrop').css('z-index', '1030').css('height', '100%')
+    if (this.props.width) {
+      // $('.modal-dialog').css('width', 'auto')
+      $(`#${this.props.id}>.modal-dialog`).css('max-width', this.props.width)
+    }
   }
   render () {
     const { title, bodyComponent, footerComponent, show, close, backdrop, id, width, ...restProps } = this.props
@@ -43,9 +43,12 @@ class CustomModal extends React.Component {
           <Modal.Body>
             {bodyComponent}
           </Modal.Body>
-          <Modal.Footer>
-            {footerComponent}
-          </Modal.Footer>
+          {
+            footerComponent &&
+            <Modal.Footer>
+              {footerComponent}
+            </Modal.Footer>
+          }
         </Modal>
       </div>
     )
@@ -55,8 +58,8 @@ class CustomModal extends React.Component {
 CustomModal.propTypes = {
   title: PropTypes.string,
   bodyComponent: PropTypes.any.isRequired,
-  footerComponent: PropTypes.element.isRequired,
-  show: PropTypes.bool.isRequired,
+  footerComponent: PropTypes.element,
+  show: PropTypes.bool,
   close: PropTypes.func,
   backdrop: PropTypes.any,
   id: PropTypes.string,

@@ -23,20 +23,24 @@ class Img extends Component {
 
     this.sourceList = this.srcToArray(this.props.src)
 
-    // check cache to decide at which index to start
-    // for (let i = 0; i < this.sourceList.length; i++) {
-    //   // if we've never seen this image before, the cache wont help.
-    //   // no need to look further, just start loading
-    //   /* istanbul ignore else */
-    //   if (!(this.sourceList[i] in cache)) break
+    console.log('this.sourceList', this.sourceList)
+    console.log('cache', cache)
+    console.log('cache.length', Object.keys(cache).length)
 
-    //   // if we have loaded this image before, just load it again
-    //   /* istanbul ignore else */
-    //   if (cache[this.sourceList[i]] === true) {
-    //     this.state = { currentIndex: i, isLoading: false, isLoaded: true }
-    //     return true
-    //   }
-    // }
+    // check cache to decide at which index to start
+    for (let i = 0; i < this.sourceList.length; i++) {
+      // if we've never seen this image before, the cache wont help.
+      // no need to look further, just start loading
+      /* istanbul ignore else */
+      if (!(this.sourceList[i] in cache)) break
+
+      // if we have loaded this image before, just load it again
+      /* istanbul ignore else */
+      if (cache[this.sourceList[i]] === true) {
+        this.state = { currentIndex: i, isLoading: false, isLoaded: true }
+        return true
+      }
+    }
 
     this.state = this.sourceList.length
       // 'normal' opperation: start at 0 and try to load

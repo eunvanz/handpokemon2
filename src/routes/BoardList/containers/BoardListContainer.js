@@ -4,7 +4,6 @@ import { compose } from 'recompose'
 
 import withAuth from 'hocs/withAuth'
 import withIntl from 'hocs/withIntl'
-import withBoards from 'hocs/withBoards'
 
 import BoardListView from '../components/BoardListView'
 
@@ -21,8 +20,7 @@ const mapStateToProps = (state) => {
 const wrappedBoardListView = compose(
   firebaseConnect(),
   withAuth(false),
-  withIntl,
-  withBoards
+  withIntl
 )(BoardListView)
 
 export default connect(mapStateToProps, mapDispatchToProps)(wrappedBoardListView)
