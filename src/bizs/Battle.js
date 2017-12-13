@@ -22,7 +22,6 @@ export default class Battle {
   _generateBattleLog () {
     const log = { turns: [] }
     log.userPicks = deepCopyArray(this.userPicks)
-    console.log('log.userPicks', log.userPicks)
     log.enemyPicks = deepCopyArray(this.enemyPicks)
     while (!this.isFinished) {
       log.turns.push(this._proceedNextTurn())

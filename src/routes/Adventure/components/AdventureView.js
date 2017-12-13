@@ -19,7 +19,8 @@ class AdventureView extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      stage: null
+      stage: null,
+      noMoreStage: false
     }
     this._handleOnClickNext = this._handleOnClickNext.bind(this)
     this._getTrainer = this._getTrainer.bind(this)
@@ -28,6 +29,7 @@ class AdventureView extends React.Component {
   componentDidMount () {
     const { stages, user } = this.props
     const stage = stages[stages.length - (user.stage || 1)]
+    if (!stage) return this.setState({ noMoreStage: true })
     this.setState({ stage })
   }
   shouldComponentUpdate (nextProps, nextState) {
@@ -64,7 +66,18 @@ class AdventureView extends React.Component {
         )
       })
     }
+    const renderHeader = () => {
+      if (this.state.noMoreStage) return <div><h2>No More Stage</h2><small className='c-lightblue' style={{ fontSize: '14px' }}>{getMsg(messages.adventure.noMoreStageMessage, locale)}</small></div>
+      return (
+        <div><h2>Stage {user.stage || 1}<small className='c-lightblue' style={{ fontSize: '14px' }}>{renderGuide()}</small></h2></div>
+      )
+    }
     const renderBody = () => {
+      if (this.state.noMoreStage) {
+        return (
+          <div />
+        )
+      }
       return (
         <div>
           <div className='row'>
@@ -99,7 +112,7 @@ class AdventureView extends React.Component {
       <ContentContainer
         title={getMsg(messages.sidebar.adventure, locale)}
         body={renderBody()}
-        header={<div><h2>Stage {user.stage || 1}<small className='c-lightblue' style={{ fontSize: '14px' }}>{renderGuide()}</small></h2></div>}
+        header={renderHeader()}
       />
     )
   }

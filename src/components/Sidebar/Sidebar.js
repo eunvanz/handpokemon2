@@ -36,6 +36,7 @@ class Sidebar extends React.Component {
     this._increaseCredit = this._increaseCredit.bind(this)
     this._handleOnClickPostHonor = this._handleOnClickPostHonor.bind(this)
     this._handleOnClickRestructureMon = this._handleOnClickRestructureMon.bind(this)
+    this._initScroll = this._initScroll.bind(this)
     this.state = {
       pickCreditTimer: null,
       battleCreditTimer: null,
@@ -55,31 +56,41 @@ class Sidebar extends React.Component {
         }
       })
     }
-
-    // 사이드 바 스크롤 적용
-    const $ = window.$
-    function scrollBar (selector, theme, mousewheelaxis) {
-      $(selector).mCustomScrollbar({
-        theme: theme,
-        scrollInertia: 100,
-        axis:'yx',
-        mouseWheel: {
-          enable: true,
-          axis: mousewheelaxis,
-          preventDefault: true
-        }
-      })
-    }
-    setTimeout(() => {
-      if (!$('html').hasClass('ismobile')) {
-        if ($('.c-overflow')[0]) {
-          scrollBar('.c-overflow', 'minimal-dark', 'y')
-        }
-      }
-    }, 5000)
+    this._initScroll()
   }
   shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
+  }
+  _initScroll () {
+    // 사이드 바 스크롤 적용
+    const $ = window.$
+    setTimeout(() => {
+      $('#sidebar').mCustomScrollbar({
+        theme: 'minimal-dark',
+        scrollInertia: 100,
+        axis: 'yx',
+        mouseWheel: {
+          enable: true,
+          axis: 'y',
+          preventDefault: true
+        }
+      })
+    }, 5000)
+
+    // if ($('#sidebar')) {
+    //   $('#sidebar').mCustomScrollbar({
+    //     theme: 'minimal-dark',
+    //     scrollInertia: 100,
+    //     axis: 'yx',
+    //     mouseWheel: {
+    //       enable: true,
+    //       axis: 'y',
+    //       preventDefault: true
+    //     }
+    //   })
+    // } else {
+    //   setTimeout(() => this(), 5000)
+    // }
   }
   componentDidUpdate (prevProps, prevState) {
     const { user } = this.props
@@ -210,11 +221,9 @@ class Sidebar extends React.Component {
   _handleOnClickRestructureMon () {
     const { mons, firebase } = this.props
     mons.forEach(mon => {
-      console.log('before', mon)
       const newMon = Object.assign({}, mon, { name: { ko: mon.name }, description: { ko: mon.description }, skill: { ko: mon.skill } })
       updateMon(firebase, newMon)
       .then(() => {
-        console.log('업데이트 완료', newMon)
       })
     })
   }
@@ -242,14 +251,10 @@ class Sidebar extends React.Component {
     return (
       <aside id='sidebar' className='sidebar c-overflow mCustomScrollbar _mCS_1 mCS-autoHide'
         style={{ overflow: 'visible' }}>
-        <div id='mCSB_1' className='mCustomScrollBox mCS-minimal-dark mCSB_vertical_horizontal mCSB_outside'
-          style={{ maxHeight: 'none' }} tabIndex='0'>
-          <div id='mCSB_1_container' className='mCSB_container mCS_x_hidden mCS_no_scrollbar_x'
-            style={{ position: 'relative', top: '0px', left: '0px', width: '100%' }} dir='ltr'>
             <div className='s-profile'>
               <a data-ma-action='profile-menu-toggle'>
                 <div className='sp-pic'>
-                  <img src={user ? (user.profileImageKey ? getThumbnailImageUrl(user.profileImage) : user.profileImage) : DEFAULT_PROFILE_IMAGE_URL} className='mCS_img_loaded' />
+                  <img id='sidebarProfileImage' src={user ? (user.profileImageKey ? getThumbnailImageUrl(user.profileImage) : user.profileImage) : DEFAULT_PROFILE_IMAGE_URL} className='mCS_img_loaded' />
                 </div>
                 <div className='sp-info' style={{ marginTop: '18px' }}>
                   {user ? user.nickname : '로그인을 해주세요.'} {user && <i className='zmdi zmdi-caret-down' />}
@@ -336,12 +341,17 @@ class Sidebar extends React.Component {
                   <i><i className='fa fa-paint-brush' style={{ fontSize: '18px' }} /></i> 포켓몬 공작소
                 </Link>
               </li>
-              <li className='f-700'>
-                <Link to='/forbidden-area'><i><i className='fa fa-lock' style={{ fontSize: '18px' }} /></i> 포켓몬관리</Link>
-              </li>
-              <li className='f-700'>
-                <Link to='/stage-management'><i><i className='fa fa-lock' style={{ fontSize: '18px' }} /></i> 스테이지관리</Link>
-              </li>
+              {
+                user && user.authorization === 'admin' &&
+                <div>
+                  <li className='f-700'>
+                    <Link to='/forbidden-area'><i><i className='fa fa-lock' style={{ fontSize: '18px' }} /></i> 포켓몬관리</Link>
+                  </li>
+                  <li className='f-700'>
+                    <Link to='/stage-management'><i><i className='fa fa-lock' style={{ fontSize: '18px' }} /></i> 스테이지관리</Link>
+                  </li>
+                </div>
+              }
               {/* <li className='f-700'>
                 <a onClick={() => updateUserIndexes(this.props.firebase)}><i className='fa fa-lock' style={{ fontSize: '18px' }} /> 일회용</a>
                 </li> */}
@@ -352,8 +362,6 @@ class Sidebar extends React.Component {
                 <a onClick={this._handleOnClickRestructureMon}><i className='fa fa-lock' style={{ fontSize: '18px' }} /> 몬구조변환</a>
               </li> */}
             </ul>
-          </div>
-        </div>
       </aside>
     )
   }

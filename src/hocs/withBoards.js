@@ -24,12 +24,16 @@ export default ComposedComponent => {
   }
 
   withBoards.propTypes = {
-    boards: PropTypes.array
+    boards: PropTypes.object
   }
 
   const mapStateToProps = (state) => {
     return {
-      boards: orderBy(convertMapToArr(dataToJS(state.firebase, 'boards')), ['regDate'], ['desc'])
+      boards: {
+        notice: orderBy(convertMapToArr(dataToJS(state.firebase, 'boards/notice')), ['regDate'], ['desc']),
+        free: orderBy(convertMapToArr(dataToJS(state.firebase, 'boards/free')), ['regDate'], ['desc']),
+        guide: orderBy(convertMapToArr(dataToJS(state.firebase, 'boards/guide')), ['regDate'], ['desc'])
+      }
     }
   }
 

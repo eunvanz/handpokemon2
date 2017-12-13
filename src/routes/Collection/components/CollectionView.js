@@ -215,10 +215,11 @@ class CollectionView extends React.Component {
       l: { has: 0, total: 0 }
     }
     let getCollectionToView
-    if (userId === auth.uid) getCollectionToView = () => Promise.resolve(userCollections)
+    if (auth && userId === auth.uid) getCollectionToView = () => Promise.resolve(userCollections)
     else getCollectionToView = () => getCollectionsByUserId(firebase, userId)
     return getCollectionToView()
     .then(cols => {
+      if (!cols) return
       let defenders
       mons.forEach(mon => {
         const monId = mon.id
@@ -239,7 +240,7 @@ class CollectionView extends React.Component {
     })
     .then(() => {
       let getUserToView
-      if (userId === auth.uid) getUserToView = () => Promise.resolve(user)
+      if (auth && userId === auth.uid) getUserToView = () => Promise.resolve(user)
       else getUserToView = () => getUserRankingByUserId(firebase, 'collection', userId).then(() => getUserRankingByUserId(firebase, 'battle', userId)).then(() => getUserByUserId(firebase, userId))
       return getUserToView() // 랭킹 업데이트 후 유저정보가져옴
     })
@@ -551,7 +552,7 @@ class CollectionView extends React.Component {
       )
     }
     const renderBody = () => {
-      if (!userToView) return <Loading text='콜렉션을 불러오는 중...' height={window.innerHeight - 280} />
+      if (!userToView || !filteredCollections) return <Loading text='콜렉션을 불러오는 중...' height={window.innerHeight - 280} />
       else {
         return (
           <div className='row'>
@@ -654,7 +655,7 @@ CollectionView.propTypes = {
   pickMonInfo: PropTypes.object,
   showUserModal: PropTypes.func.isRequired,
   userModal: PropTypes.object.isRequired,
-  userCollections: PropTypes.array.isRequired,
+  userCollections: PropTypes.array,
   locale: PropTypes.string.isRequired,
   messages: PropTypes.object.isRequired
 }

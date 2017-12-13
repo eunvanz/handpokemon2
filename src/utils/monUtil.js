@@ -120,7 +120,6 @@ export const levelDownCollection = (col, levelToDown) => {
       i = i - 1
     }
   }
-  console.log('updateObj @ levelDownCollection', updateObj)
   return updateObj
 }
 

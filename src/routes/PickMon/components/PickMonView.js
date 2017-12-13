@@ -80,7 +80,6 @@ class PickMonView extends React.Component {
   _initPick () {
     const { pickMonInfo, firebase, auth, user } = this.props
     const { quantity, attrs, grades, evoluteCol, mixCols, isReward } = pickMonInfo
-    console.log('pickMonInfo', pickMonInfo)
     if (!evoluteCol && !mixCols && !isReward && quantity > user.pickCredit) {  // 유저의 크레딧보다 더 많은 포켓몬을 채집하는 경우
       this.context.router.push('pick-district')
       return
@@ -107,7 +106,6 @@ class PickMonView extends React.Component {
           return postCollection(firebase, auth.uid, picks[pickedIdx], 'pick')
             .then(result => {
               this.setState({ picks, pickedIdx, result })
-              console.log('result', result)
               return Promise.resolve()
             })
         } else {
@@ -123,7 +121,6 @@ class PickMonView extends React.Component {
           }), Promise.resolve())
           .then(() => {
             results = mergePickResults(results)
-            console.log('results', results)
             this.setState({ multiPicks: results })
             return Promise.resolve()
           })
@@ -133,14 +130,12 @@ class PickMonView extends React.Component {
         }
       })
       .catch(msg => {
-        console.log('msg', msg)
         showAlert(msg)
         .then(() => {
           this.context.router.push('/pick-district')
         })
       })
     } else if (mixCols) { // 교배일때
-      console.log('getMixGrades', getMixGrades(mixCols))
       getPickMons(firebase, allAttrs, getMixGrades(mixCols), mixCols) // 마지막 파라미터는 특정 포켓몬 교배 처리를 위함
       .then(picks => {
         const pickedIdx = _.random(0, picks.length - 1)
@@ -151,17 +146,14 @@ class PickMonView extends React.Component {
         })
       })
       .catch(msg => {
-        console.log('msg', msg)
         showAlert(msg)
           .then(() => {
             this.context.router.push('/pick-district')
           })
       })
     } else if (evoluteCol) { // 진화일때
-      console.log('진화', pickMonInfo)
       getNextMons(firebase, evoluteCol)
       .then(nextMons => {
-        console.log('nextMons', nextMons)
         const picks = _.compact(nextMons)
         if (picks.length > 1) { // 진화체가 여러개일 경우 단건채집과 같은방식으로 진행
           const pickedIdx = _.random(0, picks.length - 1)
@@ -247,14 +239,11 @@ class PickMonView extends React.Component {
       })
     }
     let honorsNotGot
-    console.log('gotHonors', gotHonors)
-    console.log('honors', honors)
     if (gotHonors) honorsNotGot = honors.filter(honor => _.findIndex(gotHonors, gotHonor => gotHonor.id === honor.id) < 0)
     else {
       honorsNotGot = honors
       gotHonors = []
     }
-    console.log('honorsNotGot', honorsNotGot)
     const honorsNotGotType1 = []
     const honorsNotGotType2 = []
     const updateUserHonorInfoProms = []
@@ -303,10 +292,8 @@ class PickMonView extends React.Component {
         const honorModal = {
           messages, honors: honorsForModal
         }
-        console.log('honorModal', honorModal)
         showHonorModal(honorModal)
         const after = new Date().getTime()
-        console.log('time:', after - before)
       })
     }
   }

@@ -82,7 +82,15 @@ class MonManagementView extends React.Component {
     if (id === 'designer') {
       this.setState({ [id]: value })
     } else {
-      const formData = fromJS(this.state.formData)
+      let formData = fromJS(this.state.formData)
+      if (id === 'grade') {
+        if (value === 'b') formData = formData.set('point', 1)
+        else if (value === 's') formData = formData.set('point', 0)
+        else if (value === 'r') formData = formData.set('point', 3)
+        else if (value === 'sr') formData = formData.set('point', 0)
+        else if (value === 'e') formData = formData.set('point', 60)
+        else if (value === 'l') formData = formData.set('point', 120)
+      }
       this.setState({ formData: formData.set(id, value).toJS() })
     }
   }
@@ -113,6 +121,8 @@ class MonManagementView extends React.Component {
     this.setState({ isLoading: true })
     const { firebase, mons } = this.props
     const { formData, editMode, designer } = this.state
+    if (formData.point === 0) return window.swal({ text: '콜렉션점수를 입력해주세요.' })
+    if (formData.no === 0) return window.swal({ text: '도감번호를 입력해주세요.' })
     // ''은 null로 교체
     const newFormData = convertEmptyStringToNullInObj(formData)
     const { name, description, skill, ...restFormData } = newFormData
@@ -120,7 +130,7 @@ class MonManagementView extends React.Component {
     const monImageFile = document.getElementById('monImage').files[0]
     let postMonImageFile = () => Promise.resolve()
     if (monImageFile) monImageFile.filename = keygen._()
-    if (monImageFile) postMonImageFile = () => postImage(firebase, MON_IMAGE_ROOT, [monImageFile])
+    if (monImageFile) postMonImageFile = () => postImage(firebase, MON_IMAGE_ROOT, [monImageFile], true)
     postMonImageFile()
     .then(res => {
       if (monImageFile) {
@@ -156,14 +166,14 @@ class MonManagementView extends React.Component {
         type: 'success'
       })
     })
-    .catch(() => {
-      this.setState({ isLoading: false })
-      showAlert({
-        title: '저장실패..',
-        text: '저장 중에 문제가 발생했습니다.',
-        type: 'error'
-      })
-    })
+    // .catch(() => {
+    //   this.setState({ isLoading: false })
+    //   showAlert({
+    //     title: '저장실패..',
+    //     text: '저장 중에 문제가 발생했습니다.',
+    //     type: 'error'
+    //   })
+    // })
   }
   _handleOnClickDelMonImage (seq) {
     const { monImage } = this.state.formData
@@ -240,9 +250,12 @@ class MonManagementView extends React.Component {
         return this.props.mons.map((mon, idx) => {
           return (
             <div className='list-group-item media' key={idx}>
+              <div className='media-header pull-left'>
+                <img src={mon.monImage[0].url} width='50' />
+              </div>
               <div className='media-body'>
                 <div className='lgi-heading' style={{ cursor: 'pointer' }}
-                  onClick={() => this._handleOnClickMon(mon.id)}>{mon.no}. {mon.name.ko} <MonAttr mainAttr={mon.mainAttr} subAttr={mon.subAttr} grade={mon.grade} /></div>
+                  onClick={() => this._handleOnClickMon(mon.id)}>{mon.no}. {mon.name.ko} : {mon.point} <MonAttr mainAttr={mon.mainAttr} subAttr={mon.subAttr} grade={mon.grade} /></div>
               </div>
             </div>
           )

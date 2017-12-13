@@ -103,16 +103,13 @@ export const updateMon = (firebase, mon) => {
   return firebase.ref(`mons/${mon.id}`).once('value')
   .then(snapshot => {
     const asisMon = snapshot.val()
-    console.log('asisMon', asisMon)
     tobeMon = Object.assign({}, asisMon, mon)
-    console.log('tobeMon', tobeMon)
     updateObj = {
       [`mons/${mon.id}`]: tobeMon
     }
     return firebase.ref(`monCollections/${mon.id}`).once('value')
   })
   .then(snapshot => {
-    console.log('snapshot.val()', snapshot.val())
     if (snapshot.val()) { // 콜렉션이 있는경우
       const collectionIds = Object.keys(snapshot.val())
       collectionIds.forEach(colId => {
@@ -132,7 +129,6 @@ export const updateMon = (firebase, mon) => {
     merge.forEach(elem => {
       updateObj[elem] = tobeMon
     })
-    console.log('updateObj', updateObj)
     return firebase.ref().update(updateObj)
   })
 }

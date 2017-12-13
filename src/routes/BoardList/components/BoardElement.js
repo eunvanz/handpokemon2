@@ -5,7 +5,7 @@ import { findIndex } from 'lodash'
 import { FormattedDate, FormattedTime, FormattedRelative } from 'react-intl'
 import { toast } from 'react-toastify'
 
-import { getMsg, isScreenSize, isStringLength, convertMapToArr, showAlert } from 'utils/commonUtil'
+import { getMsg, isScreenSize, isStringLength, convertMapToArr, showAlert, getThumbnailImageUrl } from 'utils/commonUtil'
 
 import Img from 'components/Img'
 import Button from 'components/Button'
@@ -153,7 +153,7 @@ class BoardElement extends React.Component {
     this.setState({ showContent: false })
   }
   render () {
-    const { board, auth, user, message, locale } = this.props
+    const { board, auth, user, message, locale, firebase } = this.props
     const { showContent, showButtons, isLikesLoading, replyContent, isSaveReplyLoading, isDeleteLoading, isEditLoading, isDeleteReplyLoading } = this.state
     const renderStatus = () => {
       return (
@@ -176,7 +176,10 @@ class BoardElement extends React.Component {
           return (
             <div className={`list-group-item media${isScreenSize.xs() ? ' p-15' : ''}`} key={reply.id}>
               <a className='pull-left'>
-                <Img src={reply.writer.profileImage} className='lgi-img' />
+                <Img src={getThumbnailImageUrl(reply.writer.profileImage)} className='lgi-img' isUserProfile
+                  profilePath={`boards/${board.category}/${board.id}/replies/${reply.id}/writer/profileImage`}
+                  firebase={firebase} user={reply.writer}
+                />
               </a>
               <div className='media-body'>
                 <a className='lgi-heading'>
@@ -186,7 +189,7 @@ class BoardElement extends React.Component {
                   </small>
                 </a>
                 <span style={{ fontSize: '14px' }}>
-                  {reply.content} {reply.writer.id === auth.uid && <Button link loading={isDeleteReplyLoading === reply.id} text='삭제' size='xs' icon='fa fa-trash-alt' onClick={() => this._handleOnClickDeleteReply(reply)} />}
+                  {reply.content} {auth && reply.writer.id === auth.uid && <Button link loading={isDeleteReplyLoading === reply.id} text='삭제' size='xs' icon='fa fa-trash-alt' onClick={() => this._handleOnClickDeleteReply(reply)} />}
                 </span>
               </div>
             </div>
@@ -202,7 +205,10 @@ class BoardElement extends React.Component {
               {
                 !isScreenSize.xs() &&
                 <div className='pull-left'>
-                  <Img className='avatar-img' src={board.writer.profileImage} />
+                  <Img src={getThumbnailImageUrl(board.writer.profileImage)} className='lgi-img' isUserProfile
+                    profilePath={`boards/${board.category}/${board.id}/writer/profileImage`}
+                    firebase={firebase} user={board.writer}
+                  />
                 </div>
               }
               {!isScreenSize.xs() && renderStatus()}
@@ -225,7 +231,7 @@ class BoardElement extends React.Component {
                   }
                   {
                     isScreenSize.xs() &&
-                    <span> | views: {board.views} | likes: {board.likes} | replies: {board.replies ? Object.keys(board.replies).length : 0}</span>
+                    <span> &#183; views: {board.views} &#183; likes: {board.likes} &#183; replies: {board.replies ? Object.keys(board.replies).length : 0}</span>
                   }
                 </small>
               </div>
@@ -255,7 +261,7 @@ class BoardElement extends React.Component {
                     text={String(board.likes)} color='white'
                   />
                   {
-                    board.writer.id === auth.uid &&
+                    auth && board.writer.id === auth.uid &&
                     <span>
                       <Button onClick={this._handleOnClickDelete}
                         loading={isDeleteLoading}
@@ -279,7 +285,7 @@ class BoardElement extends React.Component {
                 <div className='list-group'>
                   {renderComments()}
                   <div className={`wic-form toggled${isScreenSize.xs() ? ' p-15' : ''}`}>
-                    <textarea placeholder='댓글을 작성해주세요.' onFocus={this._handleOnFocusComment} onChange={this._handleOnChangeInput} value={replyContent} />
+                    <textarea placeholder={auth ? '댓글을 작성해주세요.' : '로그인이 필요합니다.'} disabled={!auth} onFocus={auth ? this._handleOnFocusComment : null} onChange={auth ? this._handleOnChangeInput : null} value={replyContent} />
                     {
                       showButtons &&
                       <div className='wicf-actions text-right'>
@@ -304,8 +310,8 @@ BoardElement.contextTypes = {
 
 BoardElement.propTypes = {
   firebase: PropTypes.object.isRequired,
-  auth: PropTypes.object.isRequired,
-  user: PropTypes.object.isRequired,
+  auth: PropTypes.object,
+  user: PropTypes.object,
   messages: PropTypes.object.isRequired,
   locale: PropTypes.string.isRequired,
   board: PropTypes.object.isRequired,

@@ -36,7 +36,7 @@ class Card extends React.Component {
 
 Card.propTypes = {
   header: PropTypes.element,
-  body: PropTypes.element.isRequired,
+  body: PropTypes.any.isRequired,
   headerBgColor: PropTypes.string,
   headerTextColor: PropTypes.string,
   clearPadding: PropTypes.bool,

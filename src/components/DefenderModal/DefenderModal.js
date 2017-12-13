@@ -97,10 +97,6 @@ class DefenderModal extends React.Component {
     const srcCost = currentCol.mon[currentCol.monId].cost
     const maxCost = this._getMaxCost()
     const { asisTotalCost } = this.state
-    console.log('asisTotalCost', asisTotalCost)
-    console.log('tgtCost', tgtCost)
-    console.log('srcCost', srcCost)
-    console.log('maxCost', maxCost)
     return asisTotalCost - tgtCost + srcCost <= maxCost
   }
   render () {

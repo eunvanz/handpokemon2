@@ -182,6 +182,7 @@ class SignUpView extends React.Component {
   _checkRecommenderCode () {
     const { firebase } = this.props
     const code = this.state.formData.recommenderCode
+    if (code.length === 0) return
     isValidRecommenderCode(firebase, code)
     .then(user => {
       if (user) {

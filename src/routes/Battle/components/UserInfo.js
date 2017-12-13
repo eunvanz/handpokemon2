@@ -32,7 +32,7 @@ class UserInfo extends React.Component {
             close={() => this.setState({ showUserModal: false })} />
         }
         <p style={{ marginBottom: '10px' }}>
-          <Img src={user.profileImage} className='mCS_img_loaded'
+          <Img src={user.profileImage} className='mCS_img_loaded' width='100%' height='100%'
             onClick={!isHidden && (isChosen || isForResult) ? () => this.setState({ showUserModal: true }) : () => { }}
             style={{ border: '1px dotted #e2e2e2', width: isScreenSize.xs() ? '50%' : '70%', borderRadius: '50%', cursor: !isHidden && (isChosen || isForResult) ? 'pointer' : null }} />
         </p>

@@ -59,32 +59,26 @@ export const refreshUserCredits = (firebase, uid, user) => {
   const pickTimeGap = curTime - lastPick
   const battleTimeGap = curTime - lastLeague
   const adventureTimeGap = curTime - lastAdventure
-  console.log('pickTimeGap', pickTimeGap)
 
   // 현재시간과 마지막 크레딧 사용 시간과의 차이를 크레딧 리프레쉬 시간 단위로 나누어서 더해줄 크레딧을 계산
   const pickCreditToAdd = Math.floor(pickTimeGap / PICK_CREDIT_REFRESH)
   const battleCreditToAdd = Math.floor(battleTimeGap / BATTLE_CREDIT_REFRESH)
   const adventureCreditToAdd = Math.floor(adventureTimeGap / ADVENTURE_CREDIT_REFRESH)
-  console.log('pickCreditToAdd', pickCreditToAdd)
 
   const isPickCreditMax = pickCredit + pickCreditToAdd >= MAX_PICK_CREDIT
   const isBattleCreditMax = battleCredit + battleCreditToAdd >= MAX_BATTLE_CREDIT
   const isAdventureCreditMax = adventureCredit + adventureCreditToAdd >= MAX_ADVENTURE_CREDIT
-  console.log('isPickCreditMax', isPickCreditMax)
 
   // 위의 나머지가 다음 크레딧 증가를 실행시킬 시간
   const pickRest = pickTimeGap - (PICK_CREDIT_REFRESH * pickCreditToAdd)
   const battleRest = battleTimeGap - (BATTLE_CREDIT_REFRESH * battleCreditToAdd)
   const adventureRest = adventureTimeGap - (ADVENTURE_CREDIT_REFRESH * adventureCreditToAdd)
-  console.log('pickRest', pickRest)
 
   // 위의 시간이 지난 후 업데이트를 해줘야 하기 때문에 마지막 크레딧 사용 시간을 현재시간 - 위의 사간 을 적용
   // 이미 크래딧과 더할 크레딧을 더한 값이 MAX값일 경우에는 현재시간을 적용
   const lastPickToUpdate = isPickCreditMax ? curTime : curTime - pickRest
   const lastLeagueToUpdate = isBattleCreditMax ? curTime : curTime - battleRest
   const lastAdventureToUpdate = isAdventureCreditMax ? curTime : curTime - adventureRest
-  console.log('lastPickToUpdate', lastPickToUpdate)
-  console.log('curTime', curTime)
 
   const updateObj = {}
   updateObj.lastPick = lastPickToUpdate
@@ -96,7 +90,7 @@ export const refreshUserCredits = (firebase, uid, user) => {
   updateObj.adventureCredit =
     adventureCredit + adventureCreditToAdd > MAX_ADVENTURE_CREDIT
     ? MAX_ADVENTURE_CREDIT : adventureCredit + adventureCreditToAdd
-  return ref.update(updateObj).then(() => Promise.resolve(updateObj))
+  return ref.update(updateObj).then(() => Promise.resolve(updateObj)).catch(msg => Promise.reject(msg))
 }
 
 export const decreaseCredit = (firebase, uid, number, type) => {

@@ -1,15 +1,23 @@
 import React, { Component } from 'react'
-import { node, oneOfType, string, array } from 'prop-types'
+import { node, oneOfType, string, array, bool, object } from 'prop-types'
 import unloaderImage from './assets/unloader.png'
 import loaderImage from './assets/loader.png'
 import shallowCompare from 'react-addons-shallow-compare'
+
+import { setBoardUserProfile } from 'services/BoardService'
 
 const cache = {}
 class Img extends Component {
   static propTypes = {
     loader: node,
     unloader: node,
-    src: oneOfType([string, array])
+    src: oneOfType([string, array]),
+    cache: bool,
+    profile: string,
+    firebase: object,
+    user: object,
+    isUserProfile: bool,
+    profilePath: string
   }
 
   static defaultProps = {
@@ -23,30 +31,32 @@ class Img extends Component {
 
     this.sourceList = this.srcToArray(this.props.src)
 
-    console.log('this.sourceList', this.sourceList)
-    console.log('cache', cache)
-    console.log('cache.length', Object.keys(cache).length)
+    // console.log('this.sourceList', this.sourceList)
+    // console.log('cache', cache)
+    // console.log('cache.length', Object.keys(cache).length)
 
-    // check cache to decide at which index to start
-    for (let i = 0; i < this.sourceList.length; i++) {
-      // if we've never seen this image before, the cache wont help.
-      // no need to look further, just start loading
-      /* istanbul ignore else */
-      if (!(this.sourceList[i] in cache)) break
-
-      // if we have loaded this image before, just load it again
-      /* istanbul ignore else */
-      if (cache[this.sourceList[i]] === true) {
-        this.state = { currentIndex: i, isLoading: false, isLoaded: true }
-        return true
+    if (this.props.cache) {
+      // check cache to decide at which index to start
+      for (let i = 0; i < this.sourceList.length; i++) {
+        // if we've never seen this image before, the cache wont help.
+        // no need to look further, just start loading
+        /* istanbul ignore else */
+        if (!(this.sourceList[i] in cache)) break
+  
+        // if we have loaded this image before, just load it again
+        /* istanbul ignore else */
+        if (cache[this.sourceList[i]] === true) {
+          this.state = { currentIndex: i, isLoading: false, isLoaded: true }
+          return true
+        }
       }
     }
 
     this.state = this.sourceList.length
       // 'normal' opperation: start at 0 and try to load
-      ? { currentIndex: 0, isLoading: true, isLoaded: false }
+      ? { currentIndex: 0, isLoading: true, isLoaded: false, updatedImage: null }
       // if we dont have any sources, jump directly to unloaded
-      : { isLoading: false, isLoaded: false }
+      : { isLoading: false, isLoaded: false, updatedImage: null }
   }
 
   srcToArray = src => (Array.isArray(src) ? src : [src]).filter(x => x)
@@ -141,12 +151,12 @@ class Img extends Component {
   }
 
   render () {
-    // console.log('cache', cache)
-    const { src, loader, unloader, ...rest } = this.props
+    // console.log('isLoading, isLoaded', this.state.isLoading + ', ' + this.state.isLoaded)
+    // console.log(this.sourceList[this.state.currentIndex])
+    const { src, loader, unloader, isUserProfile, profilePath, firebase, user, cache, ...rest } = this.props
     // if we have loaded, show img
     if (this.state.isLoaded) {
       // clear non img props
-      let { src, loader, unloader, ...rest } = this.props //eslint-disable-line
       return <img src={this.sourceList[this.state.currentIndex]} {...rest} />
     }
 
@@ -157,8 +167,16 @@ class Img extends Component {
     // if we have given up on loading, show a place holder if requested, or nothing
     /* istanbul ignore else */
     // if (!this.state.isLoaded && !this.state.isLoading) return this.props.unloader ? this.props.unloader : null
-    if (!this.state.isLoaded && !this.state.isLoading) return <img src={unloaderImage} {...rest} />
-
+    if (!this.state.isLoaded && !this.state.isLoading) {
+      if (this.props.isUserProfile) {
+        // 해당 게시물의 writer의 프로필사진 정보를 업데이트
+        const { profilePath, firebase, user } = this.props
+        setBoardUserProfile(firebase, profilePath, user.id).then(img => this.setState({ updatedImage: img }))
+        return <img src={this.state.updatedImage || loaderImage} {...rest} />
+      } else {
+        return <img src={unloaderImage} {...rest} />
+      }
+    }
   }
 }
 

@@ -9,7 +9,7 @@ import '../../../../node_modules/react-summernote/dist/react-summernote.css'
 import '../../../../node_modules/bootstrap/js/modal'
 import '../../../../node_modules/bootstrap/js/tooltip'
 
-import { getMsg, isScreenSize, showAlert } from 'utils/commonUtil'
+import { getMsg, isScreenSize, showAlert, isStringLength } from 'utils/commonUtil'
 
 import Button from 'components/Button'
 import CustomModal from 'components/CustomModal'
@@ -59,7 +59,6 @@ class Editor extends React.Component {
     if (!prevState.showForm && this.state.showForm) $('#title').focus()
     if (prevProps.board !== this.props.board) {
       const { board } = this.props
-      console.log('board', board)
       if (board) this.setState({ content: board.content[this.props.locale], title: board.title[this.props.locale], showForm: true })
     }
   }
@@ -67,6 +66,7 @@ class Editor extends React.Component {
     return shallowCompare(this, nextProps, nextState)
   }
   _handleOnChangeInput (e) {
+    if (isStringLength(e.target.value) > 40) return
     this.setState({ [e.target.name]: e.target.value })
   }
   _handleOnChangeContent (content) {
@@ -149,7 +149,7 @@ class Editor extends React.Component {
               showForm &&
               <div className='row'>
                 <div className='col-xs-12'>
-                  <div className='input-group m-b-20 w-100 p-t-15 p-l-15 p-r-15'>
+                  <div className={`input-group m-b-20 w-100 p-t-15${isScreenSize.xs() ? 'p-l-0 p-r-0' : ' p-l-15 p-r-15'}`}>
                     <div className='fg-line'>
                       <input type='text' className='form-control'
                         placeholder={getMsg(messages.board.requestTitle, locale)}

@@ -13,8 +13,6 @@ import withIntl from 'hocs/withIntl'
 
 import { getMsg } from 'utils/commonUtil'
 
-import { colors } from 'constants/colors'
-
 class WorkshopCard extends React.Component {
   constructor (props) {
     super(props)
@@ -36,7 +34,7 @@ class WorkshopCard extends React.Component {
     onClickDelete()
   }
   render () {
-    const { item, messages, locale, auth, onClickLike } = this.props
+    const { item, messages, locale, auth, onClickLike, customClassName } = this.props
     const { showDetailModal, isLoading } = this.state
     const renderLikeButton = () => {
       return (
@@ -49,11 +47,11 @@ class WorkshopCard extends React.Component {
       return (
         <div>
           {
-            item.designerUid === auth.uid &&
+            auth && item.designerUid === auth.uid &&
             <Button color='red' disabled={isLoading} className='m-l-5' text={`${getMsg(messages.common.delete, locale)}`} onClick={this._handleOnClickDelete} />
           }
           {
-            item.designerUid === auth.uid &&
+            auth && item.designerUid === auth.uid &&
             <Button color='orange' disabled={isLoading} className='m-l-5' text={`${getMsg(messages.common.edit, locale)}`} onClick={this._handleOnClickEdit} />
           }
           <Button disabled={isLoading} link text={getMsg(messages.common.close, locale)} onClick={() => this.setState({ showDetailModal: false })} />
@@ -61,9 +59,9 @@ class WorkshopCard extends React.Component {
       )
     }
     return (
-      <div className='col-md-2 col-sm-3 col-xs-6' style={{ padding: '0px 5px' }}>
+      <div className={customClassName || 'col-md-2 col-sm-3 col-xs-6'} style={{ padding: '0px 5px' }}>
         <div className='c-item'
-          onClick={() => this.setState({ showDetailModal: true })}
+          onClick={this.props.onClick || (() => this.setState({ showDetailModal: true }))}
           style={{
             cursor: 'pointer',
             border: '1px solid #e2e2e2',
@@ -124,10 +122,11 @@ WorkshopCard.propTypes = {
   locale: PropTypes.string.isRequired,
   messages: PropTypes.object.isRequired,
   auth: PropTypes.object,
-  user: PropTypes.object,
-  onClickLike: PropTypes.func.isRequired,
-  onClickDelete: PropTypes.func.isRequired,
-  onClickEdit: PropTypes.func.isRequired
+  onClickLike: PropTypes.func,
+  onClickDelete: PropTypes.func,
+  onClickEdit: PropTypes.func,
+  onClick: PropTypes.func,
+  customClassName: PropTypes.string
 }
 
 export default compose(withIntl)(WorkshopCard)

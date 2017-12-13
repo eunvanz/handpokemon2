@@ -19,7 +19,6 @@ class BoardListView extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      category: props.params.category,
       boardList: props.boards,
       page: 1,
       lastRegDate: null,
@@ -39,6 +38,11 @@ class BoardListView extends React.Component {
   componentDidMount () {
     this._init()
   }
+  componentDidUpdate (prevProps, prevState) {
+    if (prevProps.params.category !== this.props.params.category) {
+      this._init()
+    }
+  }
   shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
   }
@@ -47,7 +51,7 @@ class BoardListView extends React.Component {
     firebase.unWatchEvent('value', 'boards')
   }
   _init () {
-    const { category } = this.state
+    const { category } = this.props.params
     const { firebase } = this.props
     window.scrollTo(0, 0)
     return getBoardList(firebase, category, 1)
@@ -65,7 +69,8 @@ class BoardListView extends React.Component {
       })
   }
   _loadMoreItems () {
-    const { page, lastRegDate, lastBoardId, boardList, isLastPage, category } = this.state
+    const { page, lastRegDate, lastBoardId, boardList, isLastPage } = this.state
+    const { category } = this.props.params
     if (isLastPage) return
     this.setState({ isLoading: true })
     const { firebase } = this.props
@@ -117,7 +122,8 @@ class BoardListView extends React.Component {
   }
   render () {
     const { messages, locale, auth, user, firebase } = this.props
-    const { boardList, isLastPage, isLoading, category, boardToEdit, isRefreshing } = this.state
+    const { category } = this.props.params
+    const { boardList, isLastPage, isLoading, boardToEdit, isRefreshing } = this.state
     const renderList = () => {
       if (!boardList) return <div />
       return boardList.map(board => {
@@ -146,9 +152,12 @@ class BoardListView extends React.Component {
           </ul>
         </div>
         <div className='row wall' style={{ margin: isScreenSize.sm() || isScreenSize.xs() ? '0px' : null }}>
-          <div className='col-xs-12' style={{ padding: isScreenSize.sm() || isScreenSize.xs() ? '0px' : '0px 15px' }}>
-            <Editor category={category} onClickCancel={() => this.setState({ boardToEdit: null })} board={boardToEdit} firebase={firebase} locale={locale} messages={messages} user={user} auth={auth} onCompleteSave={this._handleOnCompleteSave} />
-          </div>
+          {
+            (user && category !== 'notice' || (category === 'notice' && user && user.authorization === 'admin')) &&
+            <div className='col-xs-12' style={{ padding: isScreenSize.sm() || isScreenSize.xs() ? '0px' : '0px 15px' }}>
+              <Editor category={category} onClickCancel={() => this.setState({ boardToEdit: null })} board={boardToEdit} firebase={firebase} locale={locale} messages={messages} user={user} auth={auth} onCompleteSave={this._handleOnCompleteSave} />
+            </div>
+          }
           <WaypointListContainer
             elements={renderList()}
             onLoad={this._loadMoreItems}

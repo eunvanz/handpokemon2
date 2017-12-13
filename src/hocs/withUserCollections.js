@@ -15,7 +15,7 @@ export default ComposedComponent => {
     }
     render () {
       const { userCollections, mons, ...props } = this.props
-      if (!userCollections || !mons) return <LoadingContainer text='콜렉션 정보를 가져오는 중...' />
+      if (!mons) return <LoadingContainer text='콜렉션 정보를 가져오는 중...' />
       return (
         <ComposedComponent userCollections={userCollections} mons={mons} {...props} />
       )

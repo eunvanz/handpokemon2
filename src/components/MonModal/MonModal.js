@@ -125,7 +125,7 @@ class MonModal extends React.Component {
           <div className='col-sm-4 col-xs-12 text-center' style={{ marginBottom: '20px' }}>
             <p style={{ marginBottom: '10px' }}>
               <Img src={type === 'collection' || type === 'defender' ? getMonImage(tobeMon).url : 'hidden'} width='100%'
-                style={{ border: '1px dotted #e2e2e2', maxWidth: '200px' }} />
+                style={{ border: '1px dotted #e2e2e2', maxWidth: '200px' }} cache />
             </p>
             {tobeMon.level &&
               renderLevel()

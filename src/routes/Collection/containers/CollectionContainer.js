@@ -29,6 +29,6 @@ const mapStateToProps = (state) => {
     userModal: state.userModal
   }
 }
-const wrappedCollectionView = compose(withAuth(true), withUserCollections)(CollectionView)
+const wrappedCollectionView = compose(withAuth(false), withUserCollections)(CollectionView)
 
 export default connect(mapStateToProps, mapDispatchToProps)(wrappedCollectionView)

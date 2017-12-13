@@ -3467,3 +3467,18 @@ html.ie9 .mCS-minimal-dark.mCSB_scrollTools_onDrag .mCSB_dragger .mCSB_dragger_b
   padding: 10px;
   min-height: 40vh;
 }
+
+.slick-dots {
+  bottom: 50px;
+}
+
+.slick-prev {
+  left: 10px;
+  z-index: 1;
+  top: 45%;
+}
+
+.slick-next {
+  right: 10px;
+  top: 45%;
+}

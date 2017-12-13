@@ -63,6 +63,7 @@ class SettingView extends React.Component {
         promArr.push(setUserPath(firebase, auth.uid, 'profileImageKey', null))
       }
     }
+    let profileImageUrl
     Promise.all(promArr)
     .then(() => {
       if (profileImageFile) return postImage(firebase, PROFILE_IMAGE_ROOT, [profileImageFile])
@@ -71,7 +72,7 @@ class SettingView extends React.Component {
     .then(res => {
       if (profileImageFile) {
         const promArr = []
-        const profileImageUrl = res[0].File.downloadURL
+        profileImageUrl = res[0].File.downloadURL
         const profileImageKey = res[0].key
         promArr.push(setUserPath(firebase, auth.uid, 'profileImage', profileImageUrl))
         promArr.push(setUserPath(firebase, auth.uid, 'profileImageKey', profileImageKey))
@@ -80,6 +81,7 @@ class SettingView extends React.Component {
       return Promise.resolve()
     })
     .then(() => {
+      if (profileImageUrl) document.getElementById('sidebarProfileImage').src = profileImageUrl
       toast(getMsg(messages.setting.success, locale))
       this.setState({ isImageEdited: false, isTextEdited: false, isLoading: false })
       // window.swal(`${getMsg(messages.common.successShort, locale)}!`, getMsg(messages.common.success, locale), 'success')

@@ -130,7 +130,7 @@ class MonCard extends React.Component {
             backgroundColor: 'white'
           }}>
           <a className='ci-avatar'>
-            <Img src={(type === 'collection' || type === 'defender') && !isDummy ? getMonImage(tobeMon).url : unloader} width='100%' style={{ border: '1px dotted #e2e2e2' }} />
+            <Img cache src={(type === 'collection' || type === 'defender') && !isDummy ? getMonImage(tobeMon).url : unloader} width='100%' height='100%' style={{ border: '1px dotted #e2e2e2' }} />
           </a>
           <div className='c-info text-center' style={{ margin: '5px 0px', position: 'relative' }}>
             {

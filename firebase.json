@@ -11,6 +11,13 @@
         "source": "**",
         "destination": "/index.html"
       }
-    ]
+    ],
+    "headers": [{
+      "source": "**/o/**",
+      "headers": [{
+        "key": "Cache-Control",
+        "value": "max-age=1296000"
+      }]
+    }]
   }
 }

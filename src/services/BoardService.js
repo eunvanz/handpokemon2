@@ -23,6 +23,15 @@ export const updateBoard = (firebase, board) => {
   return firebase.ref().update(updateObj)
 }
 
+export const setBoardUserProfile = (firebase, profilePath, userId) => {
+  const userRef = firebase.ref(`users/${userId}/profileImage`)
+  return userRef.once('value')
+  .then(snapshot => {
+    const newProfileImage = snapshot.val()
+    return firebase.ref(`${profilePath}`).set(newProfileImage).then(() => Promise.resolve(newProfileImage))
+  })
+}
+
 export const updateLikes = (firebase, board, num) => {
   const ref = firebase.ref(`boards/${board.category}/${board.id}/likes`)
   return ref.transaction(likes => {

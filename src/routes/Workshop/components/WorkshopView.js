@@ -45,6 +45,10 @@ class WorkshopView extends React.Component {
   shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
   }
+  componentWillUnmount () {
+    const { firebase } = this.props
+    firebase.unWatchEvent('value', 'works')
+  }
   _handleOnClickRegister () {
     this.setState({ showRegisterModal: true, isEditMode: false, imgUrl: null })
   }
@@ -111,7 +115,6 @@ class WorkshopView extends React.Component {
     this.setState({ formData: { name: work.name, designer: work.designer }, imgUrl: work.img, showRegisterModal: true, isEditMode: true, workshopToEdit: work })
   }
   _handleOnClickDelete (work) {
-    console.log('work', work)
     const { firebase, messages, locale } = this.props
     deleteWorkshop(firebase, work)
     .then(() => {
@@ -222,8 +225,8 @@ WorkshopView.contextTypes = {
 
 WorkshopView.propTypes = {
   firebase: PropTypes.object.isRequired,
-  auth: PropTypes.object.isRequired,
-  user: PropTypes.object.isRequired,
+  auth: PropTypes.object,
+  user: PropTypes.object,
   messages: PropTypes.object.isRequired,
   locale: PropTypes.string.isRequired,
   works: PropTypes.array.isRequired
