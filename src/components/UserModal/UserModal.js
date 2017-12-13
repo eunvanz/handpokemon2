@@ -27,7 +27,7 @@ class UserModal extends React.Component {
     const renderFooter = () => {
       return (
         <div className='text-right'>
-          {showCollectionButton && <Button text='콜렉션 구경' color='green' onClick={() => this.context.router.push(`/collection/${user.id}`)} />}<Button link text='닫기' onClick={close} />
+          {!isMyself && showCollectionButton && <Button text='콜렉션 구경' color='green' onClick={() => this.context.router.push(`/collection/${user.id}`)} />}<Button link text='닫기' onClick={close} />
         </div>
       )
     }

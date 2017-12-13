@@ -100,9 +100,10 @@ class HomeView extends React.Component {
     this.setState({ [name]: value })
   }
   _handleOnClickSendChat () {
-    this.setState({ isChatLoading: true })
     const { firebase, user, auth } = this.props
     const { chatContent } = this.state
+    if (chatContent.length === 0) return
+    this.setState({ isChatLoading: true })
     postChat(firebase, Object.assign({}, new Chat(), { writer: Object.assign({}, user, { id: auth.uid }), content: chatContent }))
     .then(() => {
       this.setState({ isChatLoading: false, chatContent: '' })
@@ -110,7 +111,7 @@ class HomeView extends React.Component {
     })
   }
   render () {
-    const { boards, locale, auth, works, user, chats } = this.props
+    const { boards, locale, auth, works, user, chats, firebase, setUserModal } = this.props
     const { isChatLoading } = this.state
     const renderBanners = () => {
       const settings = {
@@ -194,7 +195,7 @@ class HomeView extends React.Component {
       })
     }
     const renderChats = () => {
-      return chats.global.map(chat => <ChatMessage key={chat.id} chat={chat} side={auth && chat.writer.id === auth.uid ? 'right' : 'left'}
+      return chats.global.map(chat => <ChatMessage key={chat.id} chat={chat} firebase={firebase} setUserModal={setUserModal} auth={auth} side={auth && chat.writer.id === auth.uid ? 'right' : 'left'}
         timeComponent={<FormattedRelative value={new Date(chat.regDate)} />} />)
     }
     const renderNewMons = () => {
@@ -218,7 +219,7 @@ class HomeView extends React.Component {
         <div className='row'>
           <div className='col-xs-12'>
             <div className='block-header'>
-              <h1 style={{ fontSize: '20px' }}>한땀 한땀 수제 포켓몬을 모아보자! <small>v.{VERSION}</small></h1>
+              <h1 style={{ fontSize: '20px' }}>한땀 한땀 수제 포켓몬을 모아보자!</h1>
             </div>
             {renderBanners()}
           </div>
@@ -292,7 +293,8 @@ HomeView.propTypes = {
   boards: PropTypes.object.isRequired,
   works: PropTypes.array.isRequired,
   chats: PropTypes.object,
-  mons: PropTypes.array.isRequired
+  mons: PropTypes.array.isRequired,
+  setUserModal: PropTypes.func.isRequired
 }
 
 export default HomeView

@@ -12,6 +12,8 @@ import { convertMapToArr } from 'utils/commonUtil'
 
 import HomeView from '../components/HomeView'
 
+import { setUserModal } from 'store/userModal'
+
 const wrappedHomeView = compose(
   firebaseConnect(['/works', '/chats']),
   withIntl,
@@ -29,4 +31,10 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps, null)(wrappedHomeView)
+const mapDispatchToProps = dispatch => {
+  return {
+    setUserModal: (userModal) => dispatch(setUserModal(userModal))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(wrappedHomeView)

@@ -4,10 +4,11 @@ export const postChat = (firebase, chat) => {
   chat.id = id
   return firebase.ref(`chats/${chat.channel}/${id}`).update(chat)
     .then(() => {
-      return ref.orderByChild('regDate').once('value')
+      return ref.once('value')
       .then(snapshot => {
-        if (snapshot.length > 30) {
-          const keyToDelete = snapshot[0].key
+        const keys = Object.keys(snapshot.val())
+        if (keys.length > 30) {
+          const keyToDelete = keys[0]
           return firebase.remove(`chats/${chat.channel}/${keyToDelete}`)
         }
         return Promise.resolve()

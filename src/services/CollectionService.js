@@ -23,7 +23,6 @@ const getUpdateColObj = col => {
 export const getCollectionsByUserId = (firebase, userId) => {
   return firebase.ref(`userCollections/${userId}`).once('value')
   .then(snapshot => {
-    console.log('snapshot', snapshot.val())
     const userCollections = convertMapToArr(snapshot.val())
     return Promise.resolve(userCollections)
   })

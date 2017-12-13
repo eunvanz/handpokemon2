@@ -121,7 +121,7 @@ class BoardListView extends React.Component {
     window.scrollTo(0, 0)
   }
   render () {
-    const { messages, locale, auth, user, firebase } = this.props
+    const { messages, locale, auth, user, firebase, setUserModal } = this.props
     const { category } = this.props.params
     const { boardList, isLastPage, isLoading, boardToEdit, isRefreshing } = this.state
     const renderList = () => {
@@ -139,6 +139,7 @@ class BoardListView extends React.Component {
             locale={locale}
             onChangeElement={() => this._handleOnChangeElement(board)}
             onClickEdit={() => this._handleOnClickEdit(board)}
+            setUserModal={setUserModal}
           />
         )
       })
@@ -182,7 +183,8 @@ BoardListView.propTypes = {
   messages: PropTypes.object.isRequired,
   locale: PropTypes.string.isRequired,
   boards: PropTypes.array.isRequired,
-  params: PropTypes.object.isRequired
+  params: PropTypes.object.isRequired,
+  setUserModal: PropTypes.func.isRequired
 }
 
 export default BoardListView

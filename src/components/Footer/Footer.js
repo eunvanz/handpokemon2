@@ -2,6 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import shallowCompare from 'react-addons-shallow-compare'
 
+import { VERSION } from 'constants/release'
+
 class Footer extends React.Component {
   constructor (props) {
     super(props)
@@ -15,7 +17,8 @@ class Footer extends React.Component {
   render () {
     return (
       <div id='footer'>
-        made with &#9829; for Pokémon® by CIVASOUL
+        <p>made with &#9829; for Pokémon® by CIVASOUL</p>
+        <small>v.{VERSION}</small>
       </div>
     )
   }

@@ -34,7 +34,7 @@ class CoreLayout extends React.Component {
     return !is(fromJS(nextProps), fromJS(this.props)) || !is(fromJS(nextState), fromJS(this.state))
   }
   componentDidUpdate (prevProps, prevState) {
-    if (prevProps.luckies.length !== this.props.luckies.length) {
+    if (prevProps.luckies && prevProps.luckies.length !== 0 && prevProps.luckies.length !== this.props.luckies.length) {
       const getTypeName = type => {
         if (type === 'signUp') return '초기픽'
         else if (type === 'pick') return '채집'
@@ -120,6 +120,7 @@ class CoreLayout extends React.Component {
         <UserModal
           {...userModal}
           close={closeUserModal}
+          showCollectionButton
         />
         <ToastContainer
           className='toast'

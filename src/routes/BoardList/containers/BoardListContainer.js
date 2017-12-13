@@ -7,8 +7,11 @@ import withIntl from 'hocs/withIntl'
 
 import BoardListView from '../components/BoardListView'
 
+import { setUserModal } from 'store/userModal'
+
 const mapDispatchToProps = dispatch => {
   return {
+    setUserModal: (userModal) => dispatch(setUserModal(userModal))
   }
 }
 

@@ -12,6 +12,7 @@ import Button from 'components/Button'
 // import Fold from 'components/Fold'
 
 import { updateLikes, updateWhoLikes, postReply, deleteBoard, deleteReply, increaseViews } from 'services/BoardService'
+import { getUserByUserId } from 'services/UserService'
 
 import Reply from 'models/reply'
 
@@ -38,6 +39,7 @@ class BoardElement extends React.Component {
     this._handleOnClickEdit = this._handleOnClickEdit.bind(this)
     this._handleOnClickDeleteReply = this._handleOnClickDeleteReply.bind(this)
     this._handleOnClickClose = this._handleOnClickClose.bind(this)
+    this._handleOnClickUserProfile = this._handleOnClickUserProfile.bind(this)
   }
   componentDidUpdate (prevProps, prevState) {
     if (prevProps.board.likes !== this.props.board.likes) this.setState({ isLikesLoading: false })
@@ -152,6 +154,24 @@ class BoardElement extends React.Component {
     e.stopPropagation()
     this.setState({ showContent: false })
   }
+  _handleOnClickUserProfile (userId) {
+    const { setUserModal, firebase, auth } = this.props
+    setUserModal({
+      show: true,
+      user: null,
+      isMyself: false,
+      isLoading: true
+    })
+    getUserByUserId(firebase, userId)
+    .then(user => {
+      setUserModal({
+        show: true,
+        user,
+        isLoading: false,
+        isMyself: auth.uid === userId
+      })
+    })
+  }
   render () {
     const { board, auth, user, message, locale, firebase } = this.props
     const { showContent, showButtons, isLikesLoading, replyContent, isSaveReplyLoading, isDeleteLoading, isEditLoading, isDeleteReplyLoading } = this.state
@@ -176,13 +196,13 @@ class BoardElement extends React.Component {
           return (
             <div className={`list-group-item media${isScreenSize.xs() ? ' p-15' : ''}`} key={reply.id}>
               <a className='pull-left'>
-                <Img src={getThumbnailImageUrl(reply.writer.profileImage)} className='lgi-img' isUserProfile
+                <Img src={getThumbnailImageUrl(reply.writer.profileImage)} className='lgi-img' isUserProfile style={{ cursor: 'pointer' }}
                   profilePath={`boards/${board.category}/${board.id}/replies/${reply.id}/writer/profileImage`}
-                  firebase={firebase} user={reply.writer}
+                  firebase={firebase} user={reply.writer} onClick={() => this._handleOnClickUserProfile(reply.writer.id)}
                 />
               </a>
               <div className='media-body'>
-                <a className='lgi-heading'>
+                <a className='lgi-heading' onClick={() => this._handleOnClickUserProfile(reply.writer.id)} style={{ cursor: 'pointer' }}>
                   {reply.writer.nickname}
                   <small className='c-gray m-l-10'>
                     <FormattedRelative value={new Date(reply.regDate)} />
@@ -206,8 +226,8 @@ class BoardElement extends React.Component {
                 !isScreenSize.xs() &&
                 <div className='pull-left'>
                   <Img src={getThumbnailImageUrl(board.writer.profileImage)} className='lgi-img' isUserProfile
-                    profilePath={`boards/${board.category}/${board.id}/writer/profileImage`}
-                    firebase={firebase} user={board.writer}
+                    profilePath={`boards/${board.category}/${board.id}/writer/profileImage`} style={{ cursor: 'pointer' }}
+                    firebase={firebase} user={board.writer} onClick={() => this._handleOnClickUserProfile(board.writer.id)}
                   />
                 </div>
               }
@@ -316,7 +336,8 @@ BoardElement.propTypes = {
   locale: PropTypes.string.isRequired,
   board: PropTypes.object.isRequired,
   onChangeElement: PropTypes.func.isRequired,
-  onClickEdit: PropTypes.func.isRequired
+  onClickEdit: PropTypes.func.isRequired,
+  setUserModal: PropTypes.func.isRequired
 }
 
 export default BoardElement
