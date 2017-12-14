@@ -4,7 +4,7 @@ import shallowCompare from 'react-addons-shallow-compare'
 import Slider from 'react-slick'
 import { FormattedRelative } from 'react-intl'
 import { toast } from 'react-toastify'
-import { sortBy } from 'lodash'
+import { sortBy, reverse } from 'lodash'
 import $ from 'jquery'
 import LinesEllipsis from 'react-lines-ellipsis'
 
@@ -210,7 +210,7 @@ class HomeView extends React.Component {
     }
     const renderNewMons = () => {
       const { mons } = this.props
-      return sortBy(mons, mon => !mon.id).slice(0, isScreenSize.xs() ? 2 : 3).map((mon) => {
+      return reverse(sortBy(mons, mon => mon.id)).slice(0, isScreenSize.xs() ? 2 : 3).map((mon) => {
         return (
           <MonCard isNotMine key={mon.id} mon={{ asis: null, tobe: mon }} type='mon' isCustomSize className='col-xs-6 col-sm-4' />
         )
