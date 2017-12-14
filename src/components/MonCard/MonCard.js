@@ -89,7 +89,7 @@ class MonCard extends React.Component {
         size='xs'
         color={isDummy ? 'green' : 'orange'}
         text={isDummy ? '추가' : '교체'}
-        icon={isDummy ? 'fa fa-plus' : 'fa fa-refresh'}
+        icon={isDummy ? 'fa fa-plus' : 'fa fa-sync'}
         onClick={onClickSetDefenderBtn}
         disabled={disableChangeBtn}
       />
