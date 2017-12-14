@@ -33,7 +33,7 @@ const bannerTextStyle = (color) => {
 }
 
 const bannerStyle = (color) => {
-  return { height: '230px', maxWidht: '1140px', backgroundColor: color, padding: '10px', textAlign: 'center' }
+  return { height: '230px', maxWidth: '1140px', backgroundColor: color, padding: '10px', textAlign: 'center', cursor: 'pointer' }
 }
 
 class HomeView extends React.Component {
@@ -129,7 +129,7 @@ class HomeView extends React.Component {
           <Slider {...settings}>
             <div className='card'>
               <div className='card-body'>
-                <div style={bannerStyle(colors.amber)}>
+                <div style={bannerStyle(colors.amber)} onClick={() => this.context.router.push('/board-list/notice/-L0L5ReceM9--_ehrASe')}>
                   <img src='https://firebasestorage.googleapis.com/v0/b/hand-pokemon-2.appspot.com/o/monImages%2F%E1%84%91%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%85%E1%85%B5.png?alt=media&token=e719c144-0e45-4307-ab02-7fa64ff9edf9'
                     style={{ width: '150px', display: 'inline-block' }}
                   /><br />
@@ -140,7 +140,7 @@ class HomeView extends React.Component {
             </div>
             <div className='card'>
               <div className='card-body'>
-                <div style={bannerStyle(colors.lime)}>
+                <div style={bannerStyle(colors.lime)} onClick={() => this.context.router.push('/board-list/notice/-L0LA3iTzcrMT7kMTQsv')}>
                   <img src='https://firebasestorage.googleapis.com/v0/b/hand-pokemon-2.appspot.com/o/monImages%2F%E1%84%85%E1%85%AE%E1%84%87%E1%85%B3%E1%84%83%E1%85%A9.png?alt=media&token=2034a328-4296-49b9-8cae-3ae4135c0243'
                     style={{ width: '150px', display: 'inline-block' }}
                   /><br />
@@ -151,7 +151,7 @@ class HomeView extends React.Component {
             </div>
             <div className='card'>
               <div className='card-body'>
-                <div style={bannerStyle(colors.lightGray)}>
+                <div style={bannerStyle(colors.lightGray)} onClick={() => this.context.router.push('/board-list/notice/-L0LCAqYGnlxfKvG6Sqv')}>
                   <img src='https://firebasestorage.googleapis.com/v0/b/hand-pokemon-2.appspot.com/o/monImages%2Fdaktrio.png?alt=media&token=33188cfe-4c15-4e3a-ad78-1b0337b5fad5'
                     style={{ width: '150px', display: 'inline-block' }}
                   /><br />
@@ -193,6 +193,7 @@ class HomeView extends React.Component {
       )
     }
     const renderWorks = () => {
+      if (works.length === 0) return <div className='flex-center' style={{ minHeight: '276px' }}>등록된 작품이 없습니다. 첫 번째로 작품을 등록해보세요!</div>
       return works.slice(0, isScreenSize.xs() ? 2 : 3).map((work) => {
         return (
           <WorkshopCard item={work} user={user} auth={auth} key={work.id}

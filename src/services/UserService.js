@@ -43,6 +43,15 @@ export const getUserIdByEmail = (firebase, email) => {
   })
 }
 
+export const getUserIdByRecommenderCode = (firebase, recommenderCode) => {
+  const ref = firebase.ref('users')
+  return ref.orderByChild('recommenderCode').equalTo(recommenderCode).once('value')
+    .then(snapshot => {
+      const userId = Object.keys(snapshot.val())[0]
+      return Promise.resolve(userId)
+    })
+}
+
 export const getUserByUserId = (firebase, userId) => {
   const ref = firebase.ref(`users/${userId}`)
   return ref.once('value').then(snapshot => {

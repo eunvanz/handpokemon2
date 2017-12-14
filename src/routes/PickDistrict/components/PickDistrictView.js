@@ -49,7 +49,8 @@ class PickDistrictView extends React.Component {
       )
     }
     const renderDistrictInfo = () => {
-      return districts.map(district =>
+      const district = districts[6]
+      return (
         <div className={district.name === '중앙던전' ? 'col-xs-12' : 'col-sm-4'} key={keygen._()}>
           <Card
             header={<span style={{ fontSize: 'large' }}>{district.name}</span>}
@@ -82,6 +83,39 @@ class PickDistrictView extends React.Component {
           />
         </div>
       )
+      // return districts.map(district =>
+      //   <div className={district.name === '중앙던전' ? 'col-xs-12' : 'col-sm-4'} key={keygen._()}>
+      //     <Card
+      //       header={<span style={{ fontSize: 'large' }}>{district.name}</span>}
+      //       headerBgColor={district.color}
+      //       headerTextColor={district.name === '중앙던전' ? '#333' : 'white'}
+      //       body={
+      //         <div>
+      //           <p className='text-center' style={{ marginTop: '12px' }}>
+      //             {district.name === '중앙던전' ? '모든 속성의 포켓몬' : renderAttrBadges(district.attrs)}
+      //           </p>
+      //           {
+      //             creditInfo && creditInfo.pickCredit > 0 &&
+      //             <div className='text-center'>
+      //               <Button className='m-r-5' text='채집 X 1' onClick={() => this._handleOnClickPick(district, 1)} />
+      //               {
+      //                 creditInfo.pickCredit > 1 &&
+      //                 <Button text={`채집 X ${creditInfo.pickCredit > 6 ? 6 : creditInfo.pickCredit}`}
+      //                   onClick={() => this._handleOnClickPick(district, creditInfo.pickCredit > 6 ? 6 : creditInfo.pickCredit)} />
+      //               }
+      //             </div>
+      //           }
+      //           {
+      //             creditInfo && creditInfo.pickCredit < 1 &&
+      //             <div className='text-center c-gray f-13'>
+      //               <WarningText text='채집 크레딧이 부족합니다.' />
+      //             </div>
+      //           }
+      //         </div>
+      //       }
+      //     />
+      //   </div>
+      // )
     }
     return (
       <div className='container container-alt' style={{ padding: isScreenSize.sm() || isScreenSize.xs() ? '0px' : '0px 15px' }}>

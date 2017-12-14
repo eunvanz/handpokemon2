@@ -58,6 +58,7 @@ class CoreLayout extends React.Component {
   }
   render () {
     const { children, messages, locale, userModal, closeUserModal, releaseInfo } = this.props
+    if (!releaseInfo) return <div>Checking Version...</div>
     return (
       <div>
         <Helmet
@@ -146,7 +147,7 @@ CoreLayout.propTypes = {
   userModal: PropTypes.object.isRequired,
   closeUserModal: PropTypes.func.isRequired,
   luckies: PropTypes.array,
-  releaseInfo: PropTypes.object.isRequired
+  releaseInfo: PropTypes.object
 }
 
 const wrappedCoreLayout = compose(withIntl, withAuth(false), firebaseConnect(({ auth }) => {

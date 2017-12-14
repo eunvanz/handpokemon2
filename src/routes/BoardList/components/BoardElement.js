@@ -241,7 +241,7 @@ class BoardElement extends React.Component {
               <div className='media-body'>
                 <h2 style={{ fontSize: '16px', marginBottom: '5px' }}>{board.title[locale]}</h2>
                 <small className='c-gray'>
-                  by {board.writer.nickname}
+                  by <span className='c-lightblue' onClick={() => this._handleOnClickUserProfile(board.writer.id)} style={{ cursor: 'pointer' }}>{board.writer.nickname}</span>
                   {
                     !isScreenSize.xs() &&
                     <span>

@@ -20,7 +20,9 @@ class SignInView extends React.Component {
         password: '',
         remember: false
       },
-      isLoading: false
+      isSignInLoading: false,
+      isGoogleLoading: false,
+      isFacebookLoading: false
     }
     this._handleOnChangeInput = this._handleOnChangeInput.bind(this)
     this._handleOnClickLogin = this._handleOnClickLogin.bind(this)
@@ -93,16 +95,16 @@ class SignInView extends React.Component {
     }
   }
   _loginProcess () {
-    this.setState({ isLoading: true })
+    this.setState({ isSignInLoading: true })
     const { formData } = this.state
     const { firebase } = this.props
     signIn(firebase, formData)
     .then(user => {
-      this.setState({ isLoading: false })
+      this.setState({ isSignInLoading: false })
       this.context.router.push('/')
     })
     .catch(e => {
-      this.setState({ isLoading: false })
+      this.setState({ isSignInLoading: false })
       let errMsg
       if (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password') {
         errMsg = '이메일 혹은 비밀번호가 틀렸습니다.'
@@ -119,10 +121,15 @@ class SignInView extends React.Component {
   }
   _handleOnClickSignInWith (provider) {
     const { firebase } = this.props
+    let loadingName
+    if (provider === 'google') loadingName = 'isGoogleLoading'
+    else if (provider === 'facebook') loadingName = 'isFacebookLoading'
+    this.setState({ [loadingName]: true })
     firebase.login({ provider })
   }
   render () {
     const { messages, locale } = this.props
+    const { isSignInLoading, isGoogleLoading, isFacebookLoading } = this.state
     return (
       <div className='text-center'
         style={{ backgroundColor: '#f3f3f3', height: `${300}px`, minHeight: '300px' }}>
@@ -151,18 +158,18 @@ class SignInView extends React.Component {
                   onChange={this._handleOnChangeInput} />
               </div>
             </div>
-            <a onClick={this.state.isLoading ? null : this._handleOnClickLogin}
+            <button onClick={this.state.isSignInLoading ? null : this._handleOnClickLogin} disabled={isGoogleLoading || isFacebookLoading}
               className={`btn btn-login btn-success btn-float waves-effect waves-circle waves-float`}
-              style={{ lineHeight: '2.5em', marginTop: '-50px', cursor: this.state.isLoading ? 'default' : 'pointer' }}>
-              <i className={this.state.isLoading ? 'zmdi zmdi-refresh zmdi-hc-spin' : 'zmdi zmdi-arrow-forward'} />
-            </a>
+              style={{ lineHeight: '2.5em', marginTop: '-50px', cursor: this.state.isSignInLoading ? 'default' : 'pointer' }}>
+              <i className={this.state.isSignInLoading ? 'zmdi zmdi-refresh zmdi-hc-spin' : 'zmdi zmdi-arrow-forward'} />
+            </button>
             <div>
               <p>{getMsg(messages.signInView.signInWith, locale)}</p>
               <Button className='m-l-5' icon='zmdi zmdi-google' text='google' color='red' style={{ width: isScreenSize.xs() ? null : '120px' }} size={isScreenSize.xs() ? 'xs' : null} block={isScreenSize.xs()}
-                onClick={() => this._handleOnClickSignInWith('google')}
+                onClick={() => this._handleOnClickSignInWith('google')} loading={isGoogleLoading} disabled={isFacebookLoading || isSignInLoading}
               />
               <Button className='m-l-5' icon='zmdi zmdi-facebook' text='facebook' color='blue' style={{ width: isScreenSize.xs() ? null : '120px' }} size={isScreenSize.xs() ? 'xs' : null} block={isScreenSize.xs()}
-                onClick={() => this._handleOnClickSignInWith('facebook')}
+                onClick={() => this._handleOnClickSignInWith('facebook')} loading={isFacebookLoading} disabled={isGoogleLoading || isSignInLoading}
               />
             </div>
           </div>

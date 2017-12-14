@@ -37,11 +37,13 @@ class Sidebar extends React.Component {
     this._handleOnClickPostHonor = this._handleOnClickPostHonor.bind(this)
     this._handleOnClickRestructureMon = this._handleOnClickRestructureMon.bind(this)
     this._initScroll = this._initScroll.bind(this)
+    this._handleOnClickReset = this._handleOnClickReset.bind(this)
     this.state = {
       pickCreditTimer: null,
       battleCreditTimer: null,
       adventureCreditTimer: null,
-      hiddenMillis: 0
+      hiddenMillis: 0,
+      isCreditInitialized: false
     }
     this.timeouts = {}
     this.intervals = {} // 크레딧이 0 이상일 경우의 interval
@@ -95,7 +97,9 @@ class Sidebar extends React.Component {
   componentDidUpdate (prevProps, prevState) {
     const { user } = this.props
     const { timeouts } = this
-    if ((!prevProps.user && user) || (prevProps.user && !prevProps.user.nickname && user && user.nickname)) { // user가 로그인 했을경우 크레딧을 리프레시해서 가져옴
+    const { isCreditInitialized } = this.state
+    if (!isCreditInitialized || (!prevProps.user && user) || (prevProps.user && !prevProps.user.nickname && user && user.nickname)) { // user가 로그인 했을경우 크레딧을 리프레시해서 가져옴
+      this.setState({ isCreditInitialized: true })
       this._refreshUserCredits()
     } else if (prevProps.user && user) { // 크레딧에 변화가 있을 경우 다시 시간 계산해서 interval 및 timeout 실행
       if (prevProps.user.pickCredit !== user.pickCredit) {
@@ -226,6 +230,14 @@ class Sidebar extends React.Component {
       .then(() => {
       })
     })
+  }
+  _handleOnClickReset () {
+    const { firebase } = this.props
+    firebase.remove('collections')
+    firebase.remove('monCollections')
+    firebase.remove('profileImages')
+    firebase.remove('stages')
+    firebase.remove('userCollections')
   }
   render () {
     const { user, auth, messages, locale } = this.props
@@ -361,6 +373,9 @@ class Sidebar extends React.Component {
               {/* <li className='f-700'>
                 <a onClick={this._handleOnClickRestructureMon}><i className='fa fa-lock' style={{ fontSize: '18px' }} /> 몬구조변환</a>
               </li> */}
+              {/*<li className='f-700'>
+                <a onClick={this._handleOnClickReset}><i className='fa fa-lock' style={{ fontSize: '18px' }} /> DB초기화</a>
+              </li>*/}
             </ul>
       </aside>
     )

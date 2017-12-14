@@ -17,7 +17,7 @@ class FloatingButton extends React.Component {
         bottom: isMobile.any() ? '20px' : '40px',
         backgroundColor: backgroundColor || colors.red,
         lineHeight: 1,
-        zIndex: hidden ? 1 : 1000,
+        zIndex: hidden ? 1 : 99,
         boxShadow: hidden ? '0 2px 5px rgba(0, 0, 0, 0), 0 2px 10px rgba(0, 0, 0, 0)' : '0 2px 5px rgba(0, 0, 0, 0.16), 0 2px 10px rgba(0, 0, 0, 0.12)'
       }
     }
@@ -25,10 +25,10 @@ class FloatingButton extends React.Component {
   componentWillUpdate (nextProps, nextState) {
     if (!nextProps.hidden && this.props.hidden) {
       const newStyle = {
-        transform: `translate3d(0, -${this.props.bottom}px, 0)`, transition, zIndex: 999, boxShadow: '0 2px 5px rgba(0, 0, 0, 0.16), 0 2px 10px rgba(0, 0, 0, 0.12)' }
+        transform: `translate3d(0, -${this.props.bottom}px, 0)`, transition, zIndex: 98, boxShadow: '0 2px 5px rgba(0, 0, 0, 0.16), 0 2px 10px rgba(0, 0, 0, 0.12)' }
       this.setState({ style: Object.assign({}, this.state.style, newStyle) })
     } else if (nextProps.hidden && !this.props.hidden) {
-      const newStyle = { transform: `translate3d(0, 0, 0)`, transition, zIndex: 999, boxShadow: '0 2px 5px rgba(0, 0, 0, 0), 0 2px 10px rgba(0, 0, 0, 0)' }
+      const newStyle = { transform: `translate3d(0, 0, 0)`, transition, zIndex: 98, boxShadow: '0 2px 5px rgba(0, 0, 0, 0), 0 2px 10px rgba(0, 0, 0, 0)' }
       this.setState({ style: Object.assign({}, this.state.style, newStyle) })
     }
   }

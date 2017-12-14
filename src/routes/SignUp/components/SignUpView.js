@@ -13,7 +13,7 @@ import Loading from 'components/Loading'
 import AvatarImgInput from 'components/AvatarImgInput'
 import WarningText from 'components/WarningText'
 
-import { isDupEmail, isDupNickname, signUp, getUserIdByEmail, signUpWithSocialAccount,
+import { isDupEmail, isDupNickname, signUp, getUserIdByRecommenderCode, signUpWithSocialAccount,
   isValidRecommenderCode } from 'services/UserService'
 import { getStartPick } from 'services/MonService'
 import { postImage } from 'services/ImageService'
@@ -59,7 +59,9 @@ class SignUpView extends React.Component {
       profileImageFile: null,
       isApplicable: false,
       signUpProcess: false,
-      recommender: null
+      recommender: null,
+      isGoogleLoading: false,
+      isFacebookLoading: false
     }
     this._handleOnChangeInput = this._handleOnChangeInput.bind(this)
     this._checkEmailField = this._checkEmailField.bind(this)
@@ -76,6 +78,17 @@ class SignUpView extends React.Component {
   }
   componentDidUpdate (prevProps, prevState) {
     if (this.props.user && this.props.user.nickname) this.context.router.push('/')
+  }
+  componentWillUnmount () {
+    const { firebase, auth, user } = this.props
+    const { signUpProcess } = this.state
+    if (!signUpProcess && auth && !user) {
+      firebase.remove(`users/${auth.uid}`)
+      .then(() => {
+        firebase.auth().currentUser.delete()
+      })
+      .then(() => location.reload())
+    }
   }
   _handleOnChangeInput (e) {
     let { name, value } = e.target
@@ -231,7 +244,7 @@ class SignUpView extends React.Component {
         profileImageKey = res[0].key
       }
       let user = {
-        email: isSocialAccount ? this.props.user.providerData[0].email : formData.email,
+        email: isSocialAccount ? this.props.auth.providerData[0].email : formData.email,
         password: formData.password,
         nickname: formData.nickname,
         profileImage: profileImageUrl,
@@ -245,7 +258,7 @@ class SignUpView extends React.Component {
       return signUp(firebase, user)
     })
     .then(user => {
-      return getUserIdByEmail(firebase, user.email)
+      return getUserIdByRecommenderCode(firebase, user.recommenderCode)
     })
     .then(userId => {
       const { startPick } = this.state
@@ -260,6 +273,7 @@ class SignUpView extends React.Component {
         confirmButtonText: '포켓몬 채집하기'
       })
       .then(() => {
+        document.getElementById('sidebarProfileImage').src = profileImageUrl
         this.context.router.push('/pick-district')
       })
     })
@@ -304,11 +318,16 @@ class SignUpView extends React.Component {
     })
   }
   _handleOnClickSignInWith (provider) {
+    let loadingName
+    if (provider === 'google') loadingName = 'isGoogleLoading'
+    else if (provider === 'facebook') loadingName = 'isFacebookLoading'
+    this.setState({ [loadingName]: true })
     const { firebase } = this.props
     firebase.login({ provider })
   }
   render () {
     const { messages, locale } = this.props
+    const { isGoogleLoading, isFacebookLoading } = this.state
     const renderPickedMon = () => {
       const { startPick, loading } = this.state
       if (loading) return <Loading height={242} />
@@ -317,7 +336,7 @@ class SignUpView extends React.Component {
       return startPick.map(mon => {
         seq++
         return (
-          <MonCard mon={{ tobe: mon }} key={keygen._()} type='collection'
+          <MonCard mon={{ tobe: mon }} key={seq} type='collection'
             className={`${seq === 1 ? 'col-md-offset-3 col-sm-offset-1 col-xs-offset-0' : ''}`} />
         )
       })
@@ -351,10 +370,10 @@ class SignUpView extends React.Component {
                     <div className='col-sm-offset-4 col-sm-8 m-b-25' style={{ padding: isScreenSize.xs() ? '0px' : null }}>
                       <p className='m-b-10'>{getMsg(messages.signUpView.signUpWith, locale)}</p>
                       <Button icon='zmdi zmdi-google' text='google' color='red' style={{ width: '120px' }}
-                        onClick={() => this._handleOnClickSignInWith('google')}
+                        onClick={() => this._handleOnClickSignInWith('google')} loading={isGoogleLoading} disabled={isFacebookLoading}
                       />
                       <Button className='m-l-5' icon='zmdi zmdi-facebook' text='facebook' color='blue' style={{ width: '120px' }}
-                        onClick={() => this._handleOnClickSignInWith('facebook')}
+                        onClick={() => this._handleOnClickSignInWith('facebook')} loading={isFacebookLoading} disabled={isGoogleLoading}
                       />
                     </div>
                   </div>
@@ -455,7 +474,7 @@ class SignUpView extends React.Component {
                 </h4>
                 <p className='text-center'>
                   <Button text={this.state.startPick ? '다시채집' : '채집하기'}
-                    icon={this.state.startPick ? 'fa fa-refresh' : 'fa fa-paw'} color='orange'
+                    icon={this.state.startPick ? 'fa fa-sync' : 'fa fa-paw'} color='orange'
                     onClick={this._handleOnClickPick}
                     loading={this.state.loading}
                     disabled={this.state.signUpProcess}
