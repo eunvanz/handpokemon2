@@ -331,9 +331,9 @@ class Sidebar extends React.Component {
                 <a style={{ cursor: 'pointer' }}
                   data-ma-action='submenu-toggle'><i><i className='fa fa-comments' style={{ fontSize: '18px' }} /></i> 커뮤니티</a>
                 <ul style={{ display: 'none' }}>
-                  <li><Link to='/board-list/notice' onClick={() => $('.ma-backdrop').click()}>공지사항</Link></li>
-                  <li><Link to='/board-list/free' onClick={() => $('.ma-backdrop').click()}>게시판</Link></li>
-                  <li><Link to='/board-list/guide' onClick={() => $('.ma-backdrop').click()}>게임가이드</Link></li>
+                  <li><Link to='/board-list/notice/all' onClick={() => $('.ma-backdrop').click()}>공지사항</Link></li>
+                  <li><Link to='/board-list/free/all' onClick={() => $('.ma-backdrop').click()}>게시판</Link></li>
+                  <li><Link to='/board-list/guide/all' onClick={() => $('.ma-backdrop').click()}>게임가이드</Link></li>
                 </ul>
               </li>
               <li className='f-700'>

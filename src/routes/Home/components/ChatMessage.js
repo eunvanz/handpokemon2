@@ -22,12 +22,11 @@ class ChatMessage extends React.Component {
     })
     getUserByUserId(firebase, chat.writer.id)
     .then(user => {
-      console.log('user', user)
       setUserModal({
         show: true,
         user,
         isLoading: false,
-        isMyself: auth.uid === chat.writer.id
+        isMyself: auth && auth.uid === chat.writer.id
       })
     })
   }
@@ -60,7 +59,7 @@ ChatMessage.propTypes = {
   timeComponent: PropTypes.element.isRequired,
   setUserModal: PropTypes.func.isRequired,
   firebase: PropTypes.object.isRequired,
-  auth: PropTypes.object.isRequired
+  auth: PropTypes.object
 }
 
 export default ChatMessage

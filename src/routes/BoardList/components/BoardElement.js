@@ -4,6 +4,7 @@ import shallowCompare from 'react-addons-shallow-compare'
 import { findIndex } from 'lodash'
 import { FormattedDate, FormattedTime, FormattedRelative } from 'react-intl'
 import { toast } from 'react-toastify'
+import HTMLEllipsis from 'react-lines-ellipsis/lib/html'
 
 import { getMsg, isScreenSize, isStringLength, convertMapToArr, showAlert, getThumbnailImageUrl } from 'utils/commonUtil'
 
@@ -20,7 +21,7 @@ class BoardElement extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      showContent: false,
+      showContent: props.defaultOpen,
       showButtons: false,
       isLikesLoading: false,
       isSaveReplyLoading: false,
@@ -41,9 +42,14 @@ class BoardElement extends React.Component {
     this._handleOnClickClose = this._handleOnClickClose.bind(this)
     this._handleOnClickUserProfile = this._handleOnClickUserProfile.bind(this)
   }
+  componentDidMount () {
+    const { defaultOpen, firebase, board } = this.props
+    if (defaultOpen) increaseViews(firebase, board)
+  }
   componentDidUpdate (prevProps, prevState) {
     if (prevProps.board.likes !== this.props.board.likes) this.setState({ isLikesLoading: false })
     if (prevProps.board.replies !== this.props.board.replies) this.setState({ isSaveReplyLoading: false })
+    if (prevProps.defaultOpen !== this.props.defaultOpen) this.setState({ showContent: this.props.defaultOpen })
   }
   shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
@@ -168,7 +174,7 @@ class BoardElement extends React.Component {
         show: true,
         user,
         isLoading: false,
-        isMyself: auth.uid === userId
+        isMyself: auth && auth.uid === userId
       })
     })
   }
@@ -196,7 +202,7 @@ class BoardElement extends React.Component {
           return (
             <div className={`list-group-item media${isScreenSize.xs() ? ' p-15' : ''}`} key={reply.id}>
               <a className='pull-left'>
-                <Img src={getThumbnailImageUrl(reply.writer.profileImage)} className='lgi-img' isUserProfile style={{ cursor: 'pointer' }}
+                <Img src={getThumbnailImageUrl(reply.writer.profileImage)} className='lgi-img' isUserProfile={!isDeleteReplyLoading} style={{ cursor: 'pointer' }}
                   profilePath={`boards/${board.category}/${board.id}/replies/${reply.id}/writer/profileImage`}
                   firebase={firebase} user={reply.writer} onClick={() => this._handleOnClickUserProfile(reply.writer.id)}
                 />
@@ -225,7 +231,7 @@ class BoardElement extends React.Component {
               {
                 !isScreenSize.xs() &&
                 <div className='pull-left'>
-                  <Img src={getThumbnailImageUrl(board.writer.profileImage)} className='lgi-img' isUserProfile
+                  <Img src={getThumbnailImageUrl(board.writer.profileImage)} className='lgi-img' isUserProfile={!isDeleteLoading} // isDeleteReplyLoading을 넣어주는 이유는 지우고나서 일시적으로 이미지가 fallback되며 프로필이미지를 수정하려 하기 때문
                     profilePath={`boards/${board.category}/${board.id}/writer/profileImage`} style={{ cursor: 'pointer' }}
                     firebase={firebase} user={board.writer} onClick={() => this._handleOnClickUserProfile(board.writer.id)}
                   />
@@ -260,7 +266,13 @@ class BoardElement extends React.Component {
           {
             !showContent &&
             <div className={`card-body card-padding${isScreenSize.xs() ? ' p-15' : ''}`} style={{ cursor: 'pointer' }} onClick={!showContent ? this._handleOnClickShowDetail : () => this.setState({ showContent: false })}>
-              {board.preview[locale] + (board.preview[locale].length === 50 ? '...' : '')}
+              <HTMLEllipsis
+                unsafeHTML={board.content[locale]}
+                maxLine={isScreenSize.xs() ? '2' : '1'}
+                ellipsis='...'
+                trimRight
+                baseOn='letters'
+              />
               <div className='row'>
                 <Button className='pull-right c-lightblue' icon='fa fa-caret-down' text='상세보기' link onClick={this._handleOnClickShowDetail} />
               </div>
@@ -337,7 +349,8 @@ BoardElement.propTypes = {
   board: PropTypes.object.isRequired,
   onChangeElement: PropTypes.func.isRequired,
   onClickEdit: PropTypes.func.isRequired,
-  setUserModal: PropTypes.func.isRequired
+  setUserModal: PropTypes.func.isRequired,
+  defaultOpen: PropTypes.bool
 }
 
 export default BoardElement

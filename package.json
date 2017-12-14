@@ -124,6 +124,7 @@
     "react-infinite": "^0.12.1",
     "react-intl": "^2.4.0",
     "react-lazyload": "^2.2.7",
+    "react-lines-ellipsis": "^0.10.0",
     "react-mfb": "^0.6.0",
     "react-motion": "^0.5.0",
     "react-redux": "^5.0.1",

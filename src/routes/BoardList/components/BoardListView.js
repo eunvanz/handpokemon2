@@ -24,7 +24,7 @@ class BoardListView extends React.Component {
       lastRegDate: null,
       lastBoardId: null,
       isLoading: true,
-      isLastPage: false,
+      isLastPage: props.params.id !== 'all',
       boardToEdit: null,
       isRefreshing: false
     }
@@ -39,7 +39,7 @@ class BoardListView extends React.Component {
     this._init()
   }
   componentDidUpdate (prevProps, prevState) {
-    if (prevProps.params.category !== this.props.params.category) {
+    if (prevProps.params.category !== this.props.params.category || prevProps.params.id !== this.props.params.id) {
       this._init()
     }
   }
@@ -51,22 +51,33 @@ class BoardListView extends React.Component {
     firebase.unWatchEvent('value', 'boards')
   }
   _init () {
-    const { category } = this.props.params
+    const { category, id } = this.props.params
     const { firebase } = this.props
     window.scrollTo(0, 0)
-    return getBoardList(firebase, category, 1)
-      .then(boardList => {
-        const lastBoard = boardList[boardList.length - 1]
-        this.setState({
-          boardList,
-          lastRegDate: lastBoard.regDate,
-          lastBoardId: lastBoard.id,
-          isLoading: false,
-          page: 1,
-          isLastPage: false
+    if (id === 'all') {
+      return getBoardList(firebase, category, 1)
+        .then(boardList => {
+          const lastBoard = boardList[boardList.length - 1]
+          this.setState({
+            boardList,
+            lastRegDate: lastBoard.regDate,
+            lastBoardId: lastBoard.id,
+            isLoading: false,
+            page: 1,
+            isLastPage: false
+          })
+          return Promise.resolve()
         })
-        return Promise.resolve()
+    } else {
+      return getBoard(firebase, category, id)
+      .then(board => {
+        this.setState({
+          boardList: [board],
+          isLoading: false,
+          isLastPage: true
+        })
       })
+    }
   }
   _loadMoreItems () {
     const { page, lastRegDate, lastBoardId, boardList, isLastPage } = this.state
@@ -122,7 +133,7 @@ class BoardListView extends React.Component {
   }
   render () {
     const { messages, locale, auth, user, firebase, setUserModal } = this.props
-    const { category } = this.props.params
+    const { category, id } = this.props.params
     const { boardList, isLastPage, isLoading, boardToEdit, isRefreshing } = this.state
     const renderList = () => {
       if (!boardList) return <div />
@@ -140,6 +151,7 @@ class BoardListView extends React.Component {
             onChangeElement={() => this._handleOnChangeElement(board)}
             onClickEdit={() => this._handleOnClickEdit(board)}
             setUserModal={setUserModal}
+            defaultOpen={boardList.length === 1}
           />
         )
       })
@@ -149,7 +161,20 @@ class BoardListView extends React.Component {
         <div className='block-header'>
           <h1 style={{ fontSize: '20px' }}>{getMsg(messages.board[category], locale)}</h1>
           <ul className='actions'>
-            <li className='m-l-10'><a onClick={this._handleOnClickRefresh} style={{ cursor: 'pointer' }}><i className={`fa fa-sync${ isRefreshing ? ' fa-spin' : ''}`} /></a></li>
+            <li className='m-l-10'>
+              {
+                id === 'all' &&
+                <a onClick={this._handleOnClickRefresh} style={{ cursor: 'pointer' }}>
+                  <i className={`fa fa-sync${isRefreshing ? ' fa-spin' : ''}`} />
+                </a>
+              }
+              {
+                id !== 'all' &&
+                <a onClick={() => this.context.router.push(`/board-list/${category}/all`)} style={{ cursor: 'pointer' }}>
+                  <i className={`fa fa-list`} />
+                </a>
+              }
+            </li>
           </ul>
         </div>
         <div className='row wall' style={{ margin: isScreenSize.sm() || isScreenSize.xs() ? '0px' : null }}>

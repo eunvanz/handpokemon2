@@ -162,7 +162,7 @@ class WorkshopView extends React.Component {
                     type='text'
                     onChange={this._handleOnChangeInput}
                     value={formData.name}
-                    length={6}
+                    length={10}
                     fontSize='md'
                     floating
                   />
@@ -173,7 +173,7 @@ class WorkshopView extends React.Component {
                     type='text'
                     onChange={this._handleOnChangeInput}
                     value={formData.designer}
-                    length={6}
+                    length={10}
                     fontSize='md'
                     floating
                   />

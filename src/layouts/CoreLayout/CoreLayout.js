@@ -22,7 +22,8 @@ import { convertMapToArr } from 'utils/commonUtil'
 
 const mapStateToProps = state => ({
   userModal: state.userModal,
-  luckies: sortBy(convertMapToArr(dataToJS(state.firebase, 'luckies')), item => !item.regDate)
+  luckies: sortBy(convertMapToArr(dataToJS(state.firebase, 'luckies')), item => !item.regDate),
+  releaseInfo: dataToJS(state.firebase, 'releaseInfo')
 })
 
 const mapDispatchToProps = {
@@ -56,7 +57,7 @@ class CoreLayout extends React.Component {
     }
   }
   render () {
-    const { children, messages, locale, userModal, closeUserModal } = this.props
+    const { children, messages, locale, userModal, closeUserModal, releaseInfo } = this.props
     return (
       <div>
         <Helmet
@@ -113,9 +114,9 @@ class CoreLayout extends React.Component {
         <section id='main'>
           <Sidebar messages={messages} locale={locale} />
           <section id='content' className='core-layout__viewport'>
-            {React.Children.map(children, child => React.cloneElement(child, { messages, locale }))}
+            {React.Children.map(children, child => React.cloneElement(child, { messages, locale, releaseInfo }))}
           </section>
-          <Footer messages={messages} locale={locale} />
+          <Footer messages={messages} locale={locale} releaseInfo={releaseInfo} />
         </section>
         <UserModal
           {...userModal}
@@ -144,11 +145,12 @@ CoreLayout.propTypes = {
   locale: PropTypes.string.isRequired,
   userModal: PropTypes.object.isRequired,
   closeUserModal: PropTypes.func.isRequired,
-  luckies: PropTypes.array
+  luckies: PropTypes.array,
+  releaseInfo: PropTypes.object.isRequired
 }
 
 const wrappedCoreLayout = compose(withIntl, withAuth(false), firebaseConnect(({ auth }) => {
-  const defaultPaths = ['/honors', '/mons', '/items', '/luckies']
+  const defaultPaths = ['/honors', '/mons', '/items', '/luckies', '/releaseInfo']
   if (auth) defaultPaths.push(`/collections/${auth.uid}`)
   return defaultPaths
 }))(CoreLayout)

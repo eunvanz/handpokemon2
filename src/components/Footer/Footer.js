@@ -4,6 +4,8 @@ import shallowCompare from 'react-addons-shallow-compare'
 
 import { VERSION } from 'constants/release'
 
+import { getMsg } from 'utils/commonUtil'
+
 class Footer extends React.Component {
   constructor (props) {
     super(props)
@@ -15,10 +17,11 @@ class Footer extends React.Component {
     return shallowCompare(this, nextProps, nextState)
   }
   render () {
+    const { messages, locale, releaseInfo } = this.props
     return (
       <div id='footer'>
         <p>made with &#9829; for Pokémon® by CIVASOUL</p>
-        <small>v.{VERSION}</small>
+        <small>v.{VERSION}{releaseInfo.version > VERSION ? <span className='c-red'>{` ${getMsg(messages.common.isNotLatestVersion, locale)}`}</span> : ''}</small>
       </div>
     )
   }
@@ -29,6 +32,9 @@ Footer.contextTypes = {
 }
 
 Footer.propTypes = {
+  releaseInfo: PropTypes.object.isRequired,
+  messages: PropTypes.object.isRequired,
+  locale: PropTypes.string.isRequired
 }
 
 export default Footer

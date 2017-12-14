@@ -66,7 +66,7 @@ class Editor extends React.Component {
     return shallowCompare(this, nextProps, nextState)
   }
   _handleOnChangeInput (e) {
-    if (isStringLength(e.target.value) > 40) return
+    if (isStringLength(e.target.value) > 80) return
     this.setState({ [e.target.name]: e.target.value })
   }
   _handleOnChangeContent (content) {
@@ -108,7 +108,7 @@ class Editor extends React.Component {
     const { content, title, isEditMode } = this.state
     if (validator.isEmpty(content) || validator.isEmpty(title)) return window.swal({ text: getMsg(messages.board.emptyMessage, locale) })
     this.setState({ isLoading: true })
-    const preview = content.replace(/(<([^>]+)>)/ig, '').slice(0, 50)
+    const preview = content.replace(/(<([^>]+)>)/ig, '').slice(0, 200)
     const boardToSave = Object.assign({}, isEditMode ? board : new Board(), { writer: Object.assign({}, user, { id: auth.uid }), category, content: { [locale]: content }, title: { [locale]: title }, preview: { [locale]: preview } })
     let saveAction = isEditMode ? updateBoard : postBoard
     saveAction(firebase, boardToSave)

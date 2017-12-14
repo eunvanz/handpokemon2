@@ -6,6 +6,7 @@ import { FormattedRelative } from 'react-intl'
 import { toast } from 'react-toastify'
 import { sortBy } from 'lodash'
 import $ from 'jquery'
+import LinesEllipsis from 'react-lines-ellipsis'
 
 import { getMsg, isScreenSize, isStringLength, isIE } from 'utils/commonUtil'
 
@@ -111,7 +112,7 @@ class HomeView extends React.Component {
     })
   }
   render () {
-    const { boards, locale, auth, works, user, chats, firebase, setUserModal } = this.props
+    const { boards, locale, auth, works, user, chats, firebase, setUserModal, releaseInfo, messages } = this.props
     const { isChatLoading } = this.state
     const renderBanners = () => {
       const settings = {
@@ -133,7 +134,7 @@ class HomeView extends React.Component {
                     style={{ width: '150px', display: 'inline-block' }}
                   /><br />
                   <div style={bannerTextStyle(colors.black)}>혹시..기다리셨나요?</div><br />
-                  <div style={bannerTextStyle(colors.red)}>손켓몬이 돌아왔습니다!</div>
+                  <div style={bannerTextStyle(colors.red)}>손켓몬이 돌아왔습니다.</div>
                 </div>
               </div>
             </div>
@@ -143,7 +144,7 @@ class HomeView extends React.Component {
                   <img src='https://firebasestorage.googleapis.com/v0/b/hand-pokemon-2.appspot.com/o/monImages%2F%E1%84%85%E1%85%AE%E1%84%87%E1%85%B3%E1%84%83%E1%85%A9.png?alt=media&token=2034a328-4296-49b9-8cae-3ae4135c0243'
                     style={{ width: '150px', display: 'inline-block' }}
                   /><br />
-                  <div style={bannerTextStyle(colors.black)}>금손이세요??</div><br />
+                  <div style={bannerTextStyle(colors.black)}>혹시..금손이세요?</div><br />
                   <div style={bannerTextStyle(colors.green)}>좀 해주셔야 할 일이..</div>
                 </div>
               </div>
@@ -169,9 +170,17 @@ class HomeView extends React.Component {
           header={<h2>{category === 'notice' ? '최근 공지사항' : category === 'free' ? '최근 게시물' : '최근 가이드'}</h2>}
           body={boards[category].slice(0, 3).map((board) => {
             return (
-              <div className='media' key={board.id} style={{ cursor: 'pointer' }} onClick={() => this.context.router.push(`/board-list/${category}`)}>
+              <div className='media' key={board.id} style={{ cursor: 'pointer' }} onClick={() => this.context.router.push(`/board-list/${category}/${board.id}`)}>
                 <div className='media-body'>
-                  <h2 style={{ fontSize: '16px', marginBottom: '5px' }}>{board.title[locale]}</h2>
+                  <h2 style={{ fontSize: '16px', marginBottom: '5px' }}>
+                    <LinesEllipsis
+                      text={board.title[locale]}
+                      maxLine='1'
+                      ellipsis='...'
+                      trimRight
+                      basedOn='letters'
+                    />
+                  </h2>
                   <small className='c-gray'>
                     by {board.writer.nickname}
                     <span> &#183; views: {board.views} &#183; likes: {board.likes} &#183; replies: {board.replies ? Object.keys(board.replies).length : 0}</span>
@@ -213,6 +222,14 @@ class HomeView extends React.Component {
           <div className='row'>
             <div className='col-xs-12'>
               <div className='alert alert-danger'>인터넷 익스플로러로 접속하셨습니다. 이 브라우저는 호환성이 떨어집니다. 크롬이나 파이어폭스, 사파리로 접속하시는 걸 권장합니다.</div>
+            </div>
+          </div>
+        }
+        {
+          releaseInfo.version > VERSION &&
+          <div className='row'>
+            <div className='col-xs-12'>
+              <div className='alert alert-danger'>{getMsg(messages.common.isNotLatestVersion, locale)}</div>
             </div>
           </div>
         }
@@ -294,7 +311,8 @@ HomeView.propTypes = {
   works: PropTypes.array.isRequired,
   chats: PropTypes.object,
   mons: PropTypes.array.isRequired,
-  setUserModal: PropTypes.func.isRequired
+  setUserModal: PropTypes.func.isRequired,
+  releaseInfo: PropTypes.object.isRequired
 }
 
 export default HomeView
