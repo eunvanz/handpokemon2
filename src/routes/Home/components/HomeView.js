@@ -167,6 +167,7 @@ class HomeView extends React.Component {
     const renderBoards = (category) => {
       return (
         <Card
+          headerBgColor={colors.lightGray}
           header={<h2>{category === 'notice' ? '최근 공지사항' : category === 'free' ? '최근 게시물' : '최근 가이드'}</h2>}
           body={boards[category].slice(0, 3).map((board) => {
             return (

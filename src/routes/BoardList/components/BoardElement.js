@@ -74,7 +74,7 @@ class BoardElement extends React.Component {
     const { auth, messages, locale, firebase, board, onChangeElement } = this.props
     if (!auth) return window.swal({ text: getMsg(messages.common.requiredLogin, locale) })
     this.setState({ isLikesLoading: true })
-    if (findIndex(board.whoLikes, e => e === auth.uid) > -1) { // 이미 좋아요를 누른 경우
+    if (findIndex(board.whoLikes, e => auth && e === auth.uid) > -1) { // 이미 좋아요를 누른 경우
       updateLikes(firebase, board, -1)
         .then(() => {
           return updateWhoLikes(firebase, board, auth.uid, 'remove')
@@ -186,7 +186,7 @@ class BoardElement extends React.Component {
         <div className='wis-stats clearfix pull-right'>
           <div className='wis-numbers'>
             <span><i className='fa fa-eye' /> {board.views}</span>
-            <span className={`${board.whoLikes && findIndex(board.whoLikes, o => o === auth.uid) > -1 ? 'active' : ''}`}>
+            <span className={`${board.whoLikes && findIndex(board.whoLikes, o => auth && o === auth.uid) > -1 ? 'active' : ''}`}>
               <i className='fa fa-heart' /> {board.likes}
             </span>
             <span><i className='fa fa-comments' /> {board.replies ? Object.keys(board.replies).length : 0}</span>

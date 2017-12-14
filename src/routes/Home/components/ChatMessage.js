@@ -41,7 +41,7 @@ class ChatMessage extends React.Component {
           </div>
           {
             side === 'left' &&
-            <small className='p-l-5 p-r-5' onClick={this._handleOnClickUserProfile} style={{ cursor: 'pointer' }}>{chat.writer.nickname} &#183; {timeComponent}</small>
+            <small className='p-l-5 p-r-5' onClick={this._handleOnClickUserProfile} style={{ cursor: 'pointer' }}><span className='c-lightblue'>{chat.writer.nickname}</span> &#183; {timeComponent}</small>
           }
           {
             side === 'right' &&
