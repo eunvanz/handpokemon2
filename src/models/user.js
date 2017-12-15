@@ -31,7 +31,7 @@ export default class User {
     this.defenseWin = 0
     this.defenseLose = 0
     this.winInRow = 0
-    this.battleSpeed = 2
+    this.battleSpeed = 5
     this.inventory = []
     this.maxWinInRow = 0
     this.recommenderCode = keygen.password()

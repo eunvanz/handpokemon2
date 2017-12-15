@@ -59,7 +59,7 @@ class Editor extends React.Component {
     if (!prevState.showForm && this.state.showForm) $('#title').focus()
     if (prevProps.board !== this.props.board) {
       const { board } = this.props
-      if (board) this.setState({ content: board.content[this.props.locale], title: board.title[this.props.locale], showForm: true })
+      if (board) this.setState({ content: board.content[this.props.locale], title: board.title[this.props.locale], showForm: true, isEditMode: true })
     }
   }
   shouldComponentUpdate (nextProps, nextState) {
@@ -114,7 +114,7 @@ class Editor extends React.Component {
     saveAction(firebase, boardToSave)
       .then(() => {
         ReactSummernote.reset()
-        this.setState({ isLoading: false, content: '', title: '', showForm: false })
+        this.setState({ isLoading: false, content: '', title: '', showForm: false, isEditMode: false })
         onCompleteSave()
       })
   }
