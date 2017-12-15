@@ -23,6 +23,7 @@ import { postChat } from 'services/ChatService'
 import Chat from 'models/chat'
 
 import bannerBg from '../assets/banner-40.png'
+import zammanbo from '../assets/잠만보.png'
 
 const bannerTextStyle = (color) => {
   return ({
@@ -30,13 +31,13 @@ const bannerTextStyle = (color) => {
     display: 'inline-block',
     color: 'white',
     padding: '2px 7px',
-    fontSize: '18px'
+    fontSize: isScreenSize.xs() ? '16px' : '18px'
   })
 }
 
 const bannerStyle = (color) => {
   return {
-    height: '230px',
+    height: '270px',
     maxWidth: '1140px',
     padding: '10px',
     textAlign: 'center',
@@ -44,6 +45,15 @@ const bannerStyle = (color) => {
     backgroundImage: `url(${bannerBg})`,
     backgroundSize: 'cover'
   }
+}
+
+const captionStyle = {
+  position: 'absolute',
+  left: '0%',
+  right: '0%',
+  textAlign: 'center',
+  top: '190px',
+  maxWidth: '1140px'
 }
 
 class HomeView extends React.Component {
@@ -135,16 +145,31 @@ class HomeView extends React.Component {
         autoplaySpeed: 5000
       }
       return (
-        <div style={{ height: '230px' }}>
+        <div style={{ height: '280px' }}>
           <Slider {...settings}>
             <div className='card'>
               <div className='card-body'>
                 <div style={bannerStyle(colors.amber)} onClick={() => this.context.router.push('/board-list/notice/-L0L5ReceM9--_ehrASe')}>
                   <img src='https://firebasestorage.googleapis.com/v0/b/hand-pokemon-2.appspot.com/o/monImages%2F%E1%84%91%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%85%E1%85%B5.png?alt=media&token=e719c144-0e45-4307-ab02-7fa64ff9edf9'
-                    style={{ width: '150px', display: 'inline-block' }}
+                    style={{ width: '250px', display: 'inline-block' }}
                   /><br />
-                  <div style={bannerTextStyle(colors.black)}>혹시..기다리셨나요?</div><br />
-                  <div style={bannerTextStyle(colors.red)}>손켓몬이 돌아왔습니다.</div>
+                  <div style={captionStyle}>
+                    <div style={bannerTextStyle(colors.black)}>한땀 한땀 수제 포켓몬을 모아보자!</div><br />
+                    <div style={bannerTextStyle(colors.red)}>손켓몬이 돌아왔습니다.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className='card'>
+              <div className='card-body'>
+                <div style={bannerStyle(colors.lightGray)} onClick={() => this.context.router.push('/board-list/notice/-L0P9WQ-qX-HT3ziEK1-')}>
+                  <img src={zammanbo}
+                    style={{ width: '250px', display: 'inline-block' }}
+                  /><br />
+                  <div style={captionStyle}>
+                    <div style={bannerTextStyle(colors.black)}>잠들어 있는 덕후본능을 깨워라!</div><br />
+                    <div style={bannerTextStyle(colors.teal)}>신규 트레이너에게 200P를 드립니다.</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -152,10 +177,12 @@ class HomeView extends React.Component {
               <div className='card-body'>
                 <div style={bannerStyle(colors.lime)} onClick={() => this.context.router.push('/board-list/notice/-L0LA3iTzcrMT7kMTQsv')}>
                   <img src='https://firebasestorage.googleapis.com/v0/b/hand-pokemon-2.appspot.com/o/monImages%2F%E1%84%85%E1%85%AE%E1%84%87%E1%85%B3%E1%84%83%E1%85%A9.png?alt=media&token=2034a328-4296-49b9-8cae-3ae4135c0243'
-                    style={{ width: '150px', display: 'inline-block' }}
+                    style={{ width: '250px', display: 'inline-block' }}
                   /><br />
-                  <div style={bannerTextStyle(colors.black)}>혹시..금손이세요?</div><br />
-                  <div style={bannerTextStyle(colors.green)}>좀 해주셔야 할 일이..</div>
+                  <div style={captionStyle}>
+                    <div style={bannerTextStyle(colors.black)}>손켓몬 아티스트 대 모집!</div><br />
+                    <div style={bannerTextStyle(colors.green)}>금손이라면 손켓몬 아티스트가 되어보세요.</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -163,10 +190,12 @@ class HomeView extends React.Component {
               <div className='card-body'>
                 <div style={bannerStyle(colors.lightGray)} onClick={() => this.context.router.push('/board-list/notice/-L0LCAqYGnlxfKvG6Sqv')}>
                   <img src='https://firebasestorage.googleapis.com/v0/b/hand-pokemon-2.appspot.com/o/monImages%2Fdaktrio.png?alt=media&token=33188cfe-4c15-4e3a-ad78-1b0337b5fad5'
-                    style={{ width: '150px', display: 'inline-block' }}
+                    style={{ width: '250px', display: 'inline-block' }}
                   /><br />
-                  <div style={bannerTextStyle(colors.black)}>성격이 급한편인가요?</div><br />
-                  <div style={bannerTextStyle(colors.purple)}>친구들을 초대해보세요.</div>
+                  <div style={captionStyle}>
+                    <div style={bannerTextStyle(colors.black)}>당신도 포키머니 부자가 될 수 있다!</div><br />
+                    <div style={bannerTextStyle(colors.purple)}>친구들을 초대하면 포키머니를 드립니다.</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -255,7 +284,7 @@ class HomeView extends React.Component {
             {renderBanners()}
           </div>
         </div>
-        <div className='row' style={{ marginTop: '30px' }}>
+        <div className='row' style={{ marginTop: '20px' }}>
           <div className='col-md-6'>
             <Card
               header={<h2 className='c-white'>최근 공작소 작품</h2>}

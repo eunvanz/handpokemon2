@@ -6,7 +6,7 @@ import _ from 'lodash'
 import ContentContainer from 'components/ContentContainer'
 import ItemCard from 'components/ItemCard'
 import CenterMidContaner from 'components/CenterMidContainer'
-import LoadingContainer from 'components/LoadingContainer'
+import Loading from 'components/Loading'
 
 import { getMsg } from 'utils/commonUtil'
 
@@ -16,9 +16,14 @@ class GiftboxView extends React.Component {
     this.state = {
       isUsingItem: false
     }
+    this._handleOnClickUse = this._handleOnClickUse.bind(this)
   }
   shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
+  }
+  _handleOnClickUse () {
+    this.setState({ isUsingItem: true })
+    setTimeout(() => this.setState({ isUsingItem: false }), 500)
   }
   render () {
     const { user, messages, locale, auth } = this.props
@@ -37,10 +42,10 @@ class GiftboxView extends React.Component {
           <div>{getMsg(messages.giftboxView.empty, locale)} <i className='far fa-frown' /></div>
         } />
       } else if (newInventory.length === 0 && isUsingItem) {
-        return <LoadingContainer text={getMsg(messages.giftboxView.using, locale)} />
+        return <CenterMidContaner bodyComponent={<Loading text={getMsg(messages.giftboxView.using, locale)} />} />
       }
       return newInventory.map((item, idx) => <ItemCard auth={auth} user={user}
-        key={idx} item={item} onClickUse={() => this.setState({ isUsingItem: true })} showCount />)
+        key={idx} item={item} onClickUse={this._handleOnClickUse} showCount />)
     }
     const renderBody = () => {
       return (

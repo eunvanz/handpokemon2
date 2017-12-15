@@ -38,8 +38,8 @@ class PickMonView extends React.Component {
   }
   componentDidMount () {
     const { pickMonInfo, auth } = this.props
-    if (!auth) return this.context.router.push('sign-in')
-    if (!pickMonInfo) return this.context.router.push('pick-district')
+    if (!auth) return this.context.router.replace('sign-in')
+    if (!pickMonInfo) return this.context.router.replace('pick-district')
     this._initPick()
   }
   shouldComponentUpdate (nextProps, nextState) {
@@ -59,7 +59,7 @@ class PickMonView extends React.Component {
   //   }
   // }
   componentDidUpdate (prevProps, prevState) {
-    if (!this.props.auth) return this.context.router.push('sign-in')
+    if (!this.props.auth) return this.context.router.replace('sign-in')
     if (prevProps.location.query.f !== this.props.location.query.f) {
       this.setState({
         pickedIdx: -1,
@@ -81,7 +81,7 @@ class PickMonView extends React.Component {
     const { pickMonInfo, firebase, auth, user } = this.props
     const { quantity, attrs, grades, evoluteCol, mixCols, isReward } = pickMonInfo
     if (!evoluteCol && !mixCols && !isReward && quantity > user.pickCredit) {  // 유저의 크레딧보다 더 많은 포켓몬을 채집하는 경우
-      this.context.router.push('pick-district')
+      this.context.router.replace('pick-district')
       return
     }
     this.setState({ mode: quantity === 1 && (!evoluteCol || _.compact(evoluteCol.mon[evoluteCol.monId].next).length > 1) ? 'single' : 'multi' })
@@ -132,7 +132,7 @@ class PickMonView extends React.Component {
       .catch(msg => {
         showAlert(msg)
         .then(() => {
-          this.context.router.push('/pick-district')
+          this.context.router.replace('/pick-district')
         })
       })
     } else if (mixCols) { // 교배일때
@@ -148,7 +148,7 @@ class PickMonView extends React.Component {
       .catch(msg => {
         showAlert(msg)
           .then(() => {
-            this.context.router.push('/pick-district')
+            this.context.router.replace('/pick-district')
           })
       })
     } else if (evoluteCol) { // 진화일때
@@ -177,7 +177,7 @@ class PickMonView extends React.Component {
       .catch(msg => {
         showAlert(msg)
         .then(() => {
-          this.context.router.push('/pick-district')
+          this.context.router.replace('/pick-district')
         })
       })
     }
@@ -196,11 +196,10 @@ class PickMonView extends React.Component {
     }
     pickMonInfoUpdater()
     .then(() => {
-      this.context.router.push(`pick-mon?f=${keygen._()}`)
+      this.context.router.replace(`pick-mon?f=${keygen._()}`)
     })
   }
   _checkHonorGot () {
-    const before = new Date().getTime()
     // 새로운 포켓몬이 나오거나 포켓몬이 사라졌을 때 칭호가 비활성화 되거나 칭호를 새롭게 얻음
     const { user, showHonorModal, honors, userCollections, auth, firebase } = this.props
     let { gotHonors, enabledHonors } = user
@@ -259,9 +258,11 @@ class PickMonView extends React.Component {
       if (honorNotGotType1.condition < user.colPoint) {
         messages.push('콜렉션 점수 상승으로 아래 칭호를 획득했습니다.')
         if (honorNotGotType1.condition === 100) { // 100점 달성 시 추천인 포키머니 보상
-          gotPokemoney += 200
-          updateUserHonorInfoProms.push(updateUserPokemoney(firebase, user.recommender.id, 100))
-          window.swal('야호!', '추천인 코드 입력 보상으로 약속했던 추가 포키머니를 받았다!', 'success')
+          if (user.recommender) {
+            gotPokemoney += 200
+            updateUserHonorInfoProms.push(updateUserPokemoney(firebase, user.recommender.id, 500))
+            window.swal('야호!', '추천인 코드 입력 보상으로 약속했던 추가 포키머니를 받았다!', 'success')
+          }
         }
         honorsForModal.push(honorNotGotType1)
         isTobeGotHonorsChanged = true
@@ -293,7 +294,6 @@ class PickMonView extends React.Component {
           messages, honors: honorsForModal
         }
         showHonorModal(honorModal)
-        const after = new Date().getTime()
       })
     }
   }
@@ -305,12 +305,12 @@ class PickMonView extends React.Component {
       return (
         <div className='text-center'>
           <Button link text='채집구역선택' className='m-r-5'
-            onClick={() => this.context.router.push('pick-district')} />
-          {user.pickCredit !== 0 && !pickMonInfo.evoluteCol && !pickMonInfo.mixCols &&
+            onClick={() => this.context.router.replace('pick-district')} />
+          {user.pickCredit !== 0 && !pickMonInfo.evoluteCol && !pickMonInfo.mixCols && !pickMonInfo.isReward &&
             <Button text={`계속채집 X ${renderQuantity()}`} color='orange' onClick={this._handleOnClickContinue} />}
-          {(user.pickCredit === 0 || pickMonInfo.evoluteCol || pickMonInfo.mixCols) &&
+          {((user.pickCredit === 0 || pickMonInfo.evoluteCol || pickMonInfo.mixCols) || pickMonInfo.isReward) &&
             <Button text='내 콜렉션' color='green'
-              onClick={() => this.context.router.push(`collection/${auth.uid}`)} />}
+              onClick={() => this.context.router.replace(`collection/${auth.uid}`)} />}
         </div>
       )
     }

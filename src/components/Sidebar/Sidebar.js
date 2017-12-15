@@ -16,12 +16,13 @@ import { honors, items } from 'constants/data'
 
 import Badge from 'components/Badge'
 
-import { refreshUserCredits, updateUserIndexes } from 'services/UserService'
+import { refreshUserCredits, updateUserIndexes, updateUserPokemoney, getAllUser } from 'services/UserService'
 import { postHonor } from 'services/HonorService'
 import { updateMon } from 'services/MonService'
 import { postItem } from 'services/ItemService'
+import { getCollectionsRefUserIdAndMonId, getUpdateColObj } from 'services/CollectionService'
 
-import { convertTimeToMMSS, getAuthUserFromFirebase, getMsg, getThumbnailImageUrl } from 'utils/commonUtil'
+import { convertTimeToMMSS, getAuthUserFromFirebase, getMsg, getThumbnailImageUrl, updater } from 'utils/commonUtil'
 
 import { receiveCreditInfo } from 'store/creditInfo'
 
@@ -38,6 +39,8 @@ class Sidebar extends React.Component {
     this._handleOnClickRestructureMon = this._handleOnClickRestructureMon.bind(this)
     this._initScroll = this._initScroll.bind(this)
     this._handleOnClickReset = this._handleOnClickReset.bind(this)
+    this._handleOnClickUpdatePokemoney = this._handleOnClickUpdatePokemoney.bind(this)
+    this._handleOnClickUpdateCollection = this._handleOnClickUpdateCollection.bind(this)
     this.state = {
       pickCreditTimer: null,
       battleCreditTimer: null,
@@ -239,6 +242,41 @@ class Sidebar extends React.Component {
     firebase.remove('stages')
     firebase.remove('userCollections')
   }
+  _handleOnClickUpdatePokemoney () {
+    console.log('started')
+    const { firebase } = this.props
+    getAllUser(firebase)
+    .then(users => {
+      console.log('users', users)
+      users.forEach(user => {
+        console.log('user.pokemoney', user.pokemoney)
+        if (user.pokemoney === 0) {
+          console.log(user)
+          updateUserPokemoney(firebase, user.id, 200)
+        }
+      })
+    })
+  }
+  _handleOnClickUpdateCollection () {
+    // const { firebase } = this.props
+    // const userId = '1fAcJckbYSTZVM5vHwvTNWPLGm22'
+    // const monId = '-L-zSk9nrHLJ3RiTZkM3'
+    // getCollectionsRefUserIdAndMonId(firebase, userId, monId)
+    // .then(snapshot => {
+    //   const collection = snapshot.val()[Object.keys(snapshot.val())[0]]
+    //   collection.addedDex = 0
+    //   collection.addedHp = 0
+    //   collection.addedPower = 0
+    //   collection.addedSArmor = 0
+    //   collection.addedSPower = 0
+    //   collection.addedTotal = 0
+    //   collection.level = 1
+    //   console.log('collection', collection)
+    //   const updateObj = getUpdateColObj(collection)
+    //   console.log('updateObj', updateObj)
+    //   updater(firebase, updateObj)
+    // })
+  }
   render () {
     const { user, auth, messages, locale } = this.props
     const { pickCreditTimer, battleCreditTimer, adventureCreditTimer } = this.state
@@ -364,6 +402,9 @@ class Sidebar extends React.Component {
                   </li>
                   <li className='f-700'>
                     <Link to='/stage-management'><i><i className='fa fa-lock' style={{ fontSize: '18px' }} /></i> 스테이지관리</Link>
+                  </li>
+                  <li className='f-700'>
+                    <i><i className='fa fa-lock' style={{ fontSize: '18px' }} onClick={this._handleOnClickUpdateCollection} style={{ cursor: 'pointer' }} /></i> 커스텀 스크립트
                   </li>
                 </div>
               }

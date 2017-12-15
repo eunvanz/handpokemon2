@@ -49,7 +49,7 @@ class PickDistrictView extends React.Component {
       )
     }
     const renderDistrictInfo = () => {
-      const district = districts[6]
+      // const district = districts[6]
       // return (
       //   <div className={district.name === '중앙던전' ? 'col-xs-12' : 'col-sm-4'} key={keygen._()}>
       //     <Card

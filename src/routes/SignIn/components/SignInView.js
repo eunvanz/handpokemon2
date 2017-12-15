@@ -168,9 +168,9 @@ class SignInView extends React.Component {
               <Button className='m-l-5' icon='zmdi zmdi-google' text='google' color='red' style={{ width: isScreenSize.xs() ? null : '120px' }} size={isScreenSize.xs() ? 'xs' : null} block={isScreenSize.xs()}
                 onClick={() => this._handleOnClickSignInWith('google')} loading={isGoogleLoading} disabled={isFacebookLoading || isSignInLoading}
               />
-              <Button className='m-l-5' icon='zmdi zmdi-facebook' text='facebook' color='blue' style={{ width: isScreenSize.xs() ? null : '120px' }} size={isScreenSize.xs() ? 'xs' : null} block={isScreenSize.xs()}
+              {/*<Button className='m-l-5' icon='zmdi zmdi-facebook' text='facebook' color='blue' style={{ width: isScreenSize.xs() ? null : '120px' }} size={isScreenSize.xs() ? 'xs' : null} block={isScreenSize.xs()}
                 onClick={() => this._handleOnClickSignInWith('facebook')} loading={isFacebookLoading} disabled={isGoogleLoading || isSignInLoading}
-              />
+              />*/}
             </div>
           </div>
           <div className='lcb-navigation'>

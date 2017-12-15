@@ -15,7 +15,6 @@ import withPickMonInfo from 'hocs/withPickMonInfo'
 
 import { getMsg } from 'utils/commonUtil'
 
-import { districts } from 'constants/data'
 import { MAX_PICK_CREDIT, MAX_BATTLE_CREDIT } from 'constants/rules'
 
 import { updateUserPokemoney, updateUserInventory, setUserPath } from 'services/UserService'

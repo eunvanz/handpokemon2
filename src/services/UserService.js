@@ -3,7 +3,7 @@ import _ from 'lodash'
 import { PICK_CREDIT_REFRESH, BATTLE_CREDIT_REFRESH, ADVENTURE_CREDIT_REFRESH,
 MAX_ADVENTURE_CREDIT, MAX_BATTLE_CREDIT, MAX_PICK_CREDIT } from 'constants/rules'
 
-import { updater, convertNumberToStringForIndex } from 'utils/commonUtil'
+import { updater, convertNumberToStringForIndex, convertMapToArr } from 'utils/commonUtil'
 
 export const isDupEmail = (firebase, email) => {
   const ref = firebase.ref('/users')
@@ -58,6 +58,14 @@ export const getUserByUserId = (firebase, userId) => {
     const user = snapshot.val()
     user.id = userId
     return Promise.resolve(user)
+  })
+}
+
+export const getAllUser = (firebase) => {
+  const ref = firebase.ref('users')
+  return ref.once('value').then(snapshot => {
+    const userArr = convertMapToArr(snapshot.val())
+    return Promise.resolve(userArr)
   })
 }
 

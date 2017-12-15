@@ -255,7 +255,7 @@ class MonManagementView extends React.Component {
               </div>
               <div className='media-body'>
                 <div className='lgi-heading' style={{ cursor: 'pointer' }}
-                  onClick={() => this._handleOnClickMon(mon.id)}>{mon.no}. {mon.name.ko} : {mon.point} <MonAttr mainAttr={mon.mainAttr} subAttr={mon.subAttr} grade={mon.grade} /></div>
+                  onClick={() => this._handleOnClickMon(mon.id)}>{mon.no}. {mon.name.ko} : {mon.point} <MonAttr mainAttr={mon.mainAttr} subAttr={mon.subAttr} grade={mon.grade} />{mon.id}</div>
               </div>
             </div>
           )

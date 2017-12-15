@@ -20,7 +20,7 @@ export default class User {
     this.lastPick = 0
     this.lastLeague = 0
     this.lastAdventure = 0
-    this.pokemoney = 0
+    this.pokemoney = 200
     this.battleWin = 0
     this.battleLose = 0
     this.colPoint_leaguePoint = '0000000000_0000001000'

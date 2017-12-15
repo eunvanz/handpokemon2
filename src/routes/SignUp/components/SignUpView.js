@@ -372,9 +372,9 @@ class SignUpView extends React.Component {
                       <Button icon='zmdi zmdi-google' text='google' color='red' style={{ width: '120px' }}
                         onClick={() => this._handleOnClickSignInWith('google')} loading={isGoogleLoading} disabled={isFacebookLoading}
                       />
-                      <Button className='m-l-5' icon='zmdi zmdi-facebook' text='facebook' color='blue' style={{ width: '120px' }}
+                      {/*<Button className='m-l-5' icon='zmdi zmdi-facebook' text='facebook' color='blue' style={{ width: '120px' }}
                         onClick={() => this._handleOnClickSignInWith('facebook')} loading={isFacebookLoading} disabled={isGoogleLoading}
-                      />
+                      />*/}
                     </div>
                   </div>
                 }

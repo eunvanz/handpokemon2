@@ -62,7 +62,7 @@ class CoreLayout extends React.Component {
     return (
       <div>
         <Helmet
-          title='손켓몬 시즌2'
+          title='Hand Pokémon'
           link={[
             {
               'rel': 'stylesheet',

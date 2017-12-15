@@ -4,14 +4,14 @@ import keygen from 'keygenerator'
 
 import Lucky from 'models/lucky'
 
-const getCollectionsRefUserIdAndMonId = (firebase, userId, monId) => {
+export const getCollectionsRefUserIdAndMonId = (firebase, userId, monId) => {
   return firebase.ref(`userCollections/${userId}`).once('value') // 사용자의 콜렉션 가져옴
   .then(snapshot => {
     return snapshot.ref.orderByChild('monId').equalTo(monId).limitToFirst(1).once('value') // 그 중에서 monId가 collection.monId와 같은 데이터를 가져옴
   })
 }
 
-const getUpdateColObj = col => {
+export const getUpdateColObj = col => {
   const updateObj = {
     [`collections/${col.id}`]: col,
     [`userCollections/${col.userId}/${col.id}`]: col,
