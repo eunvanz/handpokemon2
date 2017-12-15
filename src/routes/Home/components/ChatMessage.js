@@ -36,7 +36,7 @@ class ChatMessage extends React.Component {
       <div>
         {side === 'left' && <Img src={getThumbnailImageUrl(chat.writer.profileImage)} className='pull-left m-r-5' style={{ width: '50px', borderRadius: '50%', cursor: 'pointer' }} />}
         <div className={`mblm-item mblm-item-${side}`}>
-          <div>
+          <div className='text-left'>
             {chat.content}
           </div>
           {

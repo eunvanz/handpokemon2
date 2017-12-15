@@ -22,6 +22,8 @@ import { postChat } from 'services/ChatService'
 
 import Chat from 'models/chat'
 
+import bannerBg from '../assets/banner-40.png'
+
 const bannerTextStyle = (color) => {
   return ({
     backgroundColor: color,
@@ -33,7 +35,15 @@ const bannerTextStyle = (color) => {
 }
 
 const bannerStyle = (color) => {
-  return { height: '230px', maxWidth: '1140px', backgroundColor: color, padding: '10px', textAlign: 'center', cursor: 'pointer' }
+  return {
+    height: '230px',
+    maxWidth: '1140px',
+    padding: '10px',
+    textAlign: 'center',
+    cursor: 'pointer',
+    backgroundImage: `url(${bannerBg})`,
+    backgroundSize: 'cover'
+  }
 }
 
 class HomeView extends React.Component {
@@ -165,11 +175,13 @@ class HomeView extends React.Component {
       )
     }
     const renderBoards = (category) => {
+      const colorArr = [colors.teal, colors.pink, colors.indigo]
+      const idx = category === 'free' ? 0 : category === 'notice' ? 1 : 2
       return (
         <Card
-          headerBgColor={colors.lightGray}
-          header={<h2>{category === 'notice' ? '최근 공지사항' : category === 'free' ? '최근 게시물' : '최근 가이드'}</h2>}
-          body={boards[category].slice(0, 3).map((board) => {
+          headerBgColor={colorArr[idx]}
+          header={<h2 className='c-white'>{category === 'notice' ? '최근 공지사항' : category === 'free' ? '최근 게시물' : '최근 가이드'}</h2>}
+          body={boards[category].slice(0, 3).map((board, idx) => {
             return (
               <div className='media' key={board.id} style={{ cursor: 'pointer' }} onClick={() => this.context.router.push(`/board-list/${category}/${board.id}`)}>
                 <div className='media-body'>
@@ -246,27 +258,29 @@ class HomeView extends React.Component {
         <div className='row' style={{ marginTop: '30px' }}>
           <div className='col-md-6'>
             <Card
-              header={<h2>최근 공작소 작품</h2>}
+              header={<h2 className='c-white'>최근 공작소 작품</h2>}
+              headerBgColor={colors.green}
               body={
-                <div className='row'>
+                <div className='row p-t-20'>
                   {renderWorks()}
                 </div>
               }
             />
             <Card
-              header={<h2>최근 등록된 포켓몬</h2>}
+              header={<h2 className='c-white'>최근 등록된 포켓몬</h2>}
+              headerBgColor={colors.purple}
               body={
-                <div className='row'>
+                <div className='row p-t-20'>
                   {renderNewMons()}
                 </div>
               }
             />
           </div>
           <div className='col-md-6'>
-            <div className='messages card' style={{ height: isScreenSize.xs() ? '400px' : '725px' }}>
-              <div className='mb-list' style={{ height: isScreenSize.xs() ? '400px' : '725px' }}>
+            <div className='messages card' style={{ height: isScreenSize.xs() ? '400px' : '765px' }}>
+              <div className='mb-list' style={{ height: isScreenSize.xs() ? '400px' : '765px' }}>
                 <div id='chatting-panel' className='mbl-messages c-overflow mCustomScrollbar _mCS_4 mCS-autoHide'
-                  style={{ position: 'relative', overflow: 'visible', padding: '20px 20px 0', height: isScreenSize.xs() ? '322px' : '647px' }}>
+                  style={{ position: 'relative', overflow: 'visible', padding: '20px 20px 0', height: isScreenSize.xs() ? '322px' : '687px' }}>
                   <div id='mCSB_4' className='mCustomScrollBox mCS-minimal-dark mCSB_vertical_horizontal mCSB_outside' style={{ maxHeight: 'none' }} tabIndex='0'>
                     <div id='mCSB_4_container' className='mCSB_container mCS_x_hidden mCS_no_scrollbar_x' style={{ position: 'relative', top: '0px', left: '0px', width: '100%' }} dir='ltr'>
                       {renderChats()}

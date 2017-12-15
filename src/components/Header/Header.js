@@ -11,6 +11,8 @@ import logo from './assets/logo.png'
 
 import withAuth from 'hocs/withAuth'
 
+import { colors } from 'constants/colors'
+
 class Header extends React.Component {
   constructor (props) {
     super(props)
@@ -50,7 +52,7 @@ class Header extends React.Component {
   }
   render () {
     return (
-      <header id='header' className='clearfix' data-ma-theme='lightblue'>
+      <header id='header' className='clearfix' style={{ backgroundColor: colors.lightBlue }}>
         <ul className='h-inner'>
           <li className='hi-trigger ma-trigger' data-ma-action='sidebar-open' data-ma-target='#sidebar'>
             <div className='line-wrap'>
