@@ -60,7 +60,7 @@ class ItemCard extends React.Component {
       const pickMonInfo = {
         isReward: true,
         quantity,
-        attrs: districts[6].attrs,
+        attrs: ['노말', '땅', '유령', '불꽃', '비행', '강철', '염력', '독', '용', '전기', '벌레', '악', '풀', '격투', '바위', '물', '얼음', '요정'],
         grades: item.grades || item.attrs // attr로 잘못 입력한 데이터에 대한 처리 (추후 삭제 필요)
       }
       updateUserInventory(firebase, auth.uid, item, 'use', quantity)
