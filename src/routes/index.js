@@ -17,6 +17,7 @@ import Setting from './Setting'
 import StageManagement from './StageManagement'
 import Adventure from './Adventure'
 import BoardList from './BoardList'
+import Introduce from './Introduce'
 
 /*  Note: Instead of using JSX, we recommend using react-router
     PlainRoute objects to build route definitions.   */
@@ -41,6 +42,7 @@ export const createRoutes = (store) => ({
     Setting(store),
     StageManagement(store),
     Adventure(store),
+    Introduce(store),
     BoardList(store)
   ]
 })
