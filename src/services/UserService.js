@@ -55,7 +55,9 @@ export const getUserIdByRecommenderCode = (firebase, recommenderCode) => {
 export const getUserByUserId = (firebase, userId) => {
   const ref = firebase.ref(`users/${userId}`)
   return ref.once('value').then(snapshot => {
-    return Promise.resolve(snapshot.val())
+    const user = snapshot.val()
+    user.id = userId
+    return Promise.resolve(user)
   })
 }
 
@@ -207,7 +209,9 @@ export const getUserRanking = (firebase, type, page, prevPoint, prevKey) => {
     const result = []
     snapshot.forEach(child => {
       const user = child.val()
+      if (!user.colRank || !user.leagueRank) return
       user.id = child.key
+      if (user.id === 'null' || user.id === 'undefined') return // 임시조치임. 실제로 이렇게 세팅하는 부분 찾아서 수정해야함
       result.push(user)
     })
     return Promise.resolve(_.reverse(result.slice(prevKey ? 0 : undefined, prevKey ? -1 : undefined)))
@@ -224,6 +228,7 @@ export const getUserRankingByUserId = (firebase, type, userId) => { // update겸
     snapshot.forEach(child => {
       const user = child.val()
       user.id = child.key
+      if (user.id === 'null' || user.id === 'undefined') return
       result.push(user)
     })
     const reversed = _.reverse(result)
