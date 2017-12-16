@@ -364,10 +364,11 @@ class SignUpView extends React.Component {
                   onBlur={this._checkEmailField}
                   length={4}
                 />
+                <div className='col-sm-offset-4 p-l-10 c-lightblue' style={{ fontSize: '12px', marginTop: '-20px', marginBottom: '20px' }}>비밀번호 변경 및 찾기를 위해 실제 사용 메일을 입력해주세요.</div>
                 {
                   this.state.formData.email.length === 0 &&
                   <div className='form-group'>
-                    <div className='col-sm-offset-4 col-sm-8 m-b-25' style={{ padding: isScreenSize.xs() ? '0px' : null }}>
+                    <div className='col-sm-offset-4 col-sm-8 m-b-25'>
                       <p className='m-b-10'>{getMsg(messages.signUpView.signUpWith, locale)}</p>
                       <Button icon='zmdi zmdi-google' text='google' color='red' style={{ width: '120px' }}
                         onClick={() => this._handleOnClickSignInWith('google')} loading={isGoogleLoading} disabled={isFacebookLoading}

@@ -3,13 +3,17 @@ import PropTypes from 'prop-types'
 import shallowCompare from 'react-addons-shallow-compare'
 import { find } from 'lodash'
 import numeral from 'numeral'
+import ScrollArea from 'react-scrollbar'
 
 import { getMsg } from 'utils/commonUtil'
+
+import { colors } from 'constants/colors'
 
 import ContentContainer from 'components/ContentContainer'
 import UserInfo from '../../Battle/components/UserInfo'
 import MonCard from 'components/MonCard'
 import LoadingContainer from 'components/LoadingContainer'
+import StageHistory from './StageHistory'
 
 import User from 'models/user'
 
@@ -25,6 +29,8 @@ class AdventureView extends React.Component {
     this._handleOnClickNext = this._handleOnClickNext.bind(this)
     this._getTrainer = this._getTrainer.bind(this)
     this._getRewardName = this._getRewardName.bind(this)
+    this._getTrainerImg = this._getTrainerImg.bind(this)
+    this._getRewardItem = this._getRewardItem.bind(this)
   }
   componentDidMount () {
     const { stages, user } = this.props
@@ -41,16 +47,26 @@ class AdventureView extends React.Component {
       return Object.assign({}, new User(), { nickname: getMsg(messages.adventure.trainerName[0], locale), profileImage: doctorOh })
     }
   }
+  _getTrainerImg (stage) {
+    if (stage <= 50) {
+      return doctorOh
+    }
+  }
   _handleOnClickNext () {
     this.context.router.push('/battle?type=adventure')
   }
-  _getRewardName () {
-    const { items, locale } = this.props
-    const { stage } = this.state
-    return `${getMsg(find(items, item => item.grades[0] === 'b' && item.grades[1] === 'r').name, locale)} X ${stage.quantity}`
+  _getRewardName (idx) {
+    const { items, locale, stages } = this.props
+    const stage = stages[idx]
+    return `${getMsg(find(items, item => item.grades[0] === stage.grades[0] && item.grades[1] === stage.grades[1]).name, locale)} X ${stage.quantity}`
+  }
+  _getRewardItem (idx) {
+    const { items, stages } = this.props
+    const stage = stages[idx]
+    return find(items, item => item.grades[0] === stage.grades[0] && item.grades[1] === stage.grades[1])
   }
   render () {
-    const { messages, locale, user } = this.props
+    const { messages, locale, user, stages } = this.props
     const { stage } = this.state
     if (!stage) return <LoadingContainer text={getMsg(messages.adventure.loadingStage, locale)} />
     const renderMonCards = () => {
@@ -96,8 +112,18 @@ class AdventureView extends React.Component {
             <div className='col-xs-12 text-center'>
               <p className='m-b-5'>{getMsg(messages.adventure.total, locale)} - <span className='c-lightblue f-700'>{numeral(stage.total).format('0,0')}</span></p>
               <p className='m-b-5'>{getMsg(messages.adventure.maxCost, locale)} - <span className='c-lightblue f-700'>{stage.maxCost}</span></p>
-              <p className='m-b-5'>{getMsg(messages.adventure.reward, locale)} - <span className='c-lightblue f-700'>{this._getRewardName()}</span></p>
+              <p className='m-b-5'>{getMsg(messages.adventure.reward, locale)} - <span className='c-lightblue f-700'>{this._getRewardName(stages.length - Number(user.stage))}</span></p>
             </div>
+          </div>
+          <div className='row m-t-20'>
+            <ScrollArea
+              speed={0.8}
+              horizontal
+              style={{ height: '120px' }}
+              contentStyle={{ width: `${stages.length * 100}px` }}
+            >
+              <StageHistory stages={stages} stage={user.stage} getRewardItem={this._getRewardItem} />
+            </ScrollArea>
           </div>
         </div>
       )

@@ -16,7 +16,7 @@ import { honors, items } from 'constants/data'
 
 import Badge from 'components/Badge'
 
-import { refreshUserCredits, updateUserIndexes, updateUserPokemoney, getAllUser } from 'services/UserService'
+import { refreshUserCredits, updateUserIndexes, updateUserPokemoney, getAllUser, setUserPath, getUserByUserId } from 'services/UserService'
 import { postHonor } from 'services/HonorService'
 import { updateMon } from 'services/MonService'
 import { postItem } from 'services/ItemService'
@@ -41,6 +41,7 @@ class Sidebar extends React.Component {
     this._handleOnClickReset = this._handleOnClickReset.bind(this)
     this._handleOnClickUpdatePokemoney = this._handleOnClickUpdatePokemoney.bind(this)
     this._handleOnClickUpdateCollection = this._handleOnClickUpdateCollection.bind(this)
+    this._handleOnClickUpdateUser = this._handleOnClickUpdateUser.bind(this)
     this.state = {
       pickCreditTimer: null,
       battleCreditTimer: null,
@@ -277,6 +278,16 @@ class Sidebar extends React.Component {
     //   updater(firebase, updateObj)
     // })
   }
+  _handleOnClickUpdateUser () {
+    // const { firebase } = this.props
+    // const tgt = 'aeI4WmEFlxaHQFCRd5KCakhGfKJ2'
+    // const src = '1fAcJckbYSTZVM5vHwvTNWPLGm22'
+    // getUserByUserId(firebase, src)
+    // .then(user => {
+    //   console.log('user', user)
+    //   updater(firebase, { [`users/${tgt}`]: user })
+    // })
+  }
   render () {
     const { user, auth, messages, locale } = this.props
     const { pickCreditTimer, battleCreditTimer, adventureCreditTimer } = this.state
@@ -404,7 +415,7 @@ class Sidebar extends React.Component {
                     <Link to='/stage-management'><i><i className='fa fa-lock' style={{ fontSize: '18px' }} /></i> 스테이지관리</Link>
                   </li>
                   <li className='f-700'>
-                    <i><i className='fa fa-lock' style={{ fontSize: '18px' }} onClick={this._handleOnClickUpdateCollection} style={{ cursor: 'pointer' }} /></i> 커스텀 스크립트
+                    <i><i className='fa fa-lock' style={{ fontSize: '18px', cursor: 'pointer' }} onClick={this._handleOnClickUpdateUser} /></i> 커스텀 스크립트
                   </li>
                 </div>
               }

@@ -42,10 +42,10 @@ class BattleResult extends React.Component {
       this.setState({ isSendingReward: false })
       return
     }
-    updateUserStage()
-    .then(() => {
-      return updateUserInventory(firebase, auth.uid, isAdventure ? this._getStageRewardItem() : this._getMissionRewardItem(),
+    updateUserInventory(firebase, auth.uid, isAdventure ? this._getStageRewardItem() : this._getMissionRewardItem(),
       'save', isAdventure ? stage.quantity : this._getMissionCount())
+    .then(() => {
+      updateUserStage()
     })
     .then(() => {
       this.setState({ isSendingReward: false })

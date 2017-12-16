@@ -3493,3 +3493,8 @@ html.ie9 .mCS-minimal-dark.mCSB_scrollTools_onDrag .mCSB_dragger .mCSB_dragger_b
   -webkit-align-items: center;
   align-items: center;
 }
+
+.scroll-area {
+  overflow: hidden;
+  height: 40px;
+}

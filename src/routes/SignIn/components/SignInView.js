@@ -22,7 +22,8 @@ class SignInView extends React.Component {
       },
       isSignInLoading: false,
       isGoogleLoading: false,
-      isFacebookLoading: false
+      isFacebookLoading: false,
+      showFindPasswordModal: false
     }
     this._handleOnChangeInput = this._handleOnChangeInput.bind(this)
     this._handleOnClickLogin = this._handleOnClickLogin.bind(this)
@@ -127,6 +128,9 @@ class SignInView extends React.Component {
     this.setState({ [loadingName]: true })
     firebase.login({ provider })
   }
+  _handleOnClickFindPassword () {
+    showFindPasswordModal: true
+  }
   render () {
     const { messages, locale } = this.props
     const { isSignInLoading, isGoogleLoading, isFacebookLoading } = this.state
@@ -165,7 +169,7 @@ class SignInView extends React.Component {
             </button>
             <div>
               <p>{getMsg(messages.signInView.signInWith, locale)}</p>
-              <Button className='m-l-5' icon='zmdi zmdi-google' text='google' color='red' style={{ width: isScreenSize.xs() ? null : '120px' }} size={isScreenSize.xs() ? 'xs' : null} block={isScreenSize.xs()}
+              <Button icon='zmdi zmdi-google' text='google' color='red' style={{ width: isScreenSize.xs() ? null : '120px' }} size={isScreenSize.xs() ? 'xs' : null} block={isScreenSize.xs()}
                 onClick={() => this._handleOnClickSignInWith('google')} loading={isGoogleLoading} disabled={isFacebookLoading || isSignInLoading}
               />
               {/*<Button className='m-l-5' icon='zmdi zmdi-facebook' text='facebook' color='blue' style={{ width: isScreenSize.xs() ? null : '120px' }} size={isScreenSize.xs() ? 'xs' : null} block={isScreenSize.xs()}
@@ -179,11 +183,11 @@ class SignInView extends React.Component {
               <i className='zmdi zmdi-plus' />
               <span>회원가입</span>
             </Link>
-            <Link to='' data-ma-block='#l-forget-password'
+            <a data-ma-block='#l-forget-password' onClick={this._handleOnClickFindPassword}
               style={{ background: 'rgba(0, 150, 136, 1)' }}>
               <i>?</i>
               <span>비밀번호찾기</span>
-            </Link>
+            </a>
           </div>
         </div>
       </div>

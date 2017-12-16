@@ -117,7 +117,7 @@ class HomeView extends React.Component {
   }
   _handleOnChangeInput (e) {
     const { name, value } = e.target
-    if (isStringLength(value) > 100) return
+    if (isStringLength(value) > 200) return
     this.setState({ [name]: value })
   }
   _handleOnClickSendChat () {

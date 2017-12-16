@@ -29,6 +29,15 @@ class ChatMessage extends React.Component {
         isMyself: auth && auth.uid === chat.writer.id
       })
     })
+    .catch(() => {
+      setUserModal({
+        show: false,
+        user: null,
+        isLoading: true,
+        isMyself: false
+      })
+      window.swal({ text: '유저 정보를 찾을 수 없습니다.' })
+    })
   }
   render () {
     const { chat, side, timeComponent } = this.props

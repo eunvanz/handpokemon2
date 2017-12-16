@@ -264,6 +264,10 @@ export const setUserPath = (firebase, userId, path, value) => {
   return firebase.ref(`/users/${userId}/${path}`).set(value)
 }
 
+export const setUser = (firebase, userId, value) => {
+  return firebase.ref(`/users/${userId}`).set(value)
+}
+
 export const updateUserInventory = (firebase, userId, item, type, cnt) => {
   const inventoryRef = firebase.ref(`/users/${userId}/inventory`)
   return inventoryRef.transaction(inventory => {
