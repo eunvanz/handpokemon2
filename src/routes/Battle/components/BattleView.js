@@ -8,6 +8,7 @@ import ChoosePick from './ChoosePick'
 import ChooseFirstAttack from './ChooseFirstAttack'
 import BattleStage from './BattleStage'
 import BattleResult from './BattleResult'
+import LoadingContainer from 'components/LoadingContainer'
 
 import Battle from 'bizs/Battle'
 import Pick from 'bizs/Pick'
@@ -199,6 +200,7 @@ class BattleView extends React.Component {
           <BattleReady auth={auth} onClickStart={this._handleOnClickReady} creditInfo={creditInfo} />
         )
       } else if (step === 2) {
+        if (!userCollections) return <LoadingContainer text='콜렉션을 불러오는 중...' />
         return (
           <ChoosePick collections={userCollections} onClickNext={this._handleOnClickPickNext} user={user} locale={locale} messages={messages} isAdventure={isAdventure} maxCost={isAdventure ? this._getStage().maxCost : null} />
         )

@@ -17,7 +17,9 @@ class BattleResult extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      isSendingReward: true
+      isSendingReward: true,
+      rewardItem: null,
+      rewardQuantity: null
     }
     this._getMissionCount = this._getMissionCount.bind(this)
     this._getMissionRewardItem = this._getMissionRewardItem.bind(this)
@@ -42,6 +44,7 @@ class BattleResult extends React.Component {
       this.setState({ isSendingReward: false })
       return
     }
+    this.setState({ rewardQuantity: stage.quantity })
     updateUserInventory(firebase, auth.uid, isAdventure ? this._getStageRewardItem() : this._getMissionRewardItem(),
       'save', isAdventure ? stage.quantity : this._getMissionCount())
     .then(() => {
@@ -77,11 +80,13 @@ class BattleResult extends React.Component {
       const diffLength = _.difference(item.grades, stageGrades).length
       return diffLength === 0
     })
+    this.setState({ rewardItem: result })
     return result
   }
   _getRewardName () {
-    const { locale, stage } = this.props
-    return `${getMsg(this._getStageRewardItem().name, locale)} X ${stage.quantity}`
+    const { locale } = this.props
+    const { rewardItem, rewardQuantity } = this.state
+    return `${getMsg(rewardItem.name, locale)} X ${rewardQuantity}`
   }
   render () {
     const { user, enemy, battleLog, onClickContinue, battleResultInfo, auth, locale, items, isAdventure } = this.props
