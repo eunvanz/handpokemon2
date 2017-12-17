@@ -12,25 +12,33 @@ import Header from 'components/Header'
 import Sidebar from 'components/Sidebar'
 import Footer from 'components/Footer'
 import UserModal from 'components/UserModal'
+import TutorialModal from 'components/TutorialModal'
 
 import withAuth from 'hocs/withAuth'
 import withIntl from 'hocs/withIntl'
 
 import { closeUserModal } from 'store/userModal'
+import { setTutorialModal } from 'store/tutorialModal'
 
-import { convertMapToArr } from 'utils/commonUtil'
+import { convertMapToArr, showAlert } from 'utils/commonUtil'
 
 const mapStateToProps = state => ({
   userModal: state.userModal,
   luckies: sortBy(convertMapToArr(dataToJS(state.firebase, 'luckies')), item => !item.regDate),
-  releaseInfo: dataToJS(state.firebase, 'releaseInfo')
+  releaseInfo: dataToJS(state.firebase, 'releaseInfo'),
+  tutorialModal: state.tutorialModal
 })
 
 const mapDispatchToProps = {
-  closeUserModal
+  closeUserModal,
+  setTutorialModal
 }
 
 class CoreLayout extends React.Component {
+  constructor (props) {
+    super(props)
+    this._handleOnClickCloseTutorialModal = this._handleOnClickCloseTutorialModal.bind(this)
+  }
   shouldComponentUpdate (nextProps, nextState) {
     return !is(fromJS(nextProps), fromJS(this.props)) || !is(fromJS(nextState), fromJS(this.state))
   }
@@ -56,8 +64,23 @@ class CoreLayout extends React.Component {
       toast.success(`${lucky.user.nickname}님이 ${getTypeName(lucky.type)}에서 ${getMonName(lucky.collection)}을(를) 얻었습니다!`)
     }
   }
+  _handleOnClickCloseTutorialModal () {
+    showAlert({
+      title: '튜토리얼을 종료 하시겠습니까?',
+      text: '내 설정에서 튜토리얼모드를 다시 켤 수 있습니다.',
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonText: '예',
+      cancelButtonText: '아니오'
+    })
+    .then(() => {
+      setTutorialModal({
+        show: false
+      })
+    }, () => {})
+  }
   render () {
-    const { children, messages, locale, userModal, closeUserModal, releaseInfo } = this.props
+    const { children, messages, locale, userModal, closeUserModal, releaseInfo, tutorialModal } = this.props
     if (!releaseInfo) return <div>Checking Version...</div>
     return (
       <div>
@@ -134,6 +157,12 @@ class CoreLayout extends React.Component {
           newestOnTop
           closeOnClick
           pauseOnHover
+        />
+        <TutorialModal
+          content={tutorialModal.content}
+          close={this._handleOnClickCloseTutorialModal}
+          show={tutorialModal.show}
+          onClickContinue={tutorialModal.onClickContinue}
         />
       </div>
     )

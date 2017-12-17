@@ -13,6 +13,7 @@ import { convertMapToArr } from 'utils/commonUtil'
 import HomeView from '../components/HomeView'
 
 import { setUserModal } from 'store/userModal'
+import { setTutorialModal } from 'store/tutorialModal'
 
 const wrappedHomeView = compose(
   firebaseConnect(['/works', '/chats']),
@@ -33,7 +34,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    setUserModal: (userModal) => dispatch(setUserModal(userModal))
+    setUserModal: (userModal) => dispatch(setUserModal(userModal)),
+    setTutorialModal: (tutorialModal) => dispatch(setTutorialModal(tutorialModal))
   }
 }
 

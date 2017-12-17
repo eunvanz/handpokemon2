@@ -8,6 +8,7 @@ import $ from 'jquery'
 import shallowCompare from 'react-addons-shallow-compare'
 import Visibility from 'visibilityjs'
 import { compose } from 'recompose'
+import { Tooltip, OverlayTrigger } from 'react-bootstrap'
 
 import { DEFAULT_PROFILE_IMAGE_URL } from 'constants/urls'
 import { PICK_CREDIT_REFRESH, BATTLE_CREDIT_REFRESH, ADVENTURE_CREDIT_REFRESH,
@@ -25,6 +26,7 @@ import { getCollectionsRefUserIdAndMonId, getUpdateColObj } from 'services/Colle
 import { convertTimeToMMSS, getAuthUserFromFirebase, getMsg, getThumbnailImageUrl, updater } from 'utils/commonUtil'
 
 import { receiveCreditInfo } from 'store/creditInfo'
+import { setTutorialModal } from 'store/tutorialModal'
 
 import withMons from 'hocs/withMons'
 import withAuth from 'hocs/withAuth'
@@ -42,6 +44,7 @@ class Sidebar extends React.Component {
     this._handleOnClickUpdatePokemoney = this._handleOnClickUpdatePokemoney.bind(this)
     this._handleOnClickUpdateCollection = this._handleOnClickUpdateCollection.bind(this)
     this._handleOnClickUpdateUser = this._handleOnClickUpdateUser.bind(this)
+    this._handleOnClickSideMenu = this._handleOnClickSideMenu.bind(this)
     this.state = {
       pickCreditTimer: null,
       battleCreditTimer: null,
@@ -81,7 +84,7 @@ class Sidebar extends React.Component {
           preventDefault: true
         }
       })
-    }, 5000)
+    }, 7000)
 
     // if ($('#sidebar')) {
     //   $('#sidebar').mCustomScrollbar({
@@ -288,6 +291,24 @@ class Sidebar extends React.Component {
     //   updater(firebase, { [`users/${tgt}`]: user })
     // })
   }
+  _handleOnClickSideMenu (name) {
+    const { firebase, auth, setTutorialModal, user } = this.props
+    $('.ma-backdrop').click()
+    if (name === 'pickMon' && user.tutorialStep === 1) {
+      setUserPath(firebase, auth.uid, 'tutorialStep', 2)
+      .then(() => {
+        setTutorialModal({
+          show: true,
+          content: <div>채집을 하려면 채집구역을 선택해야 해요. 각 구역에는 각기 다른 속성의 포켓몬들이 살고 있어요.</div>,
+          onClickContinue: () => setTutorialModal({
+            show: true,
+            content: <div>어디 한번 마음에 드는 구역에서 채집을 해볼까요? 크레딧이 많으니 <span className='c-lightblue'>6마리씩 채집</span>해보도록 해요!</div>,
+            onClickContinue: () => setTutorialModal({ show: false })
+          })
+        })
+      })
+    }
+  }
   render () {
     const { user, auth, messages, locale } = this.props
     const { pickCreditTimer, battleCreditTimer, adventureCreditTimer } = this.state
@@ -310,128 +331,128 @@ class Sidebar extends React.Component {
       }
     }
     return (
-      <aside id='sidebar' className='sidebar c-overflow mCustomScrollbar _mCS_1 mCS-autoHide'
+      <aside id='sidebar' ref='sidebar' className='sidebar c-overflow mCustomScrollbar _mCS_1 mCS-autoHide'
         style={{ overflow: 'visible' }}>
-            <div className='s-profile'>
-              <a data-ma-action='profile-menu-toggle'>
-                <div className='sp-pic'>
-                  <img id='sidebarProfileImage' src={user ? (user.profileImageKey ? getThumbnailImageUrl(user.profileImage) : user.profileImage) : DEFAULT_PROFILE_IMAGE_URL} className='mCS_img_loaded' />
-                </div>
-                <div className='sp-info' style={{ marginTop: '18px' }}>
-                  {user ? user.nickname : '로그인을 해주세요.'} {user && <i className='zmdi zmdi-caret-down' />}
-                </div>
-              </a>
-              { user &&
-                <ul className='main-menu'>
-                  <li className='text-center'>
-                    <i className='fa fa-quote-left c-blue' /> {user.introduce === '' ? '자기소개가 없습니다.' : user.introduce} <i className='fa fa-quote-right c-blue' />
-                  </li>
-                </ul>
-              }
+        <div className='s-profile'>
+          <a data-ma-action='profile-menu-toggle'>
+            <div className='sp-pic'>
+              <img id='sidebarProfileImage' src={user ? (user.profileImageKey ? getThumbnailImageUrl(user.profileImage) : user.profileImage) : DEFAULT_PROFILE_IMAGE_URL} className='mCS_img_loaded' />
             </div>
+            <div className='sp-info' style={{ marginTop: '18px' }}>
+              {user ? user.nickname : '로그인을 해주세요.'} {user && <i className='zmdi zmdi-caret-down' />}
+            </div>
+          </a>
+          { user &&
             <ul className='main-menu'>
-              <li className='f-700'>
-                <Link to='/' onClick={() => $('.ma-backdrop').click()}><i><i className='fa fa-home' style={{ fontSize: '18px' }} /></i> {getMsg(messages.sidebar.home, locale)}</Link>
+              <li className='text-center'>
+                <i className='fa fa-quote-left c-blue' /> {user.introduce === '' ? '자기소개가 없습니다.' : user.introduce} <i className='fa fa-quote-right c-blue' />
               </li>
-              <li className='f-700'>
-                <Link to='/introduce' onClick={() => $('.ma-backdrop').click()}><i><i className='fa fa-book' style={{ fontSize: '18px' }} /></i> 게임 소개</Link>
-              </li>
-              {
-                auth &&
-                <li className='f-700'>
-                  <Link to='/honor' onClick={() => $('.ma-backdrop').click()}><i><i className='fa fa-bookmark' style={{ fontSize: '18px' }} /></i> {getMsg(messages.sidebar.achievements, locale)}</Link>
-                </li>
-              }
-              {
-                auth &&
-                <li className='f-700'>
-                  <Link to={`/collection/${auth.uid}`} onClick={() => $('.ma-backdrop').click()}><i><i className='fa fa-th' style={{ fontSize: '18px' }} /></i> {getMsg(messages.sidebar.collections, locale)}</Link>
-                </li>
-              }
-              {
-                auth &&
-                <li className='f-700'>
-                  <Link to='/giftbox' onClick={() => $('.ma-backdrop').click()}>
-                    <i><i className='fa fa-gift' style={{ fontSize: '18px' }} /></i> 내 선물함
-                    {user.inventory && user.inventory.length > 0 && <Badge color='lightblue' text={String(user.inventory.length)} />}
-                  </Link>
-                </li>
-              }
-              <li className='f-700'>
-                <Link to='/pick-district' onClick={() => $('.ma-backdrop').click()}>
-                  <i><i className='fa fa-paw' style={{ fontSize: '18px' }} /></i> 포켓몬 채집
-                  {renderCreditBadge('pick')}
-                </Link>
-              </li>
-              <li className='f-700'>
-                <Link to='/adventure' onClick={() => $('.ma-backdrop').click()}>
-                  <i><i className='fa fa-compass' style={{ fontSize: '18px' }} /></i> 포켓몬 탐험
-                  {renderCreditBadge('adventure')}
-                </Link>
-              </li>
-              <li className='f-700'>
-                <Link to='/battle' onClick={() => $('.ma-backdrop').click()}>
-                  <i><i className='fa fa-gamepad' style={{ fontSize: '18px' }} /></i> 포켓몬 시합
-                  {renderCreditBadge('battle')}
-                </Link>
-              </li>
-              <li className='f-700'>
-                <Link to='/item-shop' onClick={() => $('.ma-backdrop').click()}>
-                  <i><i className='fa fa-shopping-cart' style={{ fontSize: '18px' }} /></i> 상점
-                  {
-                    user && <Badge color='amber' text={`${numeral(user.pokemoney || 0).format('0,0')}P`} />
-                  }
-                </Link>
-              </li>
-              <li className='sub-menu f-700'>
-                <a style={{ cursor: 'pointer' }}
-                  data-ma-action='submenu-toggle'><i><i className='fa fa-trophy-alt' style={{ fontSize: '18px' }} /></i> 랭킹</a>
-                <ul style={{ display: 'none' }}>
-                  <li><Link to='/ranking/collection' onClick={() => $('.ma-backdrop').click()}>콜렉션 랭킹</Link></li>
-                  <li><Link to='/ranking/battle' onClick={() => $('.ma-backdrop').click()}>시합 랭킹</Link></li>
-                </ul>
-              </li>
-              <li className='sub-menu f-700'>
-                <a style={{ cursor: 'pointer' }}
-                  data-ma-action='submenu-toggle'><i><i className='fa fa-comments' style={{ fontSize: '18px' }} /></i> 커뮤니티</a>
-                <ul style={{ display: 'none' }}>
-                  <li><Link to='/board-list/notice/all' onClick={() => $('.ma-backdrop').click()}>공지사항</Link></li>
-                  <li><Link to='/board-list/free/all' onClick={() => $('.ma-backdrop').click()}>게시판</Link></li>
-                  <li><Link to='/board-list/guide/all' onClick={() => $('.ma-backdrop').click()}>게임가이드</Link></li>
-                </ul>
-              </li>
-              <li className='f-700'>
-                <Link to='/workshop' onClick={() => $('.ma-backdrop').click()}>
-                  <i><i className='fa fa-paint-brush' style={{ fontSize: '18px' }} /></i> 포켓몬 공작소
-                </Link>
-              </li>
-              {
-                user && user.authorization === 'admin' &&
-                <div>
-                  <li className='f-700'>
-                    <Link to='/forbidden-area'><i><i className='fa fa-lock' style={{ fontSize: '18px' }} /></i> 포켓몬관리</Link>
-                  </li>
-                  <li className='f-700'>
-                    <Link to='/stage-management'><i><i className='fa fa-lock' style={{ fontSize: '18px' }} /></i> 스테이지관리</Link>
-                  </li>
-                  <li className='f-700'>
-                    <i><i className='fa fa-lock' style={{ fontSize: '18px', cursor: 'pointer' }} onClick={this._handleOnClickUpdateUser} /></i> 커스텀 스크립트
-                  </li>
-                </div>
-              }
-              {/* <li className='f-700'>
-                <a onClick={() => updateUserIndexes(this.props.firebase)}><i className='fa fa-lock' style={{ fontSize: '18px' }} /> 일회용</a>
-                </li> */}
-              {/* <li className='f-700'>
-                <a onClick={this._handleOnClickPostHonor}><i className='fa fa-lock' style={{ fontSize: '18px' }} /> 아이템생성</a>
-              </li> */}
-              {/* <li className='f-700'>
-                <a onClick={this._handleOnClickRestructureMon}><i className='fa fa-lock' style={{ fontSize: '18px' }} /> 몬구조변환</a>
-              </li> */}
-              {/*<li className='f-700'>
-                <a onClick={this._handleOnClickReset}><i className='fa fa-lock' style={{ fontSize: '18px' }} /> DB초기화</a>
-              </li>*/}
             </ul>
+          }
+        </div>
+        <ul className='main-menu'>
+          <li className='f-700'>
+            <Link to='/' onClick={() => $('.ma-backdrop').click()}><i><i className='fa fa-home' style={{ fontSize: '18px' }} /></i> {getMsg(messages.sidebar.home, locale)}</Link>
+          </li>
+          <li className='f-700'>
+            <Link to='/introduce' onClick={() => $('.ma-backdrop').click()}><i><i className='fa fa-book' style={{ fontSize: '18px' }} /></i> 게임 소개</Link>
+          </li>
+          {
+            auth &&
+            <li className='f-700'>
+              <Link to='/honor' onClick={() => $('.ma-backdrop').click()}><i><i className='fa fa-bookmark' style={{ fontSize: '18px' }} /></i> {getMsg(messages.sidebar.achievements, locale)}</Link>
+            </li>
+          }
+          {
+            auth &&
+            <li className={`f-700${user && user.isTutorialOn && user.tutorialStep === 5 ? ' blink' : ''}`}>
+              <Link to={`/collection/${auth.uid}`} onClick={() => $('.ma-backdrop').click()}><i><i className='fa fa-th' style={{ fontSize: '18px' }} /></i> {getMsg(messages.sidebar.collections, locale)}</Link>
+            </li>
+          }
+          {
+            auth &&
+            <li className='f-700'>
+              <Link to='/giftbox' onClick={() => $('.ma-backdrop').click()}>
+                <i><i className='fa fa-gift' style={{ fontSize: '18px' }} /></i> 내 선물함
+                {user.inventory && user.inventory.length > 0 && <Badge color='lightblue' text={String(user.inventory.length)} />}
+              </Link>
+            </li>
+          }
+          <li className={`f-700${user && user.isTutorialOn && user.tutorialStep === 1 ? ' blink' : ''}`}>
+            <Link to='/pick-district' onClick={() => this._handleOnClickSideMenu('pickMon')}>
+              <i><i className='fa fa-paw' style={{ fontSize: '18px' }} /></i> 포켓몬 채집
+              {renderCreditBadge('pick')}
+            </Link>
+          </li>
+          <li className={`f-700${user && user.isTutorialOn && user.tutorialStep === 6 ? ' blink' : ''}`}>
+            <Link to='/adventure' onClick={() => $('.ma-backdrop').click()}>
+              <i><i className='fa fa-compass' style={{ fontSize: '18px' }} /></i> 포켓몬 탐험
+              {renderCreditBadge('adventure')}
+            </Link>
+          </li>
+          <li className='f-700'>
+            <Link to='/battle' onClick={() => $('.ma-backdrop').click()}>
+              <i><i className='fa fa-gamepad' style={{ fontSize: '18px' }} /></i> 포켓몬 시합
+              {renderCreditBadge('battle')}
+            </Link>
+          </li>
+          <li className='f-700'>
+            <Link to='/item-shop' onClick={() => $('.ma-backdrop').click()}>
+              <i><i className='fa fa-shopping-cart' style={{ fontSize: '18px' }} /></i> 상점
+              {
+                user && <Badge color='amber' text={`${numeral(user.pokemoney || 0).format('0,0')}P`} />
+              }
+            </Link>
+          </li>
+          <li className='sub-menu f-700'>
+            <a style={{ cursor: 'pointer' }}
+              data-ma-action='submenu-toggle'><i><i className='fa fa-trophy-alt' style={{ fontSize: '18px' }} /></i> 랭킹</a>
+            <ul style={{ display: 'none' }}>
+              <li><Link to='/ranking/collection' onClick={() => $('.ma-backdrop').click()}>콜렉션 랭킹</Link></li>
+              <li><Link to='/ranking/battle' onClick={() => $('.ma-backdrop').click()}>시합 랭킹</Link></li>
+            </ul>
+          </li>
+          <li className='sub-menu f-700'>
+            <a style={{ cursor: 'pointer' }}
+              data-ma-action='submenu-toggle'><i><i className='fa fa-comments' style={{ fontSize: '18px' }} /></i> 커뮤니티</a>
+            <ul style={{ display: 'none' }}>
+              <li><Link to='/board-list/notice/all' onClick={() => $('.ma-backdrop').click()}>공지사항</Link></li>
+              <li><Link to='/board-list/free/all' onClick={() => $('.ma-backdrop').click()}>게시판</Link></li>
+              <li><Link to='/board-list/guide/all' onClick={() => $('.ma-backdrop').click()}>게임가이드</Link></li>
+            </ul>
+          </li>
+          <li className='f-700'>
+            <Link to='/workshop' onClick={() => $('.ma-backdrop').click()}>
+              <i><i className='fa fa-paint-brush' style={{ fontSize: '18px' }} /></i> 포켓몬 공작소
+            </Link>
+          </li>
+          {
+            user && user.authorization === 'admin' &&
+            <div>
+              <li className='f-700'>
+                <Link to='/forbidden-area'><i><i className='fa fa-lock' style={{ fontSize: '18px' }} /></i> 포켓몬관리</Link>
+              </li>
+              <li className='f-700'>
+                <Link to='/stage-management'><i><i className='fa fa-lock' style={{ fontSize: '18px' }} /></i> 스테이지관리</Link>
+              </li>
+              <li className='f-700'>
+                <i><i className='fa fa-lock' style={{ fontSize: '18px', cursor: 'pointer' }} onClick={this._handleOnClickUpdateUser} /></i> 커스텀 스크립트
+              </li>
+            </div>
+          }
+          {/* <li className='f-700'>
+            <a onClick={() => updateUserIndexes(this.props.firebase)}><i className='fa fa-lock' style={{ fontSize: '18px' }} /> 일회용</a>
+            </li> */}
+          {/* <li className='f-700'>
+            <a onClick={this._handleOnClickPostHonor}><i className='fa fa-lock' style={{ fontSize: '18px' }} /> 아이템생성</a>
+          </li> */}
+          {/* <li className='f-700'>
+            <a onClick={this._handleOnClickRestructureMon}><i className='fa fa-lock' style={{ fontSize: '18px' }} /> 몬구조변환</a>
+          </li> */}
+          {/*<li className='f-700'>
+            <a onClick={this._handleOnClickReset}><i className='fa fa-lock' style={{ fontSize: '18px' }} /> DB초기화</a>
+          </li>*/}
+        </ul>
       </aside>
     )
   }
@@ -449,7 +470,8 @@ Sidebar.propTypes = {
   receiveCreditInfo: PropTypes.func.isRequired,
   messages: PropTypes.object.isRequired,
   locale: PropTypes.string.isRequired,
-  mons: PropTypes.array
+  mons: PropTypes.array,
+  setTutorialModal: PropTypes.func.isRequired
 }
 
 // const authConnected = connect(({ firebase }) => ({ auth: pathToJS(firebase, 'auth') }))(Sidebar)
@@ -464,7 +486,8 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatchToProps = {
-  receiveCreditInfo
+  receiveCreditInfo,
+  setTutorialModal
 }
 
 // const wrappedSidebar = connect(({ firebase }) => ({ auth: pathToJS(firebase, 'auth') }))(Sidebar)

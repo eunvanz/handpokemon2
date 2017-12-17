@@ -83,7 +83,7 @@ class MonModal extends React.Component {
     })
   }
   render () {
-    const { mon, show, close, type, updatePickMonInfo, pickMonInfo, isNotMine, user, locale, ...restProps } = this.props
+    const { mon, show, close, type, updatePickMonInfo, pickMonInfo, isNotMine, user, locale, blinkMix, ...restProps } = this.props
     const tobeMon = mon.tobe
     const renderLevel = () => {
       if (mon.asis) {
@@ -97,7 +97,7 @@ class MonModal extends React.Component {
                 tobeMon.mon[tobeMon.monId].evoLv !== 0 && tobeMon.level >= tobeMon.mon[tobeMon.monId].evoLv &&
                 <Button text='진화하기' color='deeporange' size='xs' className='m-r-5' onClick={this._handleOnClickEvolution} />
               }
-              <Button text='교배하기' color='orange' size='xs' onClick={this._handleOnClickMix} />
+              <Button className={blinkMix ? 'blink-opacity' : null} text='교배하기' color='orange' size='xs' onClick={this._handleOnClickMix} />
             </div>
             }
           </div>
@@ -113,7 +113,7 @@ class MonModal extends React.Component {
                 tobeMon.mon[tobeMon.monId].evoLv !== 0 && tobeMon.level >= tobeMon.mon[tobeMon.monId].evoLv &&
                 <Button text='진화하기' color='deeporange' size='xs' className='m-r-5' onClick={this._handleOnClickEvolution} />
               }
-              <Button text='교배하기' color='orange' size='xs' onClick={this._handleOnClickMix} />
+              <Button className={blinkMix ? 'blink-opacity' : null} text='교배하기' color='orange' size='xs' onClick={this._handleOnClickMix} />
             </div>
           }
         </div>
@@ -172,7 +172,8 @@ MonModal.propTypes = {
   pickMonInfo: PropTypes.object,
   isNotMine: PropTypes.bool,
   user: PropTypes.object,
-  locale: PropTypes.string
+  locale: PropTypes.string,
+  blinkMix: PropTypes.bool
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(MonModal)

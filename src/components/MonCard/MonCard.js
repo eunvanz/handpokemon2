@@ -80,7 +80,7 @@ class MonCard extends React.Component {
   }
   render () {
     const { mon, pick, className, type, isSelectable, onUnselect, isToggleable, isSelected, noMonOfTheMatch,
-      isNotMine, firebase, showStatusBadge, isDummy, onClickShield, onClickSetDefenderBtn,
+      isNotMine, firebase, showStatusBadge, isDummy, onClickShield, onClickSetDefenderBtn, blinkMix,
       isCustomSize, disableChangeBtn, user, kills, point, isMom, locale, messages, dispatch, ...restProps } = this.props
     const tobeMon = mon ? mon.tobe : null
     const renderSetDefenderBtn = () => {
@@ -111,7 +111,7 @@ class MonCard extends React.Component {
       }
     }
     return (
-      <div className={`${isCustomSize ? '' : 'col-md-2 col-sm-3 col-xs-6'} text-left ${className || ''}`} {...restProps}
+      <div className={`${isCustomSize ? '' : 'col-md-2 col-sm-3 col-xs-6'} text-left ${className || ''}${blinkMix ? ' blink-opacity' : ''}`} {...restProps}
         style={{ padding: '0px 5px' }} onClick={isSelectable ? (this.state.isSelected ? this._handleOnUnselect : this._handleOnSelect) : this._showMonModal}
       >
         {!isDummy && (type === 'collection' || type === 'defender') && <MonLevel level={tobeMon.level}
@@ -168,7 +168,7 @@ class MonCard extends React.Component {
           pick &&
           renderLevelUpInfo()
         }
-        { !isDummy && <MonModal locale={locale} mon={mon} type={this.props.type} show={this.state.showMonModal} isNotMine={isNotMine} user={user}
+        { !isDummy && <MonModal locale={locale} mon={mon} type={this.props.type} show={this.state.showMonModal} isNotMine={isNotMine} user={user} blinkMix={blinkMix}
           close={() => this.setState({ showMonModal: false })} />
         }
         {
@@ -206,7 +206,8 @@ MonCard.propTypes = {
   isMom: PropTypes.bool,
   locale: PropTypes.string.isRequired,
   messages: PropTypes.object.isRequired,
-  noMonOfTheMatch: PropTypes.bool
+  noMonOfTheMatch: PropTypes.bool,
+  blinkMix: PropTypes.bool
 }
 
 export default compose(firebaseConnect(), withIntl)(MonCard)

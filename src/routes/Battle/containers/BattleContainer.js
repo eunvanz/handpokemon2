@@ -12,13 +12,16 @@ import withStages from 'hocs/withStages'
 
 import { fetchCandidates, setEnemyPicks, setUserPicks, setBattleLog, clearBattle } from '../modules/battle'
 
+import { setTutorialModal } from 'store/tutorialModal'
+
 const mapDispatchToProps = dispatch => {
   return {
     fetchCandidates: (firebase, league) => dispatch(fetchCandidates(firebase, league)),
     setEnemyPicks: (enemyPick) => dispatch(setEnemyPicks(enemyPick)),
     setUserPicks: (userPick) => dispatch(setUserPicks(userPick)),
     setBattleLog: (battleLog) => dispatch(setBattleLog(battleLog)),
-    clearBattle: () => dispatch(clearBattle())
+    clearBattle: () => dispatch(clearBattle()),
+    setTutorialModal: tutorialModal => dispatch(setTutorialModal(tutorialModal))
   }
 }
 

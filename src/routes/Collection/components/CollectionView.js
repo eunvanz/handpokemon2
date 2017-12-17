@@ -147,10 +147,30 @@ class CollectionView extends React.Component {
     this._isMine = this._isMine.bind(this)
   }
   componentDidMount () {
-    const { pickMonInfo } = this.props
+    const { pickMonInfo, setTutorialModal, setUserPath, user } = this.props
     this._initCollectionState()
     .then(() => {
-      if (pickMonInfo && pickMonInfo.mixCols) this.setState({ mode: 'mix' })
+      if (pickMonInfo && pickMonInfo.mixCols) {
+        this.setState({ mode: 'mix' })
+      } else if (user && user.isTutorialOn && user.tutorialStep === 5) {
+        setTutorialModal({
+          show: true,
+          content: <div>여기는 내 콜렉션을 관리할 수 있는 곳이에요. 내가 모은 콜렉션과 모을 수 있는 콜렉션을 한눈에 볼 수 있죠.</div>,
+          onClickContinue: () => {
+            setTutorialModal({
+              show: true,
+              content: <div>새로운 포켓몬을 얻을 수 있는 방법은 채집 뿐만이 아니에요. 지금부터 포켓몬을 <span className='c-lightblue'>교배</span>해보는 시간을 가져볼까 해요.</div>,
+              onClickContinue: () => {
+                setTutorialModal({
+                  show: true,
+                  content: <div>내가 가지고 있는 포켓몬 중에 <span className='c-lightblue'>가장 마음에 안드는 포켓몬</span>의 상세정보 창을 띄우고 <span className='c-lightblue'>교배하기</span>버튼을 눌러봅시다.</div>,
+                  onClickContinue: () => setTutorialModal({ show: false })
+                })
+              }
+            })
+          }
+        })
+      }
     })
   }
   shouldComponentUpdate (nextProps, nextState) {
@@ -170,6 +190,20 @@ class CollectionView extends React.Component {
         this._initCollectionState().then(() => this._initMixMode())
       } else {
         this._initMixMode()
+      }
+      const { user, setTutorialModal } = this.props
+      if (user && user.isTutorialOn && user.tutorialStep === 5) {
+        setTutorialModal({
+          show: true,
+          content: <div>교배는 기본적으로 두 마리의 포켓몬이 필요해요. 교배 대상의 두 포켓몬은 <span className='c-lightblue'>레벨이 1씩 하락</span>하거나, 레벨 1의 포켓몬은 슬프지만 <span className='c-lightblue'>영원히 사라진답니다.</span></div>,
+          onClickContinue: () => {
+            setTutorialModal({
+              show: true,
+              content: <div>하지만 보다 강하고 희귀한 <span className='c-lightblue'>RARE 등급의 포켓몬</span>을 얻을 수 있어요. 그럼 어디 한번 해볼까요? 대상 포켓몬을 선택하고 교배를 진행해봅시다.</div>,
+              onClickContinue: () => setTutorialModal({ show: false })
+            })
+          }
+        })
       }
     }
     // 교배시 두번째 대상 포켓몬까지 선택한 경우
@@ -395,7 +429,7 @@ class CollectionView extends React.Component {
       }
       const collectionsArr = filteredCollections.map((col, idx) => {
         const isMineAndHave = isMine && col.userId
-        return <MonCard isSelectable={this.state.mode === 'mix'} onSelect={() => this._handleOnSelectMon(col)}
+        return <MonCard blinkMix={user && user.isTutorialOn && user.tutorialStep === 5 && isMineAndHave} isSelectable={this.state.mode === 'mix'} onSelect={() => this._handleOnSelectMon(col)}
           onUnselect={() => { }} isNotMine={!isMine} showStatusBadge={isMineAndHave && mode === 'view'} user={userToView}
           key={col.id} mon={{ asis: null, tobe: col }} type={col.mon ? 'collection' : 'mon'} onClickShield={() => this._handleOnClickShield(col)} />
       })
@@ -659,7 +693,8 @@ CollectionView.propTypes = {
   userModal: PropTypes.object.isRequired,
   userCollections: PropTypes.array,
   locale: PropTypes.string.isRequired,
-  messages: PropTypes.object.isRequired
+  messages: PropTypes.object.isRequired,
+  setTutorialModal: PropTypes.func.isRequried
 }
 
 export default CollectionView

@@ -9,6 +9,7 @@ import withAuth from 'hocs/withAuth'
 
 import { updatePickMonInfo, clearPickMonInfo } from 'store/pickMonInfo'
 import { showHonorModal, hideHonorModal } from 'store/honorModal'
+import { setTutorialModal } from 'store/tutorialModal'
 
 import { convertMapToArr } from 'utils/commonUtil'
 
@@ -17,7 +18,8 @@ const mapDispatchToProps = dispatch => {
     updatePickMonInfo: pickMonInfo => dispatch(updatePickMonInfo(pickMonInfo)),
     clearPickMonInfo: () => dispatch(clearPickMonInfo()),
     showHonorModal: honorInfo => dispatch(showHonorModal(honorInfo)),
-    hideHonorModal: () => dispatch(hideHonorModal())
+    hideHonorModal: () => dispatch(hideHonorModal()),
+    setTutorialModal: (tutorialModal) => dispatch(setTutorialModal(tutorialModal))
   }
 }
 

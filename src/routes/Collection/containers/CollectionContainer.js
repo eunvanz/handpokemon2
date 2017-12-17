@@ -8,6 +8,7 @@ import CollectionView from '../components/CollectionView'
 
 import { updatePickMonInfo } from 'store/pickMonInfo'
 import { showUserModal } from 'store/userModal'
+import { setTutorialModal } from 'store/tutorialModal'
 
 import withAuth from 'hocs/withAuth'
 import withUserCollections from 'hocs/withUserCollections'
@@ -15,7 +16,8 @@ import withUserCollections from 'hocs/withUserCollections'
 const mapDispatchToProps = dispatch => {
   return {
     updatePickMonInfo: pickMonInfo => dispatch(updatePickMonInfo(pickMonInfo)),
-    showUserModal: userModal => dispatch(showUserModal(userModal))
+    showUserModal: userModal => dispatch(showUserModal(userModal)),
+    setTutorialModal: tutorialModal => dispatch(setTutorialModal(tutorialModal))
   }
 }
 const mapStateToProps = (state) => {

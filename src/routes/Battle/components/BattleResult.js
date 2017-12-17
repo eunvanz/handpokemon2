@@ -39,16 +39,16 @@ class BattleResult extends React.Component {
         this.setState({ isSendingReward: false })
         return window.swal({ text: getMsg(messages.battleView.rewardDuplicated, locale) })
       }
+      this.setState({ rewardQuantity: stage.quantity })
       updateUserStage = () => setUserPath(firebase, auth.uid, 'stage', (user.stage || 1) + 1)
     } else if (isAdventure) {
       this.setState({ isSendingReward: false })
       return
     }
-    this.setState({ rewardQuantity: stage.quantity })
     updateUserInventory(firebase, auth.uid, isAdventure ? this._getStageRewardItem() : this._getMissionRewardItem(),
       'save', isAdventure ? stage.quantity : this._getMissionCount())
     .then(() => {
-      updateUserStage()
+      return updateUserStage()
     })
     .then(() => {
       this.setState({ isSendingReward: false })

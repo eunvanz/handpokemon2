@@ -14,7 +14,7 @@ import AvatarImgInput from 'components/AvatarImgInput'
 import WarningText from 'components/WarningText'
 
 import { isDupEmail, isDupNickname, signUp, getUserIdByRecommenderCode, signUpWithSocialAccount,
-  isValidRecommenderCode } from 'services/UserService'
+  isValidRecommenderCode, setUserPath } from 'services/UserService'
 import { getStartPick } from 'services/MonService'
 import { postImage } from 'services/ImageService'
 import { postCollection } from 'services/CollectionService'
@@ -266,16 +266,32 @@ class SignUpView extends React.Component {
       return getSeqPromise(promArr)
     })
     .then(() => {
-      showAlert({
-        title: '정식 포켓몬 트레이너가 된 것을 축하드립니다!',
-        text: '지금 바로 포켓몬을 채집하러 떠나보세요.',
-        type: 'success',
-        confirmButtonText: '포켓몬 채집하기'
+      const { setTutorialModal } = this.props
+      setTutorialModal({
+        show: true,
+        content: <div>정식 트레이너가 된 것을 축하드립니다. 저는 <span className='c-lightblue'>운영자웅이</span>라고 해요. 당신의 모험을 도와줄 사람이죠.</div>,
+        onClickContinue: () => {
+          return setTutorialModal({
+            show: true,
+            content: <div>우선 가장 기본이 되는 포켓몬 채집부터 해볼까요? 사이드 메뉴에서 <span className='c-lightblue'>포켓몬 채집</span>메뉴를 선택해봅시다.</div>,
+            onClickContinue: () => {
+              setTutorialModal({
+                show: false
+              })
+            }
+          })
+        }
       })
-      .then(() => {
-        document.getElementById('sidebarProfileImage').src = profileImageUrl
-        this.context.router.push('/pick-district')
-      })
+      // showAlert({
+      //   title: '정식 포켓몬 트레이너가 된 것을 축하드립니다!',
+      //   text: '지금 바로 포켓몬을 채집하러 떠나보세요.',
+      //   type: 'success',
+      //   confirmButtonText: '포켓몬 채집하기'
+      // })
+      // .then(() => {
+      //   document.getElementById('sidebarProfileImage').src = profileImageUrl
+      //   this.context.router.push('/pick-district')
+      // })
     })
     .catch((msg) => {
       showAlert({
@@ -541,7 +557,8 @@ SignUpView.propTypes = {
   user: PropTypes.object,
   auth: PropTypes.object,
   messages: PropTypes.object.isRequired,
-  locale: PropTypes.string.isRequired
+  locale: PropTypes.string.isRequired,
+  setTutorialModal: PropTypes.func.isRequired
 }
 
 export default SignUpView

@@ -23,7 +23,7 @@ class UserInfo extends React.Component {
   render () {
     const { showUserModal } = this.state
     const { isHidden, isChosen, user, onClickChoose, onClickNext, picks, isForResult, attrBonusInfo, battleResultInfo,
-    isForStage, noButtons } = this.props
+    isForStage, noButtons, blinkNextButton } = this.props
     return (
       <div className='text-center'>
         {
@@ -62,7 +62,7 @@ class UserInfo extends React.Component {
         }
         {
           ((!isHidden && isChosen) || isForStage) && !noButtons &&
-          <Button text='다음단계로' size='xs' block color='green' onClick={onClickNext} />
+          <Button className={blinkNextButton ? 'blink-opacity' : null} text='다음단계로' size='xs' block color='green' onClick={onClickNext} />
         }
         {
           !isHidden && !isChosen && !isForResult &&
@@ -95,7 +95,8 @@ UserInfo.propTypes = {
   attrBonusInfo: PropTypes.object,
   battleResultInfo: PropTypes.object,
   isForStage: PropTypes.bool,
-  noButtons: PropTypes.bool
+  noButtons: PropTypes.bool,
+  blinkNextButton: PropTypes.bool
 }
 
 export default UserInfo

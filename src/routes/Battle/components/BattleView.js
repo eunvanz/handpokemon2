@@ -193,7 +193,7 @@ class BattleView extends React.Component {
   }
   render () {
     const { step, chosenEnemy, winInRow, battleResultInfo, isAdventure } = this.state
-    const { user, candidates, userCollections, battleLog, userPicks, enemyPicks, auth, creditInfo, locale, items, firebase, messages } = this.props
+    const { user, candidates, userCollections, battleLog, userPicks, enemyPicks, auth, creditInfo, locale, items, firebase, messages, setTutorialModal } = this.props
     const renderBody = () => {
       if (step === 1) {
         return (
@@ -202,7 +202,7 @@ class BattleView extends React.Component {
       } else if (step === 2) {
         if (!userCollections) return <LoadingContainer text='콜렉션을 불러오는 중...' />
         return (
-          <ChoosePick collections={userCollections} onClickNext={this._handleOnClickPickNext} user={user} locale={locale} messages={messages} isAdventure={isAdventure} maxCost={isAdventure ? this._getStage().maxCost : null} />
+          <ChoosePick setTutorialModal={setTutorialModal} collections={userCollections} onClickNext={this._handleOnClickPickNext} user={user} locale={locale} messages={messages} isAdventure={isAdventure} maxCost={isAdventure ? this._getStage().maxCost : null} />
         )
       } else if (step === 3) {
         return (
@@ -252,7 +252,8 @@ BattleView.propTypes = {
   items: PropTypes.array.isRequired,
   messages: PropTypes.object.isRequired,
   location: PropTypes.object,
-  stages: PropTypes.array.isRequired
+  stages: PropTypes.array.isRequired,
+  setTutorialModal: PropTypes.func.isRequired
 }
 
 export default BattleView

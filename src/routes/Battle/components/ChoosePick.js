@@ -124,7 +124,19 @@ class ChoosePick extends React.Component {
     this._handleOnClickNext = this._handleOnClickNext.bind(this)
   }
   componentDidMount () {
+    const { user, setTutorialModal, isAdventure } = this.props
     this._filterByAvailableCost(0, [])
+    if (isAdventure && user && user.isTutorialOn && user.tutorialStep === 6) {
+      setTutorialModal({
+        show: true,
+        content: <div>출전할 포켓몬을 선택해야 합니다. 총 3마리를 출전시키는데, 코스트 제한이 있습니다. </div>,
+        onClickContinue: () => {
+          setTutorialModal({
+            show: false
+          })
+        }
+      })
+    }
   }
   shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
@@ -407,7 +419,8 @@ ChoosePick.propTypes = {
   locale: PropTypes.string.isRequired,
   messages: PropTypes.object.isRequired,
   isAdventure: PropTypes.bool,
-  maxCost: PropTypes.number
+  maxCost: PropTypes.number,
+  setTutorialModal: PropTypes.func.isRequired
 }
 
 export default ChoosePick

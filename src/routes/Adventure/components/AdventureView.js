@@ -33,10 +33,25 @@ class AdventureView extends React.Component {
     this._getRewardItem = this._getRewardItem.bind(this)
   }
   componentDidMount () {
-    const { stages, user } = this.props
+    const { stages, user, setTutorialModal } = this.props
     const stage = stages[stages.length - (user.stage || 1)]
     if (!stage) return this.setState({ noMoreStage: true })
     this.setState({ stage })
+    if (user && user.isTutorialOn && user.tutorialStep === 6) {
+      setTutorialModal({
+        show: true,
+        content: <div>포켓몬 탐험은 일종의 싱글플레이 개념입니다. 스테이지가 상승할수록 난이도도 높아지지만, 보상도 더욱 좋아지죠.</div>,
+        onClickContinue: () => {
+          setTutorialModal({
+            show: true,
+            content: <div>첫 단계는 쉬울테니 걱정하지 마세요. 그럼 어디 한 번 진행해봅시다!</div>,
+            onClickContinue: () => {
+              setTutorialModal({ show: false })
+            }
+          })
+        }
+      })
+    }
   }
   shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
@@ -104,6 +119,7 @@ class AdventureView extends React.Component {
                 user={this._getTrainer()}
                 onClickNext={this._handleOnClickNext}
                 noButtons={user.adventureCredit <= 0}
+                blinkNextButton={user.isTutorialOn && user.tutorialStep === 6}
               />
             </div>
             {renderMonCards()}
@@ -117,10 +133,10 @@ class AdventureView extends React.Component {
           </div>
           <div className='row m-t-20'>
             <ScrollArea
-              speed={0.8}
               horizontal
               style={{ height: '120px' }}
               contentStyle={{ width: `${stages.length * 100}px` }}
+              smoothScrolling
             >
               <StageHistory stages={stages} stage={user.stage} getRewardItem={this._getRewardItem} />
             </ScrollArea>
@@ -155,7 +171,8 @@ AdventureView.propTypes = {
   messages: PropTypes.object.isRequired,
   locale: PropTypes.string.isRequired,
   stages: PropTypes.array.isRequired,
-  items: PropTypes.array.isRequired
+  items: PropTypes.array.isRequired,
+  setTutorialModal: PropTypes.func.isRequired
 }
 
 export default AdventureView

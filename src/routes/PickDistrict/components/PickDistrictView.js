@@ -12,7 +12,7 @@ import { districts } from 'constants/data'
 
 import { isScreenSize } from 'utils/commonUtil'
 
-import { refreshUserCredits } from 'services/UserService'
+import { refreshUserCredits, setUserPath } from 'services/UserService'
 
 class PickDistrictView extends React.Component {
   constructor (props) {
@@ -28,6 +28,7 @@ class PickDistrictView extends React.Component {
     return shallowCompare(this, nextProps, nextState)
   }
   _handleOnClickPick (district, quantity) {
+    const { user, firebase, auth } = this.props
     const pickMonInfo = {
       quantity,
       attrs: district.attrs,
@@ -35,11 +36,17 @@ class PickDistrictView extends React.Component {
     }
     this.props.updatePickMonInfo(pickMonInfo)
     .then(() => {
+      if (user.isTutorialOn && user.tutorialStep === 2) {
+        return setUserPath(firebase, auth.uid, 'tutorialStep', 3)
+      }
+      return Promise.resolve()
+    })
+    .then(() => {
       this.context.router.push(`pick-mon?f=${keygen._()}`)
     })
   }
   render () {
-    const { creditInfo } = this.props
+    const { creditInfo, user } = this.props
     const renderAttrBadges = attrs => {
       return attrs.map(attr =>
         <AttrBadge
@@ -100,7 +107,7 @@ class PickDistrictView extends React.Component {
                     <Button className='m-r-5' text='채집 X 1' onClick={() => this._handleOnClickPick(district, 1)} />
                     {
                       creditInfo.pickCredit > 1 &&
-                      <Button text={`채집 X ${creditInfo.pickCredit > 6 ? 6 : creditInfo.pickCredit}`}
+                      <Button className={user && user.isTutorialOn && user.tutorialStep === 2 ? 'blink-opacity' : null} text={`채집 X ${creditInfo.pickCredit > 6 ? 6 : creditInfo.pickCredit}`}
                         onClick={() => this._handleOnClickPick(district, creditInfo.pickCredit > 6 ? 6 : creditInfo.pickCredit)} />
                     }
                   </div>

@@ -3498,3 +3498,20 @@ html.ie9 .mCS-minimal-dark.mCSB_scrollTools_onDrag .mCSB_dragger .mCSB_dragger_b
   overflow: hidden;
   height: 40px;
 }
+
+.blink {
+  animation: blinker 1s linear infinite;
+  background-color: lightgray;
+}
+
+.blink-opacity {
+  animation: opacity-blinker 1s linear infinite;
+}
+
+@Keyframes blinker {
+  50% { background-color: rgba(255, 255, 255, 0); }
+}
+
+@Keyframes opacity-blinker {
+  50% { opacity: 0.2; }
+}

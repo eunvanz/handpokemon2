@@ -1,4 +1,5 @@
 import { firebaseConnect } from 'react-redux-firebase'
+import { connect } from 'react-redux'
 import { compose } from 'recompose'
 
 import withAuth from 'hocs/withAuth'
@@ -8,7 +9,14 @@ import withItems from 'hocs/withItems'
 
 import AdventureView from '../components/AdventureView'
 
+import { setTutorialModal } from 'store/TutorialModal'
+
+const mapDispatchToProps = {
+  setTutorialModal
+}
+
 const wrappedAdventureView = compose(
+  connect(null, mapDispatchToProps),
   firebaseConnect(),
   withAuth(true),
   withIntl,
