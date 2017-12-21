@@ -62,7 +62,7 @@ class CoreLayout extends React.Component {
         result += collection.mon[collection.monId].name[this.props.locale]
         return result
       }
-      const lucky = this.props.luckies[this.props.luckies.length - 1]
+      const lucky = sortBy(this.props.luckies, ['date'])[this.props.luckies.length - 1]
       toast.success(`${lucky.user.nickname}님이 ${getTypeName(lucky.type)}에서 ${getMonName(lucky.collection)}을(를) 얻었습니다!`)
     }
   }
