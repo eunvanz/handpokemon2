@@ -73,10 +73,10 @@ class PickMonView extends React.Component {
     }
     if (!prevState.multiPicks && this.state.multiPicks) {
       const { setTutorialModal, user, firebase, auth } = this.props
-      if (user.isTutorialOn && user.tutorialStep === 3 && user.pickCredit > 0) {
+      if (user.isTutorialOn && (user.tutorialStep === 3 || user.tutorialStep === 4) && user.pickCredit > 0) {
         setTutorialModal({
           show: true,
-          content: <div>포켓몬들을 발견했어요! 어디 얼마나 귀여운 녀석들이 발견됐는지 확인해볼까요? 확인 후에는 남은 크레딧으로 한번 더 채집해보죠.</div>,
+          content: <div>포켓몬들을 발견했어! 어디 얼마나 귀여운 녀석들이 발견됐는지 확인해볼까? 확인 후에는 남은 크레딧으로 한번 더 채집해보자.</div>,
           onClickContinue: () => {
             setUserPath(firebase, auth.uid, 'tutorialStep', 4)
             .then(() => {
@@ -84,22 +84,22 @@ class PickMonView extends React.Component {
             })
           }
         })
-      } else if (user.isTutorialOn && user.tutorialStep === 4 && user.pickCredit === 0) {
+      } else if (user.isTutorialOn && (user.tutorialStep === 4 || user.tutorialStep === 3) && user.pickCredit === 0) {
         setTutorialModal({
           show: true,
-          content: <div>채집 크레딧을 모두 소모했어요. 채집 크레딧은 <span className='c-lightblue'>20분</span>마다 한번씩 충전 된답니다. <span className='c-lightblue'>최대 12개</span>까지 모아둘 수 있으니, 4시간에 한번씩 채집을하면 최대 효율로 채집할 수 있겠죠?</div>,
+          content: <div>채집 크레딧을 모두 소모했어. 채집 크레딧은 <span className='c-lightblue'>20분</span>마다 한번씩 충전 된단다. <span className='c-lightblue'>최대 12개</span>까지 모아둘 수 있으니, 4시간에 한번씩 채집을하면 최대 효율로 채집할 수 있겠지?</div>,
           onClickContinue: () => {
             setTutorialModal({
               show: true,
-              content: <div>새로운 포켓몬을 발견하면 콜렉션 점수가 상승하고, 이미 가지고 있는 포켓몬을 채집하는 경우에는 레벨이 상승해요.</div>,
+              content: <div>새로운 포켓몬을 발견하면 콜렉션 점수가 상승하고, 이미 가지고 있는 포켓몬을 채집하는 경우에는 레벨이 상승해.</div>,
               onClickContinue: () => {
                 setTutorialModal({
                   show: true,
-                  content: <div>레벨이 상승하면 더욱 강력해지고 시합에서 유리해진답니다. 그리고 진화 가능레벨에 도달하면 진화를 할 수도 있어요.</div>,
+                  content: <div>레벨이 상승하면 더욱 강력해지고 시합에서 유리해져. 그리고 진화 가능레벨에 도달하면 진화를 할 수도 있어.</div>,
                   onClickContinue: () => {
                     setTutorialModal({
                       show: true,
-                      content: <div>자, 이제 채집한 포켓몬을 확인한 후에 <span className='c-lightblue'>내 콜렉션</span>으로 이동해봅시다!</div>,
+                      content: <div>자, 이제 채집한 포켓몬을 확인한 후에 <span className='c-lightblue'>내 콜렉션</span>으로 이동해보자구!</div>,
                       onClickContinue: () => {
                         setUserPath(firebase, auth.uid, 'tutorialStep', 5)
                         .then(() => {
@@ -248,11 +248,11 @@ class PickMonView extends React.Component {
       const { setTutorialModal, firebase, auth } = this.props
       setTutorialModal({
         show: true,
-        content: <div>마음에 드는 포켓몬이 탄생했나요? 이렇게 교배를 통해서도 포켓몬을 얻을 수 있답니다! 하지만 포켓몬 두 마리를 희생해야 하니 마구잡이로 하면 안되겠죠? 교배는 전략적으로 활용합시다.</div>,
+        content: <div>마음에 드는 포켓몬이 탄생했어? 이렇게 교배를 통해서도 포켓몬을 얻을 수 있어! 하지만 포켓몬 두 마리를 희생해야 하니 마구잡이로 하면 안되겠지? 교배는 전략적으로 활용하자구.</div>,
         onClickContinue: () => {
           setTutorialModal({
             show: true,
-            content: <div>이제 포켓몬을 모았으니, 포켓몬 세계를 탐험해볼까요? 사이트메뉴의 <span className='c-lightblue'>포켓몬 탐험</span>메뉴를 눌러봅시다.</div>,
+            content: <div>이제 포켓몬을 모았으니, 포켓몬 세계를 탐험해볼까? 사이트메뉴의 <span className='c-lightblue'>포켓몬 탐험</span>메뉴를 눌러보자.</div>,
             onClickContinue: () => {
               setTutorialModal({ show: false })
               setUserPath(firebase, auth.uid, 'tutorialStep', 6)

@@ -79,8 +79,8 @@ class MonCard extends React.Component {
     onClickShield(mon.tobe)
   }
   render () {
-    const { mon, pick, className, type, isSelectable, onUnselect, isToggleable, isSelected, noMonOfTheMatch,
-      isNotMine, firebase, showStatusBadge, isDummy, onClickShield, onClickSetDefenderBtn, blinkMix,
+    const { mon, pick, className, type, isSelectable, onUnselect, isToggleable, isSelected, noMonOfTheMatch, blinkInfo,
+      isNotMine, firebase, showStatusBadge, isDummy, onClickShield, onClickSetDefenderBtn, blinkMix, blinkCost, blinkRank,
       isCustomSize, disableChangeBtn, user, kills, point, isMom, locale, messages, dispatch, ...restProps } = this.props
     const tobeMon = mon ? mon.tobe : null
     const renderSetDefenderBtn = () => {
@@ -117,7 +117,7 @@ class MonCard extends React.Component {
         {!isDummy && (type === 'collection' || type === 'defender') && <MonLevel level={tobeMon.level}
           style={{ position: 'absolute', top: '0px', borderRadius: '0px 0px 2px 0px', backgroundColor: tobeMon.level >= (tobeMon.mon[tobeMon.monId].evoLv === 0 ? 99999 : tobeMon.mon[tobeMon.monId].evoLv) ? colors.deepOrange : colors.lightBlue }} />}
         <div className='text-right' style={{ marginRight: '18px' }}>
-          {!isDummy && (type === 'collection' || type === 'defender') && <MonRank rank={tobeMon.rank} style={{ borderRadius: '0px 0px 0px 2px' }} />}
+          {!isDummy && (type === 'collection' || type === 'defender') && <MonRank rank={tobeMon.rank} style={{ borderRadius: '0px 0px 0px 2px' }} blink={blinkRank} />}
         </div>
         <div className='c-item'
           style={{
@@ -143,10 +143,10 @@ class MonCard extends React.Component {
             }
             {
               isSelectable &&
-              <StatusBadge icon='fa fa-info' side='right' isActive activeColor={colors.blueGray} onClick={this._showMonModal} />
+              <StatusBadge icon={`fa fa-info${blinkInfo ? ' blink-opacity' : ''}`} side='right' isActive activeColor={colors.blueGray} onClick={this._showMonModal} />
             }
             <MonCost cost={isDummy ? 0 : (type === 'collection' || type === 'defender') ? tobeMon.mon[tobeMon.monId].cost : tobeMon.cost}
-              style={{ marginBottom: '5px' }} />
+              style={{ marginBottom: '5px' }} blink={blinkCost} />
             <MonAttr grade={isDummy ? null : (type === 'collection' || type === 'defender') ? tobeMon.mon[tobeMon.monId].grade : tobeMon.grade}
               mainAttr={isDummy ? null : (type === 'collection' || type === 'defender') ? tobeMon.mon[tobeMon.monId].mainAttr : tobeMon.mainAttr}
               subAttr={isDummy ? null : (type === 'collection' || type === 'defender') ? tobeMon.mon[tobeMon.monId].subAttr : tobeMon.subAttr}
@@ -207,7 +207,9 @@ MonCard.propTypes = {
   locale: PropTypes.string.isRequired,
   messages: PropTypes.object.isRequired,
   noMonOfTheMatch: PropTypes.bool,
-  blinkMix: PropTypes.bool
+  blinkMix: PropTypes.bool,
+  blinkCost: PropTypes.bool,
+  blinkRank: PropTypes.bool
 }
 
 export default compose(firebaseConnect(), withIntl)(MonCard)

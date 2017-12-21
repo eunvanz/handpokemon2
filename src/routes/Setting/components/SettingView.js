@@ -32,6 +32,7 @@ class SettingView extends React.Component {
     this._handleOnClickApply = this._handleOnClickApply.bind(this)
     this._handleOnClickSendPasswordResetEmail = this._handleOnClickSendPasswordResetEmail.bind(this)
     this._handleOnClickCodeCopy = this._handleOnClickCodeCopy.bind(this)
+    this._handleOnChangeTutorial = this._handleOnChangeTutorial.bind(this)
   }
   shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
@@ -102,6 +103,14 @@ class SettingView extends React.Component {
     clipboard.copy(user.recommenderCode)
     toast(getMsg(messages.setting.copied, locale))
   }
+  _handleOnChangeTutorial (e) {
+    const { firebase, auth } = this.props
+    const { checked } = e.target
+    let status = checked ? '활성화 됐습니다.' : '비활성화 됐습니다.'
+    setUserPath(firebase, auth.uid, 'isTutorialOn', checked)
+    .then(() => setUserPath(firebase, auth.uid, 'tutorialStep', 1))
+    .then(() => toast(`튜토리얼이 ${status}`))
+  }
   render () {
     const { messages, locale, user } = this.props
     const { profileImage, introduce, isImageEdited, isTextEdited, isLoading } = this.state
@@ -135,6 +144,9 @@ class SettingView extends React.Component {
               </p>
             </div>
           }
+          <p className='col-sm-offset-3 col-sm-6 f-700 m-t-30 toggle-switch'>
+            <label htmlFor='tutorial' className='ts-label f-700'>{getMsg(messages.setting.tutorial, locale)}</label><input type='checkbox' hidden='hidden' id='tutorial' onChange={this._handleOnChangeTutorial} /><label htmlFor='tutorial' className='ts-helper' />
+          </p>
           <p className='col-sm-offset-3 col-sm-6 f-700 m-t-30'>{getMsg(messages.signUp.recommenderCode, locale)}</p>
           <p onClick={this._handleOnClickCodeCopy} style={{ cursor: 'pointer' }} className='col-sm-offset-3 col-sm-6 f-700 c-lightblue'>{user.recommenderCode} <i className='far fa-copy c-gray' /></p>
           <p className='col-sm-offset-3 col-sm-6 c-gray'><small>{getMsg(messages.setting.recommenderDetail, locale)}</small></p>

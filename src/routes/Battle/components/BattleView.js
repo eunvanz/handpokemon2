@@ -210,15 +210,15 @@ class BattleView extends React.Component {
         )
       } else if (step === 4) {
         return (
-          <ChooseFirstAttack onSlowdownCallback={this._onSlowdownFirstAttackRouletteCallback} onClickStart={this._handleOnClickStartBattle} />
+          <ChooseFirstAttack user={user} setTutorialModal={setTutorialModal} onSlowdownCallback={this._onSlowdownFirstAttackRouletteCallback} onClickStart={this._handleOnClickStartBattle} />
         )
       } else if (step === 5) {
         return (
-          <BattleStage battleLog={battleLog} userPicks={userPicks} user={user} enemy={chosenEnemy} enemyPicks={enemyPicks} locale={locale} messages={messages} onClickNext={this._handleOnClickCompleteBattle} />
+          <BattleStage setTutorialModal={setTutorialModal} battleLog={battleLog} userPicks={userPicks} user={user} enemy={chosenEnemy} enemyPicks={enemyPicks} locale={locale} messages={messages} onClickNext={this._handleOnClickCompleteBattle} />
         )
       } else if (step === 6) {
         return (
-          <BattleResult user={user} winInRow={winInRow} enemy={chosenEnemy} auth={auth} locale={locale} items={items} firebase={firebase} stage={isAdventure ? this._getStage() : null}
+          <BattleResult setTutorialModal={setTutorialModal} user={user} winInRow={winInRow} enemy={chosenEnemy} auth={auth} locale={locale} items={items} firebase={firebase} stage={isAdventure ? this._getStage() : null}
             battleLog={battleLog} onClickContinue={this._handleOnClickContinueBattle} battleResultInfo={battleResultInfo} isAdventure={isAdventure} messages={messages} />
           // <BattleResult user={user} winInRow={winInRow} enemy={chosenEnemy} onMount={this._handleOnMountBattleResultView}
           //   battleLog={battleLog} onClickContinue={this._handleOnClickContinueBattle} />

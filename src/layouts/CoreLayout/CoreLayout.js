@@ -22,6 +22,8 @@ import { setTutorialModal } from 'store/tutorialModal'
 
 import { convertMapToArr, showAlert } from 'utils/commonUtil'
 
+import { setUserPath } from 'services/UserService'
+
 const mapStateToProps = state => ({
   userModal: state.userModal,
   luckies: sortBy(convertMapToArr(dataToJS(state.firebase, 'luckies')), item => !item.regDate),
@@ -65,6 +67,7 @@ class CoreLayout extends React.Component {
     }
   }
   _handleOnClickCloseTutorialModal () {
+    const { setTutorialModal, firebase, auth } = this.props
     showAlert({
       title: '튜토리얼을 종료 하시겠습니까?',
       text: '내 설정에서 튜토리얼모드를 다시 켤 수 있습니다.',
@@ -74,6 +77,7 @@ class CoreLayout extends React.Component {
       cancelButtonText: '아니오'
     })
     .then(() => {
+      setUserPath(firebase, auth.uid, 'isTutorialOn', false)
       setTutorialModal({
         show: false
       })
@@ -163,6 +167,7 @@ class CoreLayout extends React.Component {
           close={this._handleOnClickCloseTutorialModal}
           show={tutorialModal.show}
           onClickContinue={tutorialModal.onClickContinue}
+          isHiddenImg={tutorialModal.isHiddenImg}
         />
       </div>
     )
@@ -176,7 +181,10 @@ CoreLayout.propTypes = {
   userModal: PropTypes.object.isRequired,
   closeUserModal: PropTypes.func.isRequired,
   luckies: PropTypes.array,
-  releaseInfo: PropTypes.object
+  releaseInfo: PropTypes.object,
+  setTutorialModal: PropTypes.func.isRequired,
+  firebase: PropTypes.object.isRequired,
+  auth: PropTypes.object
 }
 
 const wrappedCoreLayout = compose(withIntl, withAuth(false), firebaseConnect(({ auth }) => {

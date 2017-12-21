@@ -124,18 +124,80 @@ class ChoosePick extends React.Component {
     this._handleOnClickNext = this._handleOnClickNext.bind(this)
   }
   componentDidMount () {
-    const { user, setTutorialModal, isAdventure } = this.props
     this._filterByAvailableCost(0, [])
-    if (isAdventure && user && user.isTutorialOn && user.tutorialStep === 6) {
-      setTutorialModal({
-        show: true,
-        content: <div>출전할 포켓몬을 선택해야 합니다. 총 3마리를 출전시키는데, 코스트 제한이 있습니다. </div>,
-        onClickContinue: () => {
-          setTutorialModal({
-            show: false
-          })
-        }
-      })
+  }
+  componentDidUpdate (prevProps, prevState) {
+    if (prevState.sortedCollections.length === 0 && this.state.sortedCollections.length > 0) {
+      const { user, setTutorialModal, isAdventure, locale, messages } = this.props
+      const { sortedCollections } = this.state
+      const exampleCol = sortedCollections[0]
+      if (isAdventure && user && user.isTutorialOn && user.tutorialStep === 6) {
+        setTutorialModal({
+          show: true,
+          content: <div>출전할 포켓몬을 선택해. 총 3마리를 출전시키는데, 무조건 강한 포켓몬만 출전시키면 재미가 없겠지? 그래서 <span className='c-lightblue'>코스트</span> 제한이 있어. 그런데 코스트가 뭘까?</div>,
+          onClickContinue: () => {
+            setTutorialModal({
+              show: true,
+              isHiddenImg: true,
+              content: (
+                <div>
+                  <div className='row'>
+                    <MonCard isCustomSize className='col-sm-4 col-sm-offset-4 col-xs-6' isSelectable isNotMine mon={{ asis: null, tobe: exampleCol }} type='collection'
+                      locale={locale} messages={messages} blinkCost
+                    />
+                  </div>
+                  <div>간략하게 포켓몬 카드를 훑어보자. 위 카드에서 별의 갯수가 코스트를 뜻해. 5코스트 이상부터는 노란색 별로 덧칠해져. 지금 이 포켓몬은 <span className='c-lightblue'>{exampleCol.mon[exampleCol.monId].cost}</span>코스트인 셈이지.</div>
+                </div>
+              ),
+              onClickContinue: () => {
+                setTutorialModal({
+                  show: true,
+                  isHiddenImg: true,
+                  content: (
+                    <div>
+                      <div className='row'>
+                        <MonCard isCustomSize className='col-sm-4 col-sm-offset-4 col-xs-6' isSelectable isNotMine mon={{ asis: null, tobe: exampleCol }} type='collection'
+                          locale={locale} messages={messages} blinkRank
+                        />
+                      </div>
+                      <div>우측 상단의 알파벳은 <span className='c-lightblue'>랭크</span>를 뜻해. 랭크는 <span className='c-lightblue'>새로운 포켓몬을 얻을 때 마다 랜덤</span>으로 정해져. 이론 상으로는 <span className='c-lightblue'>SS부터 F랭크</span>까지 존재해. 상위 랭크일수록 더욱 높은 능력치를 가지고 있지.</div>
+                    </div>
+                  ),
+                  onClickContinue: () => {
+                    setTutorialModal({
+                      show: true,
+                      isHiddenImg: true,
+                      content: (
+                        <div>
+                          <div className='row'>
+                            <MonCard isCustomSize className='col-sm-4 col-sm-offset-4 col-xs-6' isSelectable isNotMine mon={{ asis: null, tobe: exampleCol }} type='collection'
+                              locale={locale} messages={messages} blinkInfo
+                            />
+                          </div>
+                          <div>더 자세한 항목별 설명을 보고싶다면? <i className='fa fa-info-circle c-bluegray' />버튼을 눌러 포켓몬의 능력치와 그에 대한 설명을 확인해봐.</div>
+                        </div>
+                      ),
+                      onClickContinue: () => {
+                        setTutorialModal({
+                          show: true,
+                          content: (
+                            <div>
+                              그럼 이제 포켓몬을 출전시켜볼까? 좌측 상단의 <span className='c-lightblue'>총 전투력</span>과 <span className='c-lightblue'>코스트</span> 정보를 주시하면서 포켓몬을 선택해봐. 참고로 포켓몬은 <span className='c-lightblue'>전투력이 높은 순</span>으로 기본 정렬 되어있어.
+                            </div>
+                          ),
+                          onClickContinue: () => {
+                            setTutorialModal({ show: false })
+                          }
+                        })
+                      }
+                    })
+                  }
+                })
+              }
+            })
+          }
+        })
+      }
     }
   }
   shouldComponentUpdate (nextProps, nextState) {
@@ -392,7 +454,7 @@ class ChoosePick extends React.Component {
         <div>
           <h2 style={{ paddingRight: '60px' }}>총 전투력: <span className='c-lightblue f-700'>{chosenPick ? numeral(chosenPick.reduce((accm, p) => accm + p.total + p.addedTotal, 0) + getHonorBurfTotal(getHonorBurf(user)) * chosenPick.length).format('0,0') : 0}</span> (코스트: <span className='c-lightblue f-700'>{currentCost}</span> / {maxCost})</h2>
           <ul className='actions' style={{ right: '20px' }}>
-            <li><Button loading={isLoading} icon='fa fa-check' text='선택완료' color='green' disabled={chosenPick.length !== 3} onClick={this._handleOnClickNext} /></li>
+            <li><Button loading={isLoading} icon='fa fa-check' text='선택완료' color='green' disabled={chosenPick.length !== 3} onClick={this._handleOnClickNext} className={chosenPick.length === 3 && user.isTutorialOn && user.tutorialStep === 6 ? 'blink-opacity' : null} /></li>
           </ul>
         </div>
       )

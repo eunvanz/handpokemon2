@@ -37,7 +37,7 @@ export default class User {
     this.recommenderCode = keygen.password()
     this.isSocialAccount = false
     this.stage = 1
-    this.isTutorialOn = false
+    this.isTutorialOn = true
     this.tutorialStep = 1
   }
 }

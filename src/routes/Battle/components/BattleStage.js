@@ -15,6 +15,7 @@ import { fontSizeByDamage } from 'constants/styles'
 
 import specialImage from './assets/fire.svg'
 import normalImage from './assets/paw.png'
+import battleRouletteImage from './assets/battleRoulette.png'
 
 const rouletteStyle = {
   border: `3px solid ${colors.lightGray}`, borderRadius: isScreenSize.xs() ? '5px' : '10px', margin: 'auto'
@@ -31,6 +32,80 @@ class BattleStage extends React.Component {
     this._initRoulette = this._initRoulette.bind(this)
   }
   componentDidMount () {
+    const { user, setTutorialModal } = this.props
+    if (user.isTutorialOn && user.tutorialStep === 6) {
+      setTutorialModal({
+        show: true,
+        content: <div>시합은 자동으로 진행이 돼. 내 포켓몬들이 잘 싸우는지 관전만 하면 된다구. 그래도 <span className='c-lightblue'>룰렛</span>의 의미를 알아야겠지?</div>,
+        onClickContinue: () => {
+          setTutorialModal({
+            show: true,
+            isHiddenImg: true,
+            content: (
+              <div>
+                <div className='row'>
+                  <div className='col-xs-12 text-center'>
+                    <img src={battleRouletteImage} />
+                  </div>
+                </div>
+                <div>오박사님의 룰렛을 살펴볼까? 첫번째 룰렛은 <span className='c-lightblue'>공격 포켓몬</span>을 뜻해. 두번째 룰렛은 <span className='c-lightblue'>수비 포켓몬</span>, 세번째 룰렛은 <span className='c-lightblue'>공격 타입</span>을 뜻하지.</div>
+              </div>
+            ),
+            onClickContinue: () => {
+              setTutorialModal({
+                show: true,
+                isHiddenImg: true,
+                content: (
+                  <div>
+                    <div className='row'>
+                      <div className='col-xs-12 text-center'>
+                        <img src={battleRouletteImage} />
+                      </div>
+                    </div>
+                    <div>이 룰렛의 결과로 보면 오박사님의 <span className='c-lightblue'>소미안</span>이 너의 <span className='c-lightblue'>꾸꾸리</span>를 <span className='c-lightblue'>일반공격</span>으로 공격하게 돼있어.</div>
+                  </div>
+                ),
+                onClickContinue: () => {
+                  setTutorialModal({
+                    show: true,
+                    isHiddenImg: true,
+                    content: (
+                      <div>
+                        <div className='row'>
+                          <div className='col-xs-12 text-center'>
+                            <img src={battleRouletteImage} />
+                          </div>
+                        </div>
+                        <div>세번째 룰렛에는 <span className='c-lightblue'>발바닥</span>과 <span className='c-lightblue'>불꽃모양</span>이 있는데, 불꽃모양은 <span className='c-lightblue'>특수공격</span>을 의미해. <span className='c-lightblue'>1/3확률</span>로 특수공격이 발동하지.</div>
+                      </div>
+                    ),
+                    onClickContinue: () => {
+                      setTutorialModal({
+                        show: true,
+                        content: (
+                          <div>시합 속도를 조절하고 싶으면 <span className='c-lightblue'>화면 아래쪽의 슬라이드바</span>로 속도를 조절해봐. 자, 그럼 관전을 시작해보자!</div>
+                        ),
+                        onClickContinue: () => {
+                          setTutorialModal({ show: false })
+                          this._initStage()
+                        }
+                      })
+                    }
+                  })
+                }
+              })
+            }
+          })
+        }
+      })
+    } else {
+      this._initStage()
+    }
+  }
+  shouldComponentUpdate (nextProps, nextState) {
+    return shallowCompare(this, nextProps, nextState)
+  }
+  _initStage () {
     const { user } = this.props
     const $ = window.$
     setTimeout(() => {
@@ -58,9 +133,6 @@ class BattleStage extends React.Component {
 
       setTimeout(() => this._initAnimation(), 100)
     }, 100)
-  }
-  shouldComponentUpdate (nextProps, nextState) {
-    return shallowCompare(this, nextProps, nextState)
   }
   _initAnimation () {
     const { battleLog, onClickNext, messages, locale } = this.props
@@ -323,7 +395,8 @@ BattleStage.propTypes = {
   enemyPicks: PropTypes.array.isRequired,
   onClickNext: PropTypes.func.isRequired,
   locale: PropTypes.string.isRequired,
-  messages: PropTypes.object.isRequired
+  messages: PropTypes.object.isRequired,
+  setTutorialModal: PropTypes.func.isRequired
 }
 
 export default BattleStage

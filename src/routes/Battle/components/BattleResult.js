@@ -29,6 +29,33 @@ class BattleResult extends React.Component {
   }
   componentDidMount () {
     this._sendReward()
+    const { setTutorialModal, firebase, auth } = this.props
+    setTutorialModal({
+      show: true,
+      content: <div>시합이 끝났어! 스테이지를 클리어하게 되면 그에 따른 보상이 <span className='c-lightblue'>선물함</span>으로 발송되지.</div>,
+      onClickContinue: () => {
+        setTutorialModal({
+          show: true,
+          content: (
+            <div>다른 트레이너들과 시합할 수 있는 <span className='c-lightblue'>포켓몬 시합</span>도 이와 비슷하게 진행되니 진행하는데에 어려움은 없을거야.</div>
+          ),
+          onClickContinue: () => {
+            setTutorialModal({
+              show: true,
+              content: (
+                <div>나는 이만 들어가볼까 해. 더 친절하게 하고 싶었지만 튜토리얼 만드는 일이 너무 힘들어.ㅜㅜ 다른 할 일이 많으니 나는 이제 가볼게. 다음에 또 보자구!</div>
+              ),
+              onClickContinue: () => {
+                setUserPath(firebase, auth.uid, 'isTutorialOn', false)
+                setTutorialModal({
+                  show: false
+                })
+              }
+            })
+          }
+        })
+      }
+    })
   }
   _sendReward () {
     const { firebase, auth, user, stage, isAdventure, messages, locale, battleLog } = this.props
@@ -235,7 +262,8 @@ BattleResult.propTypes = {
   firebase: PropTypes.object.isRequired,
   isAdventure: PropTypes.bool,
   stage: PropTypes.object,
-  messages: PropTypes.object.isRequired
+  messages: PropTypes.object.isRequired,
+  setTutorialModal: PropTypes.func.isRequired
 }
 
 export default BattleResult

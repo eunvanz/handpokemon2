@@ -269,11 +269,11 @@ class SignUpView extends React.Component {
       const { setTutorialModal } = this.props
       setTutorialModal({
         show: true,
-        content: <div>정식 트레이너가 된 것을 축하드립니다. 저는 <span className='c-lightblue'>운영자웅이</span>라고 해요. 당신의 모험을 도와줄 사람이죠.</div>,
+        content: <div>정식 트레이너가 된 것을 축하해! 나는 <span className='c-lightblue'>운영자웅이</span>라고 해. 너의 모험을 도와줄 사람이지.</div>,
         onClickContinue: () => {
           return setTutorialModal({
             show: true,
-            content: <div>우선 가장 기본이 되는 포켓몬 채집부터 해볼까요? 사이드 메뉴에서 <span className='c-lightblue'>포켓몬 채집</span>메뉴를 선택해봅시다.</div>,
+            content: <div>우선 가장 기본이 되는 포켓몬 채집부터 해볼까? 사이드 메뉴에서 <span className='c-lightblue'>포켓몬 채집</span>메뉴를 선택해 봐.</div>,
             onClickContinue: () => {
               setTutorialModal({
                 show: false

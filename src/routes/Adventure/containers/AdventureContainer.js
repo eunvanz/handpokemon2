@@ -9,7 +9,7 @@ import withItems from 'hocs/withItems'
 
 import AdventureView from '../components/AdventureView'
 
-import { setTutorialModal } from 'store/TutorialModal'
+import { setTutorialModal } from 'store/tutorialModal'
 
 const mapDispatchToProps = {
   setTutorialModal

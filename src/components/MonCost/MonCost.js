@@ -1,11 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import classNames from 'classnames'
 
 import { colors } from 'constants/colors'
 
 class MonCost extends React.Component {
   render () {
-    const { cost, ...rest } = this.props
+    const { cost, blink, className, ...rest } = this.props
     const renderCost = () => {
       const resultComponent = []
       let fullStar = null
@@ -30,7 +31,7 @@ class MonCost extends React.Component {
       return resultComponent
     }
     return (
-      <div {...rest}>
+      <div className={`${classNames({ 'blink-opacity': blink, [className]: className })}`} {...rest}>
         {renderCost()}
       </div>
     )
@@ -38,7 +39,9 @@ class MonCost extends React.Component {
 }
 
 MonCost.propTypes = {
-  cost: PropTypes.number
+  cost: PropTypes.number,
+  blink: PropTypes.bool,
+  className: PropTypes.string
 }
 
 export default MonCost

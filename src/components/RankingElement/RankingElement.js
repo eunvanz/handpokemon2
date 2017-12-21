@@ -40,7 +40,7 @@ class RankingElement extends React.Component {
       lineHeight: isScreenSize.xs() ? '2.8' : '2.4',
       fontSize: isScreenSize.xs() ? '14px' : '16px',
       padding: isScreenSize.xs() ? '15px 5px' : '15px 30px',
-      width: [isScreenSize.xs() ? '20%' : isScreenSize.sm() ? '15%' : '10%', isScreenSize.xs() ? '50%' : isScreenSize.sm() ? '35%' : '20%', isScreenSize.xs() ? '30%' : isScreenSize.sm() ? '25%' : '20%', isScreenSize.xs() ? '30%' : isScreenSize.sm() ? '25%' : '20%', '10%', '10%', '10%'],
+      width: [isScreenSize.xs() ? '20%' : isScreenSize.sm() ? '15%' : '10%', isScreenSize.xs() ? '50%' : isScreenSize.sm() ? '35%' : '22%', isScreenSize.xs() ? '30%' : isScreenSize.sm() ? '25%' : '18%', isScreenSize.xs() ? '30%' : isScreenSize.sm() ? '25%' : '20%', '10%', '10%', '10%'],
       showProfile: !isScreenSize.smallerThan(414)
     })
   }
@@ -55,7 +55,9 @@ class RankingElement extends React.Component {
             ? <strong style={{ lineHeight }}>트레이너</strong>
             : <div onClick={() => this.setState({ showUserModal: true })} style={{ cursor: 'pointer' }}>
               <Img className='lgi-img' src={user.profileImageKey ? getThumbnailImageUrl(user.profileImage) : user.profileImage} style={{ display: showProfile ? 'inline' : 'none' }} />
-              <span style={{ paddingLeft: '10px', lineHeight }}>{user.nickname}</span>
+              <span style={{ paddingLeft: '10px', lineHeight }}>
+                {user.nickname}
+              </span>
             </div>
           }
         </div>

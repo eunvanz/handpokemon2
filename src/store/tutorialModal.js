@@ -6,6 +6,7 @@ export const SET_TUTORIAL_MODAL = 'SET_TUTORIAL_MODAL'
 const initialState = {
   show: false,
   content: null,
+  isHiddenImg: false,
   onClickContinue: () => {}
 }
 // ------------------------------------

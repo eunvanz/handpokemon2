@@ -35,7 +35,19 @@ class ChooseFirstAttack extends React.Component {
       slowDownCallback: this._onSlowdownCallback,
       stopCallback: this._onStopCallback
     }
-    window.$(`#firstAttackRoulette`).roulette(option).roulette('start')
+    const { user, setTutorialModal } = this.props
+    if (user && user.isTutorialOn && user.tutorialStep === 6) {
+      setTutorialModal({
+        show: true,
+        content: <div>누가 먼저 공격을 할지 룰렛으로 결정해. 당연히 먼저 공격하는게 유리하니 <span className='c-lightblue'>STOP</span>버튼을 신중하게 눌러보라구.</div>,
+        onClickContinue: () => {
+          setTutorialModal({ show: false })
+          window.$(`#firstAttackRoulette`).roulette(option).roulette('start')
+        }
+      })
+    } else {
+      window.$(`#firstAttackRoulette`).roulette(option).roulette('start')
+    }
   }
   shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
@@ -50,11 +62,24 @@ class ChooseFirstAttack extends React.Component {
     this.setState({ isSlowdown: true })
   }
   _onStopCallback () {
+    const { user, setTutorialModal } = this.props
+    const { stopIdx } = this.state
     this.setState({ isStopped: true, isSlowdown: false })
+    if (user && user.isTutorialOn && user.tutorialStep === 6) {
+      let content = <div>잘했어! 발바닥 모양은 공격을 의미해. 방패모양은 방어겠지? 먼저 공격하게 됐으니 시합이 유리해졌군! 그럼 <span className='c-lightblue'>시합시작</span> 버튼을 눌러보자.</div>
+      if (stopIdx === 1) content = <div>이런.. 수비를 먼저 하게 됐군! 방패모양은 방어를 의미해. 발바닥 모양은 공격이겠지? 그럼 <span className='c-lightblue'>시합시작</span> 버튼을 눌러보자.</div>
+      setTutorialModal({
+        show: true,
+        content: content,
+        onClickContinue: () => {
+          setTutorialModal({ show: false })
+        }
+      })
+    }
   }
   render () {
     const { isStopped, isSlowdown } = this.state
-    const { onClickStart } = this.props
+    const { onClickStart, user } = this.props
     const renderBody = () => {
       return (
         <div>
@@ -66,7 +91,7 @@ class ChooseFirstAttack extends React.Component {
             size={220}
             innerSize={200}
           />
-          <Button className='m-t-30' text={isStopped ? '시합시작' : 'STOP'} color={isStopped ? 'green' : isSlowdown ? 'orange' : 'red'} onClick={isStopped ? onClickStart : this._handleOnClickStop} disabled={this.state.isSlowdown} />
+          <Button className={`m-t-30${user.isTutorialOn && user.tutorialStep === 6 ? ' blink-opacity' : ''}`} text={isStopped ? '시합시작' : 'STOP'} color={isStopped ? 'green' : isSlowdown ? 'orange' : 'red'} onClick={isStopped ? onClickStart : this._handleOnClickStop} disabled={this.state.isSlowdown} />
         </div>
       )
     }
@@ -85,7 +110,9 @@ ChooseFirstAttack.contextTypes = {
 
 ChooseFirstAttack.propTypes = {
   onSlowdownCallback: PropTypes.func.isRequired,
-  onClickStart: PropTypes.func.isRequired
+  onClickStart: PropTypes.func.isRequired,
+  setTutorialModal: PropTypes.func.isRequired,
+  user: PropTypes.object.isRequired
 }
 
 export default ChooseFirstAttack

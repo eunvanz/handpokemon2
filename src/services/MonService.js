@@ -129,6 +129,7 @@ export const updateMon = (firebase, mon) => {
     merge.forEach(elem => {
       updateObj[elem] = tobeMon
     })
+    console.log('updateObj', updateObj)
     return firebase.ref().update(updateObj)
   })
 }
@@ -139,4 +140,8 @@ export const updateMonWithRoute = (firebase, route, value) => {
 
 export const deleteMon = (firebase, mon) => {
   return firebase.remove(`mons/${mon.id}`)
+}
+
+export const getMonById = (firebase, monId) => {
+  return firebase.ref(`mons/${monId}`).once('value').then(snapshot => snapshot.val())
 }

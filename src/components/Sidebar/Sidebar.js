@@ -19,7 +19,7 @@ import Badge from 'components/Badge'
 
 import { refreshUserCredits, updateUserIndexes, updateUserPokemoney, getAllUser, setUserPath, getUserByUserId } from 'services/UserService'
 import { postHonor } from 'services/HonorService'
-import { updateMon } from 'services/MonService'
+import { updateMon, getMonById } from 'services/MonService'
 import { postItem } from 'services/ItemService'
 import { getCollectionsRefUserIdAndMonId, getUpdateColObj } from 'services/CollectionService'
 
@@ -45,6 +45,7 @@ class Sidebar extends React.Component {
     this._handleOnClickUpdateCollection = this._handleOnClickUpdateCollection.bind(this)
     this._handleOnClickUpdateUser = this._handleOnClickUpdateUser.bind(this)
     this._handleOnClickSideMenu = this._handleOnClickSideMenu.bind(this)
+    this._handleOnClickUpdateMon = this._handleOnClickUpdateMon.bind(this)
     this.state = {
       pickCreditTimer: null,
       battleCreditTimer: null,
@@ -291,18 +292,28 @@ class Sidebar extends React.Component {
     //   updater(firebase, { [`users/${tgt}`]: user })
     // })
   }
+  _handleOnClickUpdateMon () {
+    // const { firebase } = this.props
+    // const monId = '-KraNX9U36Qqf5Zb6gc8'
+    // getMonById(firebase, monId)
+    // .then(mon => {
+    //   mon.next = ['-L0Xq_RToxM7nf6yBKNS']
+    //   console.log('updatedMon', mon)
+    //   updateMon(firebase, mon)
+    // })
+  }
   _handleOnClickSideMenu (name) {
     const { firebase, auth, setTutorialModal, user } = this.props
     $('.ma-backdrop').click()
-    if (name === 'pickMon' && user.tutorialStep === 1) {
+    if (name === 'pickMon' && user && user.isTutorialOn && user.tutorialStep === 1) {
       setUserPath(firebase, auth.uid, 'tutorialStep', 2)
       .then(() => {
         setTutorialModal({
           show: true,
-          content: <div>채집을 하려면 채집구역을 선택해야 해요. 각 구역에는 각기 다른 속성의 포켓몬들이 살고 있어요.</div>,
+          content: <div>채집을 하려면 채집구역을 선택해야 해. 각 구역에는 각기 다른 속성의 포켓몬들이 살고 있어.</div>,
           onClickContinue: () => setTutorialModal({
             show: true,
-            content: <div>어디 한번 마음에 드는 구역에서 채집을 해볼까요? 크레딧이 많으니 <span className='c-lightblue'>6마리씩 채집</span>해보도록 해요!</div>,
+            content: <div>어디 한번 마음에 드는 구역에서 채집을 해볼까? 크레딧이 많으니 <span className='c-lightblue'>여러마리 씩 채집</span>해보도록 하자!</div>,
             onClickContinue: () => setTutorialModal({ show: false })
           })
         })
@@ -436,7 +447,7 @@ class Sidebar extends React.Component {
                 <Link to='/stage-management'><i><i className='fa fa-lock' style={{ fontSize: '18px' }} /></i> 스테이지관리</Link>
               </li>
               <li className='f-700'>
-                <i><i className='fa fa-lock' style={{ fontSize: '18px', cursor: 'pointer' }} onClick={this._handleOnClickUpdateUser} /></i> 커스텀 스크립트
+                <i><i className='fa fa-lock' style={{ fontSize: '18px', cursor: 'pointer' }} onClick={this._handleOnClickUpdateMon} /></i> 커스텀 스크립트
               </li>
             </div>
           }

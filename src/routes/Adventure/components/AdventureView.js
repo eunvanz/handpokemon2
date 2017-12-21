@@ -40,11 +40,11 @@ class AdventureView extends React.Component {
     if (user && user.isTutorialOn && user.tutorialStep === 6) {
       setTutorialModal({
         show: true,
-        content: <div>포켓몬 탐험은 일종의 싱글플레이 개념입니다. 스테이지가 상승할수록 난이도도 높아지지만, 보상도 더욱 좋아지죠.</div>,
+        content: <div>포켓몬 탐험은 일종의 싱글플레이야. 스테이지가 상승할수록 난이도도 높아지지만, 보상도 더욱 좋아지지.</div>,
         onClickContinue: () => {
           setTutorialModal({
             show: true,
-            content: <div>첫 단계는 쉬울테니 걱정하지 마세요. 그럼 어디 한 번 진행해봅시다!</div>,
+            content: <div>첫 단계는 쉬울테니 너무 걱정하지 마. 그럼 한 번 시작해보자! 상대를 확인한 후에 <span>다음단계로</span> 버튼을 눌러줘.</div>,
             onClickContinue: () => {
               setTutorialModal({ show: false })
             }
