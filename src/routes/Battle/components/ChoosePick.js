@@ -324,7 +324,7 @@ class ChoosePick extends React.Component {
     this.setState({ filterCollapse: Object.assign({}, filterCollapse, { [key]: !filterCollapse[key] }) })
   }
   render () {
-    const { user, messages, locale } = this.props
+    const { user, messages, locale, isDefenseMode } = this.props
     const { currentCost, maxCost, sortedCollections, chosenPick, filterCollapse, filter, isLoading } = this.state
     const renderFilterBody = () => {
       const grades = {
@@ -485,7 +485,7 @@ class ChoosePick extends React.Component {
     }
     return (
       <ContentContainer
-        title='출전 포켓몬 선택'
+        title={isDefenseMode ? '수비 포켓몬 선택' : '출전 포켓몬 선택'}
         body={renderBody()}
         header={renderHeader()}
         stickyHeader

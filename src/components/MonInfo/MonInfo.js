@@ -1,11 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { Link } from 'react-router'
 
 import MonRank from 'components/MonRank'
 import MonAttr from 'components/MonAttr'
 import MonCost from 'components/MonCost'
 import Stat from 'components/Stat'
 import Button from 'components/Button'
+import Info from 'components/Info'
 
 import { getMonImage } from 'utils/monUtil'
 import { getMsg } from 'utils/commonUtil'
@@ -70,23 +72,23 @@ class MonInfo extends React.Component {
                 <div className='col-xs-9'>{mon.mon ? getMsg(monToView.name, locale) : '????'}</div>
               </div>
               {mon.rank && <div className='row' style={{ marginBottom: '15px' }}>
-                <div className='col-xs-3 f-700'>랭크</div>
+                <div className='col-xs-3 f-700'>랭크 <Info id='rankInfo' title='랭크' content='SS~F까지의 랭크가 존재하며, 높은 등급의 랭크일수록 전투력이 높습니다. 랭크는 새로운 포켓몬 채집시에 결정됩니다.' /></div>
                 <div className='col-xs-9'><MonRank rank={mon.rank} /></div>
               </div>}
               <div className='row' style={{ marginBottom: '15px' }}>
-                <div className='col-xs-3 f-700'>등급</div>
+                <div className='col-xs-3 f-700'>등급 <Info id='gradeInfo' title='등급' content={<div>등급마다 얻을 수 있는 방법이 다릅니다.<br />BASIC: 채집<br />SPECIAL: BASIC 진화<br />RARE: BASIC 혹은 SPECIAL간의 교배<br />S.RARE: RARE의 진화<br />ELITE: RARE 혹은 S.RARE간의 교배<br />LEGEND: ELITE간의 교배</div>} /></div>
                 <div className='col-xs-9'><MonAttr grade={monToView.grade} point={monToView.point} /></div>
               </div>
               <div className='row' style={{ marginBottom: '15px' }}>
-                <div className='col-xs-3 f-700'>속성</div>
+                <div className='col-xs-3 f-700'>속성 <Info id='attrInfo' title='속성' content={<div>속성별로 상성이 있습니다. 두 개의 속성을 가진 포켓몬의 경우 중첩하여 적용됩니다. 상성표는 <Link to=''>이곳</Link>을 참고해주세요.</div>} /></div>
                 <div className='col-xs-9'><MonAttr mainAttr={monToView.mainAttr} subAttr={monToView.subAttr} /></div>
               </div>
               <div className='row' style={{ marginBottom: '15px' }}>
-                <div className='col-xs-3 f-700'>코스트</div>
+                <div className='col-xs-3 f-700'>코스트 <Info id='costInfo' title='코스트' content='시합에서 사용할 수 있는 최대 코스트는 정해져있습니다. 코스트가 적으면서 전투력이 높은 포켓몬이 좋은 포켓몬이겠죠?' /></div>
                 <div className='col-xs-9'><MonCost cost={monToView.cost} /></div>
               </div>
               <div className='row' style={{ marginBottom: '15px' }}>
-                <div className='col-xs-3 f-700'>전투력</div>
+                <div className='col-xs-3 f-700'>전투력 <Info id='battleInfo' title='전투력' content='체력, 공격, 방어, 특수공격, 특수방어, 민첩 능력치를 합친 값입니다.' /></div>
                 {renderTotal()}
               </div>
               <div className='row' style={{ marginBottom: '15px' }}>

@@ -54,7 +54,7 @@ class IntroduceView extends React.Component {
                   src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQs03Pga0G-IZB6wnlejFN8e890r-Ny1BtAmlP7v0urB3rgp1sl'
                   style={{ maxWidth: '160px', width: '100%', margin: '22px 0px' }} />
                 <div>
-                  손켓몬은 Pokémon®의 정식 라이센스가 없는 순수 팬 게임입니다. 개발자 또한 바쁜 백수생활을 하며 짬짬이 운영 및 업데이트 하고 있기 때문에 상업성 게임의 퀄리티를 보장할 수 없습니다. 단, 무료로 마음껏 즐겨주세요!
+                  손켓몬은 Pokémon®의 정식 라이센스가 없는 순수 팬 게임입니다. 개발자 또한 바쁜 직장생활을 하며 짬짬이 운영 및 업데이트 하고 있기 때문에 상업성 게임의 퀄리티를 보장할 수 없습니다. 단, 무료로 마음껏 즐겨주세요!
                 </div>
               </div>
             </div>

@@ -8,6 +8,7 @@ import UserInfo from './UserInfo'
 import Button from 'components/Button'
 import Loading from 'components/Loading'
 import CenterMidContainer from 'components/CenterMidContainer'
+import Info from 'components/Info'
 
 import { updateUserInventory, setUserPath } from 'services/UserService'
 
@@ -29,33 +30,35 @@ class BattleResult extends React.Component {
   }
   componentDidMount () {
     this._sendReward()
-    const { setTutorialModal, firebase, auth } = this.props
-    setTutorialModal({
-      show: true,
-      content: <div>시합이 끝났어! 스테이지를 클리어하게 되면 그에 따른 보상이 <span className='c-lightblue'>선물함</span>으로 발송되지.</div>,
-      onClickContinue: () => {
-        setTutorialModal({
-          show: true,
-          content: (
-            <div>다른 트레이너들과 시합할 수 있는 <span className='c-lightblue'>포켓몬 시합</span>도 이와 비슷하게 진행되니 진행하는데에 어려움은 없을거야.</div>
-          ),
-          onClickContinue: () => {
-            setTutorialModal({
-              show: true,
-              content: (
-                <div>나는 이만 들어가볼까 해. 어려운 일이 발생하면 언제든지 <span className='c-lightblue'>자유게시판</span>에 글을 남겨줘. 다른 할 일이 많으니 나는 이제 가볼게. 다음에 또 보자구!</div>
-              ),
-              onClickContinue: () => {
-                setUserPath(firebase, auth.uid, 'isTutorialOn', false)
-                setTutorialModal({
-                  show: false
-                })
-              }
-            })
-          }
-        })
-      }
-    })
+    const { setTutorialModal, firebase, auth, user } = this.props
+    if (user && user.isTutorialOn && user.tutorialStep === 6) {
+      setTutorialModal({
+        show: true,
+        content: <div>시합이 끝났어! 스테이지를 클리어하게 되면 그에 따른 보상이 <span className='c-lightblue'>선물함</span>으로 발송되지.</div>,
+        onClickContinue: () => {
+          setTutorialModal({
+            show: true,
+            content: (
+              <div>다른 트레이너들과 시합할 수 있는 <span className='c-lightblue'>포켓몬 시합</span>도 이와 비슷하게 진행되니 진행하는데에 어려움은 없을거야.</div>
+            ),
+            onClickContinue: () => {
+              setTutorialModal({
+                show: true,
+                content: (
+                  <div>나는 이만 들어가볼까 해. 어려운 일이 발생하면 언제든지 <span className='c-lightblue'>자유게시판</span>에 글을 남겨줘. 다른 할 일이 많으니 나는 이제 가볼게. 다음에 또 보자구!</div>
+                ),
+                onClickContinue: () => {
+                  setUserPath(firebase, auth.uid, 'isTutorialOn', false)
+                  setTutorialModal({
+                    show: false
+                  })
+                }
+              })
+            }
+          })
+        }
+      })
+    }
   }
   _sendReward () {
     const { firebase, auth, user, stage, isAdventure, messages, locale, battleLog } = this.props
@@ -196,11 +199,11 @@ class BattleResult extends React.Component {
                   {
                     !isAdventure &&
                     <div className='pti-body'>
-                      <div className='ptib-item'>퍼펙트게임: {battleLog.isPerfectGame ? <span className='c-green f-700'>달성</span> : <span className='c-red'>미달성</span>}</div>
-                      <div className='ptib-item'>선방승리: {battleLog.isFirstDefense ? <span className='c-green f-700'>달성</span> : <span className='c-red'>미달성</span>}</div>
-                      <div className='ptib-item'>원몬쇼: {battleLog.isOneMonShow ? <span className='c-green f-700'>달성</span> : <span className='c-red'>미달성</span>}</div>
-                      <div className='ptib-item'>아슬아슬: {battleLog.isGandang ? <span className='c-green f-700'>달성</span> : <span className='c-red'>미달성</span>}</div>
-                      <div className='ptib-item'>언더독: {battleLog.isUnderDog ? <span className='c-green f-700'>달성</span> : <span className='c-red'>미달성</span>}</div>
+                      <div className='ptib-item'>퍼펙트게임: {battleLog.isPerfectGame ? <span className='c-green f-700'>달성</span> : <span className='c-red'>미달성</span>} <Info id='perfectGameInfo' title='퍼펙트게임' content='내 포켓몬 중 기절한 포켓몬이 없이 승리' /></div>
+                      <div className='ptib-item'>선방승리: {battleLog.isFirstDefense ? <span className='c-green f-700'>달성</span> : <span className='c-red'>미달성</span>} <Info id='firstDefenseInfo' title='선방승리' content='첫 턴에 방어부터 시작하고 승리' /></div>
+                      <div className='ptib-item'>원몬쇼: {battleLog.isOneMonShow ? <span className='c-green f-700'>달성</span> : <span className='c-red'>미달성</span>} <Info id='oneMonShowInfo' title='원몬쇼' content='한 포켓몬이 모든 포켓몬을 마무리하며 승리' /></div>
+                      <div className='ptib-item'>아슬아슬: {battleLog.isGandang ? <span className='c-green f-700'>달성</span> : <span className='c-red'>미달성</span>} <Info id='gandangInfo' title='아슬아슬' content='내 포켓몬의 남은 HP가 50 이하로 승리' /></div>
+                      <div className='ptib-item'>언더독: {battleLog.isUnderDog ? <span className='c-green f-700'>달성</span> : <span className='c-red'>미달성</span>} <Info id='underDogInfo' title='언더독' content='상대보다 총 전투력이 낮은 상황에서 승리' /></div>
                     </div>
                   }
                   {

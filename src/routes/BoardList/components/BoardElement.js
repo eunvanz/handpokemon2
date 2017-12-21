@@ -268,7 +268,7 @@ class BoardElement extends React.Component {
             <div className={`card-body card-padding${isScreenSize.xs() ? ' p-15' : ''}`} style={{ cursor: 'pointer' }} onClick={!showContent ? this._handleOnClickShowDetail : () => this.setState({ showContent: false })}>
               <HTMLEllipsis
                 unsafeHTML={board.content[locale]}
-                maxLine={isScreenSize.xs() ? '2' : '1'}
+                maxLine='1'
                 ellipsis='...'
                 trimRight
                 baseOn='letters'

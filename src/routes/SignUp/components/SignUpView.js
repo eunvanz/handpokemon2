@@ -14,7 +14,7 @@ import AvatarImgInput from 'components/AvatarImgInput'
 import WarningText from 'components/WarningText'
 
 import { isDupEmail, isDupNickname, signUp, getUserIdByRecommenderCode, signUpWithSocialAccount,
-  isValidRecommenderCode, setUserPath } from 'services/UserService'
+  isValidRecommenderCode, setUserPath, getUserRankingByUserId } from 'services/UserService'
 import { getStartPick } from 'services/MonService'
 import { postImage } from 'services/ImageService'
 import { postCollection } from 'services/CollectionService'
@@ -263,6 +263,8 @@ class SignUpView extends React.Component {
     .then(userId => {
       const { startPick } = this.state
       const promArr = startPick.map(col => () => postCollection(firebase, userId, col, 'signUp'))
+      promArr.push(() => getUserRankingByUserId(firebase, 'collection', userId))
+      promArr.push(() => getUserRankingByUserId(firebase, 'battle', userId))
       return getSeqPromise(promArr)
     })
     .then(() => {
