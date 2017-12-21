@@ -43,7 +43,7 @@ class BattleResult extends React.Component {
             setTutorialModal({
               show: true,
               content: (
-                <div>나는 이만 들어가볼까 해. 더 친절하게 하고 싶었지만 튜토리얼 만드는 일이 너무 힘들어.ㅜㅜ 다른 할 일이 많으니 나는 이제 가볼게. 다음에 또 보자구!</div>
+                <div>나는 이만 들어가볼까 해. 어려운 일이 발생하면 언제든지 <span className='c-lightblue'>자유게시판</span>에 글을 남겨줘. 다른 할 일이 많으니 나는 이제 가볼게. 다음에 또 보자구!</div>
               ),
               onClickContinue: () => {
                 setUserPath(firebase, auth.uid, 'isTutorialOn', false)

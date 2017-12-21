@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import shallowCompare from 'react-addons-shallow-compare'
+import { toast } from 'react-toastify'
 
 import BattleReady from './BattleReady'
 import ChooseEnemy from './ChooseEnemy'
@@ -15,6 +16,7 @@ import Pick from 'bizs/Pick'
 
 import { setUserPath, updateUserToLose, decreaseCredit, updateUserToWin,
   getUserRankingByUserId } from 'services/UserService'
+import { updateIsDefender } from 'services/CollectionService'
 
 import { getMsg } from 'utils/commonUtil'
 
@@ -30,7 +32,8 @@ class BattleView extends React.Component {
       step: props.location.query.type === 'adventure' ? 2 : 1,
       chosenEnemy: null,
       winInRow: props.user.winInRow || 0,
-      battleResultInfo: null
+      battleResultInfo: null,
+      isDefenseMode: false
     }
     this._handleOnClickStartBattle = this._handleOnClickStartBattle.bind(this)
     this._handleOnClickChooseEnemy = this._handleOnClickChooseEnemy.bind(this)
@@ -42,6 +45,8 @@ class BattleView extends React.Component {
     this._generateBattleResult = this._generateBattleResult.bind(this)
     this._getTrainerForAdventure = this._getTrainerForAdventure.bind(this)
     this._getStage = this._getStage.bind(this)
+    this._handleOnClickDefense = this._handleOnClickDefense.bind(this)
+    this._handleOnClickApplyDefender = this._handleOnClickApplyDefender.bind(this)
   }
   componentDidUpdate (prevProps, prevState) {
     if (prevProps.location.query.type !== this.props.location.query.type) {
@@ -61,6 +66,9 @@ class BattleView extends React.Component {
   _handleOnClickReady () {
     const { user } = this.props
     this.setState({ step: 2, chosenEnemy: null, winInRow: user.winInRow, battleResultInfo: null })
+  }
+  _handleOnClickDefense () {
+    this.setState({ step: 2, isDefenseMode: true })
   }
   _handleOnClickPickNext (userPick) {
     const { isAdventure } = this.state
@@ -93,6 +101,26 @@ class BattleView extends React.Component {
       window.swal({ text: `${getMsg(messages.common.fail, locale)} - ${msg}` })
       return Promise.reject(msg)
     })
+  }
+  _handleOnClickApplyDefender (defenders) { // defenders.asis, defenders.tobe
+    // TODO: 총 전투력 제한 및 코스트 체크로직 들어가야함
+    const { firebase } = this.props
+    const asisProms = []
+    const tobeProms = []
+    defenders.asis.forEach(defender => {
+      tobeProms.push(updateIsDefender(firebase, defender, false))
+    })
+    defenders.tobe.forEach(defender => {
+      tobeProms.push(updateIsDefender(firebase, defender, true))
+    })
+    return Promise.all(asisProms)
+      .then(() => {
+        return Promise.all(tobeProms)
+      })
+      .then(() => {
+        toast('새로운 수비 포켓몬이 적용되었습니다.')
+        return Promise.resolve()
+      })
   }
   _getTrainerForAdventure () { // 탐험모드일때 사용
     const { user, messages, locale } = this.props
@@ -192,17 +220,17 @@ class BattleView extends React.Component {
     })
   }
   render () {
-    const { step, chosenEnemy, winInRow, battleResultInfo, isAdventure } = this.state
+    const { step, chosenEnemy, winInRow, battleResultInfo, isAdventure, isDefenseMode } = this.state
     const { user, candidates, userCollections, battleLog, userPicks, enemyPicks, auth, creditInfo, locale, items, firebase, messages, setTutorialModal } = this.props
     const renderBody = () => {
       if (step === 1) {
         return (
-          <BattleReady auth={auth} onClickStart={this._handleOnClickReady} creditInfo={creditInfo} />
+          <BattleReady auth={auth} onClickStart={this._handleOnClickReady} creditInfo={creditInfo} onClickDefense={this._handleOnClickDefense} />
         )
       } else if (step === 2) {
         if (!userCollections) return <LoadingContainer text='콜렉션을 불러오는 중...' />
         return (
-          <ChoosePick setTutorialModal={setTutorialModal} collections={userCollections} onClickNext={this._handleOnClickPickNext} user={user} locale={locale} messages={messages} isAdventure={isAdventure} maxCost={isAdventure ? this._getStage().maxCost : null} />
+          <ChoosePick isDefenseMode={isDefenseMode} setTutorialModal={setTutorialModal} collections={userCollections} onClickNext={this._handleOnClickPickNext} user={user} locale={locale} messages={messages} isAdventure={isAdventure} maxCost={isAdventure ? this._getStage().maxCost : null} onClickApplyDefender={this._handleOnClickApplyDefender} />
         )
       } else if (step === 3) {
         return (

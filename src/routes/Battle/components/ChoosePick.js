@@ -111,7 +111,8 @@ class ChoosePick extends React.Component {
         isEvolutable: false
       },
       showFilterModal: false,
-      isLoading: false
+      isLoading: false,
+      asisDefenders: []
     }
     this._filterByAvailableCost = this._filterByAvailableCost.bind(this)
     this._handleOnSelectMon = this._handleOnSelectMon.bind(this)
@@ -124,7 +125,15 @@ class ChoosePick extends React.Component {
     this._handleOnClickNext = this._handleOnClickNext.bind(this)
   }
   componentDidMount () {
-    this._filterByAvailableCost(0, [])
+    const { isDefenseMode, collections } = this.props
+    if (isDefenseMode) {
+      const defenseCols = collections.filter(col => col.isDefender)
+      const currentCost = defenseCols.reduce((accm, col) => accm + col.mon[col.monId].cost, 0)
+      this._filterByAvailableCost(currentCost, defenseCols)
+      this.setState({ chosenPick: defenseCols, currentCost, asisDefenders: defenseCols.slice() })
+    } else {
+      this._filterByAvailableCost(0, [])
+    }
   }
   componentDidUpdate (prevProps, prevState) {
     if (prevState.sortedCollections.length === 0 && this.state.sortedCollections.length > 0) {
@@ -237,11 +246,17 @@ class ChoosePick extends React.Component {
     this._filterByAvailableCost(newCost, newPick)
   }
   _filterByAvailableCost (cost, pick) {
+    const { isDefenseMode } = this.props
     if (pick.length === 3) return this.setState({ sortedCollections: pick })
     const { collections } = this.props
     const { maxCost } = this.state
     const adjustCollections = collections.map(col => Object.assign({}, col, { totalIdx: col.total + col.addedTotal }, { isChosen: _.find(pick, p => col.id === p.id) != undefined }))
-    const originCollections = _.orderBy(adjustCollections.filter(c => !c.isDefender), ['isChosen', 'isFavorite', 'totalIdx'], ['desc', 'desc', 'desc'])
+    let originCollections
+    if (isDefenseMode) {
+      originCollections = _.orderBy(adjustCollections, ['isChosen', 'isFavorite', 'totalIdx'], ['desc', 'desc', 'desc'])
+    } else {
+      originCollections = _.orderBy(adjustCollections.filter(c => !c.isDefender), ['isChosen', 'isFavorite', 'totalIdx'], ['desc', 'desc', 'desc'])
+    }
     const restPick = 2 - pick.length
     const availableCost = maxCost - cost - restPick
     const filteredCollections = originCollections.filter(c => (c.mon[c.monId].cost <= availableCost) ||
@@ -254,13 +269,22 @@ class ChoosePick extends React.Component {
   }
   _handleOnClickNext () {
     this.setState({ isLoading: true })
-    const { onClickNext } = this.props
-    const { chosenPick } = this.state
+    const { onClickNext, isDefenseMode, onClickApplyDefender } = this.props
+    const { chosenPick, asisDefenders } = this.state
     if (chosenPick.length !== 3) {
       this.setState({ isLoading: false })
       return window.swal({ text: '3마리의 포켓몬을 선택해주세요.' })
     }
-    onClickNext(chosenPick)
+    let defenders = {}
+    if (isDefenseMode) {
+      defenders.asis = asisDefenders
+      defenders.tobe = chosenPick
+    }
+    let onClickConfirmButton = isDefenseMode ? () => onClickApplyDefender(defenders) : () => onClickNext(chosenPick)
+    onClickConfirmButton()
+    .then(() => {
+      this.setState({ isLoading: false })
+    })
     .catch(msg => {
       this.setState({ isLoading: false })
     })
@@ -482,7 +506,9 @@ ChoosePick.propTypes = {
   messages: PropTypes.object.isRequired,
   isAdventure: PropTypes.bool,
   maxCost: PropTypes.number,
-  setTutorialModal: PropTypes.func.isRequired
+  setTutorialModal: PropTypes.func.isRequired,
+  isDefenseMode: PropTypes.bool,
+  onClickApplyDefender: PropTypes.func.isRequired
 }
 
 export default ChoosePick

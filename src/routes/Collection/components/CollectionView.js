@@ -323,12 +323,6 @@ class CollectionView extends React.Component {
     .then(() => {
       this.setState({ defenders: defenders.tobe, isLoading: false, showDefenderModal: false })
       this._initCollectionState()
-      // window.swal({
-      //   confirmButtonText: '확인',
-      //   title: '변경 완료',
-      //   text: '새로운 수비 포켓몬이 적용되었습니다.',
-      //   type: 'success'
-      // })
       toast('새로운 수비 포켓몬이 적용되었습니다.')
     })
   }
