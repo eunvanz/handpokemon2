@@ -62,9 +62,9 @@ export function receiveBattle (battle = initialState) {
 // ------------------------------------
 // Specialized Action Creator
 // ------------------------------------
-export const fetchCandidates = (firebase, league) => {
+export const fetchCandidates = (firebase, league, userId) => {
   return dispatch => {
-    return getUsersByLeagueForBattle(firebase, league)
+    return getUsersByLeagueForBattle(firebase, league, userId)
     .then(users => {
       const userArr = convertMapToArr(users)
       const result = []

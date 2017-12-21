@@ -293,14 +293,14 @@ class Sidebar extends React.Component {
     // })
   }
   _handleOnClickUpdateMon () {
-    // const { firebase } = this.props
-    // const monId = '-KraNX9U36Qqf5Zb6gc8'
-    // getMonById(firebase, monId)
-    // .then(mon => {
-    //   mon.next = ['-L0Xq_RToxM7nf6yBKNS']
-    //   console.log('updatedMon', mon)
-    //   updateMon(firebase, mon)
-    // })
+    const { firebase } = this.props
+    const monId = '-L0LULd1hWG56-6-NbUA'
+    getMonById(firebase, monId)
+    .then(mon => {
+      mon.next = ['-L0tcQcm_ugDcEhllbgz']
+      console.log('updatedMon', mon)
+      updateMon(firebase, mon)
+    })
   }
   _handleOnClickSideMenu (name) {
     const { firebase, auth, setTutorialModal, user } = this.props

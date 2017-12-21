@@ -80,7 +80,7 @@ class MonInfo extends React.Component {
                 <div className='col-xs-9'><MonAttr grade={monToView.grade} point={monToView.point} /></div>
               </div>
               <div className='row' style={{ marginBottom: '15px' }}>
-                <div className='col-xs-3 f-700'>속성 <Info id='attrInfo' title='속성' content={<div>속성별로 상성이 있습니다. 두 개의 속성을 가진 포켓몬의 경우 중첩하여 적용됩니다. 상성표는 <Link to=''>이곳</Link>을 참고해주세요.</div>} /></div>
+                <div className='col-xs-3 f-700'>속성 <Info id='attrInfo' title='속성' content={<div>속성별로 상성이 있습니다. 두 개의 속성을 가진 포켓몬의 경우 중첩하여 적용됩니다. 상성표는 <Link to='/board-list/guide/-L0uGqchkF06RvRU5R6V'>이곳</Link>을 참고해주세요.</div>} /></div>
                 <div className='col-xs-9'><MonAttr mainAttr={monToView.mainAttr} subAttr={monToView.subAttr} /></div>
               </div>
               <div className='row' style={{ marginBottom: '15px' }}>

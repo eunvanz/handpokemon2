@@ -16,7 +16,7 @@ import { setTutorialModal } from 'store/tutorialModal'
 
 const mapDispatchToProps = dispatch => {
   return {
-    fetchCandidates: (firebase, league) => dispatch(fetchCandidates(firebase, league)),
+    fetchCandidates: (firebase, league, userId) => dispatch(fetchCandidates(firebase, league, userId)),
     setEnemyPicks: (enemyPick) => dispatch(setEnemyPicks(enemyPick)),
     setUserPicks: (userPick) => dispatch(setUserPicks(userPick)),
     setBattleLog: (battleLog) => dispatch(setBattleLog(battleLog)),

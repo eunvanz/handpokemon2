@@ -78,7 +78,7 @@ class BattleView extends React.Component {
       return !isAdventure ? updateUserToLose(firebase, auth.uid, 'attackLose', 5) : Promise.resolve()
     })
     .then(() => {
-      return !isAdventure ? fetchCandidates(firebase, user.league) : Promise.resolve()
+      return !isAdventure ? fetchCandidates(firebase, user.league, auth.uid) : Promise.resolve()
     })
     .then(() => {
       setUserPicks(userPick)

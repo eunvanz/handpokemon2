@@ -213,3 +213,12 @@ export const flattenFirebaseObject = obj => {
   const key = Object.keys(obj)[0]
   return Object.assign({}, obj[key], { id: key })
 }
+
+export const isOlderVersion = (src, tgt) => {
+  const srcArr = src.split('.')
+  const tgtArr = tgt.split('.')
+  if (Number(srcArr[0]) < Number(tgtArr[0])) return true
+  if (Number(srcArr[1]) < Number(tgtArr[1])) return true
+  if (Number(srcArr[2]) < Number(tgtArr[2])) return true
+  return false
+}

@@ -333,10 +333,14 @@ export const updateUserToWin = (firebase, userId, type, point, winInRow) => {
     })
 }
 
-export const getUsersByLeagueForBattle = (firebase, league) => {
+export const getUsersByLeagueForBattle = (firebase, league, userId) => {
   const ref = firebase.ref('users')
   return ref.orderByChild('league').equalTo(league).once('value')
-  .then(snapshot => Promise.resolve(snapshot.val()))
+  .then(snapshot => {
+    const users = snapshot.val()
+    delete users[userId]
+    return Promise.resolve(users)
+  })
 }
 
 // 일회용 함수: 콜렉션점수&시합점수 인덱스 필드 생성

@@ -15,11 +15,16 @@ export const getStartPick = firebase => {
       basicMons[monId] = mon
     })
     const keys = Object.keys(basicMons)
-    const idxSet = new Set()
-    const qtyToPick = 3
-    while (idxSet.size < qtyToPick) {
-      const idx = Math.floor(Math.random() * keys.length)
-      idxSet.add(idx)
+    let idxSet
+    let totalCost = 12
+    while (totalCost > 11 || totalCost < 10) {
+      idxSet = new Set()
+      const qtyToPick = 3
+      while (idxSet.size < qtyToPick) {
+        const idx = Math.floor(Math.random() * keys.length)
+        idxSet.add(idx)
+      }
+      totalCost = keys.filter((key, idx) => idxSet.has(idx)).reduce((accm, key) => accm + basicMons[key].cost, 0)
     }
     const startPick = _.shuffle(keys.filter((key, idx) => idxSet.has(idx)).map(key => convertMonToCol(basicMons[key])))
     return Promise.resolve(startPick)

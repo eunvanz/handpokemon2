@@ -4,6 +4,7 @@ import shallowCompare from 'react-addons-shallow-compare'
 import ReactSummernote from 'react-summernote'
 import $ from 'jquery'
 import validator from 'validator'
+import { Collapse } from 'react-bootstrap'
 
 import '../../../../node_modules/react-summernote/dist/react-summernote.css'
 import '../../../../node_modules/bootstrap/js/modal'

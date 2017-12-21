@@ -202,7 +202,7 @@ class BattleResult extends React.Component {
                       <div className='ptib-item'>퍼펙트게임: {battleLog.isPerfectGame ? <span className='c-green f-700'>달성</span> : <span className='c-red'>미달성</span>} <Info id='perfectGameInfo' title='퍼펙트게임' content='내 포켓몬 중 기절한 포켓몬이 없이 승리' /></div>
                       <div className='ptib-item'>선방승리: {battleLog.isFirstDefense ? <span className='c-green f-700'>달성</span> : <span className='c-red'>미달성</span>} <Info id='firstDefenseInfo' title='선방승리' content='첫 턴에 방어부터 시작하고 승리' /></div>
                       <div className='ptib-item'>원몬쇼: {battleLog.isOneMonShow ? <span className='c-green f-700'>달성</span> : <span className='c-red'>미달성</span>} <Info id='oneMonShowInfo' title='원몬쇼' content='한 포켓몬이 모든 포켓몬을 마무리하며 승리' /></div>
-                      <div className='ptib-item'>아슬아슬: {battleLog.isGandang ? <span className='c-green f-700'>달성</span> : <span className='c-red'>미달성</span>} <Info id='gandangInfo' title='아슬아슬' content='내 포켓몬의 남은 HP가 50 이하로 승리' /></div>
+                      <div className='ptib-item'>아슬아슬: {battleLog.isGandang ? <span className='c-green f-700'>달성</span> : <span className='c-red'>미달성</span>} <Info id='gandangInfo' title='아슬아슬' content='내 포켓몬의 남은 HP가 30 이하로 승리' /></div>
                       <div className='ptib-item'>언더독: {battleLog.isUnderDog ? <span className='c-green f-700'>달성</span> : <span className='c-red'>미달성</span>} <Info id='underDogInfo' title='언더독' content='상대보다 총 전투력이 낮은 상황에서 승리' /></div>
                     </div>
                   }

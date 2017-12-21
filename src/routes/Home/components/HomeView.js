@@ -8,7 +8,7 @@ import { sortBy, reverse } from 'lodash'
 import $ from 'jquery'
 import LinesEllipsis from 'react-lines-ellipsis'
 
-import { getMsg, isScreenSize, isStringLength, isIE } from 'utils/commonUtil'
+import { getMsg, isScreenSize, isStringLength, isIE, isOlderVersion } from 'utils/commonUtil'
 
 import { VERSION } from 'constants/release'
 import { colors } from 'constants/colors'
@@ -269,7 +269,7 @@ class HomeView extends React.Component {
           </div>
         }
         {
-          releaseInfo.version > VERSION &&
+          isOlderVersion(VERSION, releaseInfo.version) &&
           <div className='row'>
             <div className='col-xs-12'>
               <div className='alert alert-danger'>{getMsg(messages.common.isNotLatestVersion, locale)}</div>

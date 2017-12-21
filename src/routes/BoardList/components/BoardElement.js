@@ -5,6 +5,7 @@ import { findIndex } from 'lodash'
 import { FormattedDate, FormattedTime, FormattedRelative } from 'react-intl'
 import { toast } from 'react-toastify'
 import HTMLEllipsis from 'react-lines-ellipsis/lib/html'
+import { Collapse } from 'react-bootstrap'
 
 import { getMsg, isScreenSize, isStringLength, convertMapToArr, showAlert, getThumbnailImageUrl } from 'utils/commonUtil'
 
