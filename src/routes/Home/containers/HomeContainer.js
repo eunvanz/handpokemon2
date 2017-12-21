@@ -16,7 +16,7 @@ import { setUserModal } from 'store/userModal'
 import { setTutorialModal } from 'store/tutorialModal'
 
 const wrappedHomeView = compose(
-  firebaseConnect(['/works', '/chats']),
+  firebaseConnect(['/works', '/chats', '/luckies']),
   withIntl,
   withBoards,
   withAuth(false),
@@ -28,7 +28,8 @@ const mapStateToProps = (state) => {
     works: reverse(convertMapToArr(dataToJS(state.firebase, 'works'))),
     chats: {
       global: sortBy(convertMapToArr(dataToJS(state.firebase, 'chats/global')), item => item.id)
-    }
+    },
+    luckies: reverse(sortBy(convertMapToArr(dataToJS(state.firebase, 'luckies')), ['date']))
   }
 }
 

@@ -258,6 +258,45 @@ class HomeView extends React.Component {
         )
       })
     }
+    const renderLuckies = () => {
+      const { luckies } = this.props
+      const getTypeName = type => {
+        if (type === 'signUp') return '초기픽에서'
+        else if (type === 'pick') return '아이템사용으로'
+        else if (type === 'mix') return '교배로'
+        else if (type === 'evolution') return '진화로'
+      }
+      const getMonName = collection => {
+        let result = ''
+        if (collection.rank === 'S' || collection.rank === 'SS') {
+          result += `${collection.rank}랭크 `
+        }
+        if (collection.grade === 'e') result += '엘리트 '
+        else if (collection.grade === 'l') result += '레전드 '
+        result += collection.mon[collection.monId].name[this.props.locale]
+        return result
+      }
+      return luckies.slice(0, 3).map(lucky => {
+        return (
+          <div className='media' key={lucky.id}>
+            <div className='media-body'>
+              <h2 style={{ fontSize: '16px', marginBottom: '5px' }}>
+                <LinesEllipsis
+                  text={`${lucky.user.nickname}님이 ${getTypeName(lucky.type)} ${getMonName(lucky.collection)}을(를) 얻었습니다!`}
+                  maxLine='1'
+                  ellipsis='...'
+                  trimRight
+                  basedOn='letters'
+                />
+              </h2>
+              <small className='c-gray'>
+                <FormattedRelative value={new Date(lucky.date)} />
+              </small>
+            </div>
+          </div>
+        )
+      })
+    }
     return (
       <div className='container container-alt'>
         {
@@ -327,14 +366,21 @@ class HomeView extends React.Component {
           </div>
         </div>
         <div className='row'>
-          <div className='col-md-4'>
+          <div className='col-md-6'>
             {renderBoards('notice')}
           </div>
-          <div className='col-md-4'>
+          <div className='col-md-6'>
             {renderBoards('free')}
           </div>
-          <div className='col-md-4'>
+          <div className='col-md-6'>
             {renderBoards('guide')}
+          </div>
+          <div className='col-md-6'>
+            <Card
+              header={<h2 className='c-white'>최근 배아픈 소식</h2>}
+              headerBgColor={colors.blueGray}
+              body={renderLuckies()}
+            />
           </div>
         </div>
       </div>
@@ -357,7 +403,8 @@ HomeView.propTypes = {
   chats: PropTypes.object,
   mons: PropTypes.array.isRequired,
   setUserModal: PropTypes.func.isRequired,
-  releaseInfo: PropTypes.object.isRequired
+  releaseInfo: PropTypes.object.isRequired,
+  luckies: PropTypes.array.isRequired
 }
 
 export default HomeView

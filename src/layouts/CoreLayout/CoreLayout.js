@@ -26,7 +26,7 @@ import { setUserPath } from 'services/UserService'
 
 const mapStateToProps = state => ({
   userModal: state.userModal,
-  luckies: sortBy(convertMapToArr(dataToJS(state.firebase, 'luckies')), item => !item.regDate),
+  luckies: convertMapToArr(dataToJS(state.firebase, 'luckies')),
   releaseInfo: dataToJS(state.firebase, 'releaseInfo'),
   tutorialModal: state.tutorialModal
 })
@@ -47,10 +47,10 @@ class CoreLayout extends React.Component {
   componentDidUpdate (prevProps, prevState) {
     if (prevProps.luckies && prevProps.luckies.length !== 0 && prevProps.luckies.length !== this.props.luckies.length) {
       const getTypeName = type => {
-        if (type === 'signUp') return '초기픽'
-        else if (type === 'pick') return '채집'
-        else if (type === 'mix') return '교배'
-        else if (type === 'evolution') return '진화'
+        if (type === 'signUp') return '초기픽에서'
+        else if (type === 'pick') return '아이템사용으로'
+        else if (type === 'mix') return '교배로'
+        else if (type === 'evolution') return '진화로'
       }
       const getMonName = collection => {
         let result = ''
@@ -63,7 +63,7 @@ class CoreLayout extends React.Component {
         return result
       }
       const lucky = sortBy(this.props.luckies, ['date'])[this.props.luckies.length - 1]
-      toast.success(`${lucky.user.nickname}님이 ${getTypeName(lucky.type)}에서 ${getMonName(lucky.collection)}을(를) 얻었습니다!`)
+      toast.success(`${lucky.user.nickname}님이 ${getTypeName(lucky.type)} ${getMonName(lucky.collection)}을(를) 얻었습니다!`)
     }
   }
   _handleOnClickCloseTutorialModal () {
