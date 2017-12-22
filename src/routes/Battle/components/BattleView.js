@@ -23,6 +23,7 @@ import { getMsg } from 'utils/commonUtil'
 import User from 'models/user'
 
 import doctorOh from '../../Adventure/components/assets/doctor_oh.png'
+import woongImg from '../../../components/TutorialModal/assets/KakaoTalk_2017-12-21-11-30-42_Photo_14.png'
 
 class BattleView extends React.Component {
   constructor (props) {
@@ -124,8 +125,10 @@ class BattleView extends React.Component {
   }
   _getTrainerForAdventure () { // 탐험모드일때 사용
     const { user, messages, locale } = this.props
-    if ((user.stage || 1) <= 50) {
+    if ((user.stage || 1) <= 40) {
       return Object.assign({}, new User(), { nickname: getMsg(messages.adventure.trainerName[0], locale), profileImage: doctorOh })
+    } else if (user.stage <= 80) {
+      return Object.assign({}, new User(), { nickname: getMsg(messages.adventure.trainerName[1], locale), profileImage: woongImg, enabledHonors: [{ burf: [5, 5, 5, 5, 5, 5], name: '특급트레이너', type: 1, id: '-L-MK6QhWji8QtK0kQ8Y', reward: 50, condition: 100 }] })
     }
   }
   _getEnemyPicksForAdventure () {

@@ -126,7 +126,7 @@ export const postCollection = (firebase, userId, collection, type, srcCols) => {
   })
   .then(snapshot => {
     if (!snapshot.val()) { // mon이 user에게 없을경우
-      if (collection.rank === 'SS' || collection.rank === 'S') { // 새포켓몬인 경우에만 체크
+      if (collectionMon.grade !== 'b' && (collection.rank === 'SS' || collection.rank === 'S')) { // 새포켓몬인 경우에만 체크
         updateObj = {
           [`luckies/${keygen._()}`]: Object.assign({}, new Lucky(), { user, collection, type })
         }

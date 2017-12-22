@@ -62,7 +62,7 @@ class AdventureView extends React.Component {
     if ((user.stage || 1) <= 40) {
       return Object.assign({}, new User(), { nickname: getMsg(messages.adventure.trainerName[0], locale), profileImage: doctorOh })
     } else if (user.stage <= 80) {
-      return Object.assign({}, new User(), { nickname: getMsg(messages.adventure.trainerName[1], locale), profileImage: woongImg, enabledHonors: [{ burf: [5, 5, 5, 5, 5], name: '특급트레이너', type: 1, id: '-L-MK6QhWji8QtK0kQ8Y', reward: 50, condition: 100 }] })
+      return Object.assign({}, new User(), { nickname: getMsg(messages.adventure.trainerName[1], locale), profileImage: woongImg, enabledHonors: [{ burf: [5, 5, 5, 5, 5, 5], name: '특급트레이너', type: 1, id: '-L-MK6QhWji8QtK0kQ8Y', reward: 50, condition: 100 }] })
     }
   }
   _getTrainerImg (stage) {
