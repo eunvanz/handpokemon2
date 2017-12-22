@@ -93,6 +93,7 @@ export const postCollection = (firebase, userId, collection, type, srcCols) => {
   let leaguePoint
   let checkSrcCols
   let isError = false
+  let user
   if (type === 'evolution' || type === 'mix') {
     const proms = srcCols.map(srcCol => {
       return () => firebase.ref(`collections/${srcCol.id}/level`).transaction(asisLevel => {
@@ -113,11 +114,10 @@ export const postCollection = (firebase, userId, collection, type, srcCols) => {
     return firebase.ref(`users/${userId}`).once('value')
   })
   .then(snapshot => {
-    const user = snapshot.val()
+    user = snapshot.val()
     resultPoint = user.colPoint
     leaguePoint = user.leaguePoint
-    if (collectionMon.grade !== 'b' && (collectionMon.grade === 'e' || collectionMon.grade === 'l' ||
-    collection.rank === 'S' || collection.rank === 'SS')) { // 방송되는 포켓몬을 뽑았을경우
+    if (collectionMon.grade !== 'b' && (collectionMon.grade === 'e' || collectionMon.grade === 'l')) { // 방송되는 포켓몬을 뽑았을경우
       updateObj = {
         [`luckies/${keygen._()}`]: Object.assign({}, new Lucky(), { user, collection, type })
       }
@@ -126,6 +126,11 @@ export const postCollection = (firebase, userId, collection, type, srcCols) => {
   })
   .then(snapshot => {
     if (!snapshot.val()) { // mon이 user에게 없을경우
+      if (collection.rank === 'SS' || collection.rank === 'S') { // 새포켓몬인 경우에만 체크
+        updateObj = {
+          [`luckies/${keygen._()}`]: Object.assign({}, new Lucky(), { user, collection, type })
+        }
+      }
       resultPoint += collectionMon.point
       const updateUserObj = {
         [`users/${userId}/colPoint`]: resultPoint,

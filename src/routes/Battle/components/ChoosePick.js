@@ -283,6 +283,7 @@ class ChoosePick extends React.Component {
     let onClickConfirmButton = isDefenseMode ? () => onClickApplyDefender(defenders) : () => onClickNext(chosenPick)
     onClickConfirmButton()
     .then(() => {
+      if (isDefenseMode) this.setState({ asisDefenders: chosenPick })
       this.setState({ isLoading: false })
     })
     .catch(msg => {

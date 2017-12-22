@@ -48,7 +48,7 @@ class CoreLayout extends React.Component {
     if (prevProps.luckies && prevProps.luckies.length !== 0 && prevProps.luckies.length !== this.props.luckies.length) {
       const getTypeName = type => {
         if (type === 'signUp') return '초기픽에서'
-        else if (type === 'pick') return '아이템사용으로'
+        else if (type === 'pick') return '채집권으로'
         else if (type === 'mix') return '교배로'
         else if (type === 'evolution') return '진화로'
       }

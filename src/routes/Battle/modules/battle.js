@@ -85,6 +85,7 @@ export const fetchCandidates = (firebase, league, userId) => {
       .then(userCollectionsArr => {
         userCollectionsArr.forEach(userCollections => {
           const defenders = userCollections.filter(col => col.isDefender)
+          if (defenders.length !== 3) return
           const candidateDefenders = Object.assign({}, { defenders }, { user: users[defenders[0].userId] })
           result.push(candidateDefenders)
         })
