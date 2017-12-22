@@ -438,6 +438,14 @@ class Sidebar extends React.Component {
             </Link>
           </li>
           {
+            auth &&
+            <li className='f-700'>
+              <Link to='/forbidden-area' onClick={() => $('.ma-backdrop').click()}>
+                <i><i className='fa fa-pencil-alt' style={{ fontSize: '18px' }} /></i> 포켓몬 등록신청
+              </Link>
+            </li>
+          }
+          {
             user && user.authorization === 'admin' &&
             <div>
               <li className='f-700'>

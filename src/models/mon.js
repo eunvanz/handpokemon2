@@ -21,14 +21,15 @@ export default class Mon {
     this.prev = null
     this.evoLv = null
     this.point = 0
-    this.monImage = [
-      {
-        fullPath: '',
-        url: '',
-        seq: 0,
-        designer: ''
-      }
-    ]
+    this.monImage = null
+    // this.monImage = [
+    //   {
+    //     fullPath: '',
+    //     url: '',
+    //     seq: 0,
+    //     designer: ''
+    //   }
+    // ]
     this.cost = 0
     this.requiredLv = 0
   }

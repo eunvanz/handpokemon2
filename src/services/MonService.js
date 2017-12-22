@@ -150,3 +150,7 @@ export const deleteMon = (firebase, mon) => {
 export const getMonById = (firebase, monId) => {
   return firebase.ref(`mons/${monId}`).once('value').then(snapshot => snapshot.val())
 }
+
+export const getMonByNo = (firebase, no) => {
+  return firebase.ref(`mons`).orderByChild('no').equalTo(no).once('value').then(snapshot => snapshot.val())
+}
