@@ -132,12 +132,18 @@ export const decreaseCredit = (firebase, uid, number, type) => {
   const creditRef = firebase.ref(`users/${uid}/${creditRefPath}`)
   const lastRef = firebase.ref(`users/${uid}/${lastRefPath}`)
   let isError = false
-  return creditRef.transaction(credit => {
-    if (credit - number < 0) {
-      isError = true
-      return 0
-    }
-    return credit - number
+  return getUserByUserId(firebase, uid)
+  .then(user => {
+    return refreshUserCredits(firebase, uid, user)
+  })
+  .then(() => {
+    return creditRef.transaction(credit => {
+      if (credit - number < 0) {
+        isError = true
+        return 0
+      }
+      return credit - number
+    })
   })
   .then(() => {
     if (isError) return Promise.reject('크레딧이 부족합니다.')

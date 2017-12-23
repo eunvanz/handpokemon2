@@ -342,9 +342,9 @@ class Sidebar extends React.Component {
           console.log(`${completeNum} / ${allUsersNum} 완료`)
           completeNum++
         })
-        .catch((msg) => {
-          console.log(`${user.nickname}의 리그 적용 실패 - ${msg}`)
-        })
+        // .catch((msg) => {
+        //   console.log(`${user.nickname}의 리그 적용 실패 - ${msg}`)
+        // })
       })
     })
   }

@@ -71,8 +71,8 @@ class UserInfo extends React.Component {
         {
           isForResult &&
           <div>
-            <p className='m-b-0'>순위: <span className='c-lightblue f-700'>{numeral(battleResultInfo.tobe.leagueRank).format('0,0')}</span>{battleResultInfo.tobe.leagueRank - battleResultInfo.asis.leagueRank !== 0 ? <span> (<span className={battleResultInfo.asis.leagueRank - battleResultInfo.tobe.leagueRank > 0 ? 'c-green' : 'c-red'}>{numeral(battleResultInfo.asis.leagueRank - battleResultInfo.tobe.leagueRank).format('+0,0')}</span>)</span> : <span>(-)</span>}</p>
-            <p className='m-b-0'>점수: <span className='c-lightblue f-700'>{numeral(battleResultInfo.tobe.leaguePoint).format('0,0')}</span>{battleResultInfo.tobe.leaguePoint - battleResultInfo.asis.leaguePoint !== 0 ? <span> (<span className={battleResultInfo.tobe.leaguePoint - battleResultInfo.asis.leaguePoint > 0 ? 'c-green' : 'c-red'}>{numeral(battleResultInfo.tobe.leaguePoint - battleResultInfo.asis.leaguePoint).format('+0,0')}</span>)</span> : <span>(-)</span>}</p>
+            <p className='m-b-0'>순위: <span className='c-lightblue f-700'>{numeral(battleResultInfo.tobe.leagueRank).format('0,0')}</span>{battleResultInfo.tobe.leagueRank - battleResultInfo.asis.leagueRank !== 0 ? <span> (<span className={battleResultInfo.asis.leagueRank - battleResultInfo.tobe.leagueRank > 0 ? 'c-green' : 'c-red'}>{numeral(battleResultInfo.asis.leagueRank - battleResultInfo.tobe.leagueRank).format('+0,0')}</span>)</span> : <span> (-)</span>}</p>
+            <p className='m-b-0'>점수: <span className='c-lightblue f-700'>{numeral(battleResultInfo.tobe.leaguePoint).format('0,0')}</span>{battleResultInfo.tobe.leaguePoint - battleResultInfo.asis.leaguePoint !== 0 ? <span> (<span className={battleResultInfo.tobe.leaguePoint - battleResultInfo.asis.leaguePoint > 0 ? 'c-green' : 'c-red'}>{numeral(battleResultInfo.tobe.leaguePoint - battleResultInfo.asis.leaguePoint).format('+0,0')}</span>)</span> : <span> (-)</span>}</p>
           </div>
         }
       </div>

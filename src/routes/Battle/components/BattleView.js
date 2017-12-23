@@ -167,14 +167,12 @@ class BattleView extends React.Component {
     const { isAdventure } = this.state
     setUserPath(firebase, auth.uid, 'battleSpeed', speed)
     this.setState({ step: 6 })
-    console.log('isAdventure', isAdventure)
     if (!isAdventure) this._generateBattleResult()
   }
   _handleOnClickContinueBattle () {
     this.setState({ step: 1, chosenEnemy: null })
   }
   _generateBattleResult () {
-    console.log('generateBattleResult')
     const { auth, firebase, battleLog, user } = this.props
     const { chosenEnemy, winInRow } = this.state
     const battleResultInfo = {

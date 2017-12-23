@@ -91,7 +91,7 @@ export const LEAGUE = [
   {
     name: '실버',
     maxCost: 13,
-    cut: 25,
+    cut: 20,
     icon: 'fa fa-certificate c-gray'
   },
   {

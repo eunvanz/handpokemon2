@@ -97,7 +97,7 @@ class SignUpView extends React.Component {
     this.setState({ formData: formData.set(name, value).toJS() })
   }
   _checkEmailField () {
-    if (this.state.isSocialAccount) return true
+    if (this.state.isSocialAccount) return Promise.resolve(true)
     const { firebase } = this.props
     let email = this.state.formData.email
     let message = ''
@@ -106,17 +106,17 @@ class SignUpView extends React.Component {
     else if (!validator.isLength(email, { min: 5, max: 50 })) message = '5~50자의 이메일주소를 사용해주세요.'
     if (message !== '') {
       this._setValidAndHelper('email', message, 'error')
-      return false
+      return Promise.resolve(false)
     }
     email = validator.normalizeEmail(email)
     return isDupEmail(firebase, email)
     .then(isDup => {
       if (isDup) {
         this._setValidAndHelper('email', '이미 사용중인 이메일주소입니다.', 'error')
-        return false
+        return Promise.resolve(false)
       } else {
         this._setValidAndHelper('email', null, 'success')
-        return true
+        return Promise.resolve(true)
       }
     })
     .catch(() => {
@@ -127,7 +127,7 @@ class SignUpView extends React.Component {
         type: 'error'
       })
       this._setValidAndHelper('email', '다시 한 번 시도해주세요.', 'error')
-      return false
+      return Promise.resolve(false)
     })
   }
   _checkNicknameField () {
@@ -138,7 +138,7 @@ class SignUpView extends React.Component {
     else if (isStringLength(nickname) > 16) message = '한글 8자, 영문 16자 이하의 닉네임을 사용해주세요.'
     if (message !== '') {
       this._setValidAndHelper('nickname', message, 'error')
-      return false
+      return Promise.resolve(false)
     }
     nickname = validator.escape(nickname) // HTML용으로 변경, replace <, >, &, ', " and / with HTML entities.
     return isDupNickname(firebase, nickname)
@@ -306,8 +306,16 @@ class SignUpView extends React.Component {
   _handleOnClickNext () {
     const { step } = this.state
     if (step === 1) {
-      if (this._checkEmailField() && this._checkPasswordField() && this._checkPasswordConfirmField()) {
-        this.setState({ step: this.state.step + 1 })
+      if (this._checkPasswordField() && this._checkPasswordConfirmField()) {
+        this._checkEmailField()
+        .then(result => {
+          if (!result) window.swal({ text: '모든 항목을 정확히 입력해주세요.' })
+          return this._checkNicknameField()
+        })
+        .then(result => {
+          if (!result) return window.swal({ text: '모든 항목을 정확히 입력해주세요.' })
+          this.setState({ step: this.state.step + 1 })
+        })
       }
     } else if (step === 3) {
       this._processSignUp()

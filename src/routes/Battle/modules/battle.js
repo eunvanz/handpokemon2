@@ -4,6 +4,7 @@ import { getCollectionsByUserId } from 'services/CollectionService'
 import _ from 'lodash'
 
 import { convertMapToArr } from 'utils/commonUtil'
+import { getDefendersByUserId } from '../../../services/CollectionService';
 
 const initialState = {
   candidates: null,
@@ -69,27 +70,36 @@ export const fetchCandidates = (firebase, league, userId) => {
       const userArr = convertMapToArr(users)
       const result = []
       const promArr = []
-      const getRandomIds = () => {
-        const ids = []
-        while (ids.length < 3) {
-          const id = userArr[_.random(0, userArr.length - 1)].id
-          if (ids.indexOf(id) === -1) ids.push(id)
-        }
-        return ids
-      }
-      const userIds = getRandomIds()
-      for (let i = 0; i < 3; i++) {
-        promArr.push(getCollectionsByUserId(firebase, userIds[i]))
-      }
-      return Promise.all(promArr)
-      .then(userCollectionsArr => {
-        userCollectionsArr.forEach(userCollections => {
-          const defenders = userCollections.filter(col => col.isDefender)
-          if (defenders.length !== 3) return
-          const candidateDefenders = Object.assign({}, { defenders }, { user: users[defenders[0].userId] })
-          result.push(candidateDefenders)
+      const ids = []
+      const generateValidUserIds = () => {
+        const id = userArr[_.random(0, userArr.length - 1)].id
+        return getDefendersByUserId(firebase, id)
+        .then(defenders => {
+          if (defenders.length !== 3) return Promise.resolve()
+          if (ids.indexOf(id) === -1) {
+            ids.push(id)
+            return Promise.resolve()
+          }
         })
-        return dispatch(receiveCandiates(result))
+        .then(() => {
+          return ids.length === 3 ? Promise.resolve() : generateValidUserIds()
+        })
+      }
+      return generateValidUserIds()
+      .then(() => {
+        for (let i = 0; i < 3; i++) {
+          promArr.push(getCollectionsByUserId(firebase, ids[i]))
+        }
+        return Promise.all(promArr)
+        .then(userCollectionsArr => {
+          userCollectionsArr.forEach(userCollections => {
+            const defenders = userCollections.filter(col => col.isDefender)
+            if (defenders.length !== 3) return
+            const candidateDefenders = Object.assign({}, { defenders }, { user: users[defenders[0].userId] })
+            result.push(candidateDefenders)
+          })
+          return dispatch(receiveCandiates(result))
+        })
       })
       .catch(() => {
         return dispatch(fetchCandidates(firebase, league))

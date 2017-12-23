@@ -25,7 +25,7 @@ const wrappedHomeView = compose(
 
 const mapStateToProps = (state) => {
   return {
-    works: reverse(convertMapToArr(dataToJS(state.firebase, 'works'))),
+    works: reverse(sortBy(convertMapToArr(dataToJS(state.firebase, 'works')), ['id'])),
     chats: {
       global: sortBy(convertMapToArr(dataToJS(state.firebase, 'chats/global')), item => item.id)
     },

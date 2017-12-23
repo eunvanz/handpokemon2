@@ -10,7 +10,7 @@ export default class User {
     this.profileImageThumbnail = ''
     this.colPoint = 0
     this.colRank = 1
-    this.leaguePoint = 1000
+    this.leaguePoint = 950
     this.leagueRank = 1
     this.trainerGrade = null
     this.trainerAttr = null

@@ -255,10 +255,10 @@ export const setDefendersToMaxCostByUserId = (firebase, userId) => {
       const currentCost = defendersArr.reduce((accm, col) => accm + col.mon[col.monId].cost, 0)
       if (newMaxCost !== currentCost) {
         const isPromoted = newMaxCost > currentCost
-        const sortedCols = sortBy(userCollections, col => col.mon[col.monId].cost)
         // 강등됐을 경우는 코스트가 가장 큰 포켓몬 보다 코스트가 작은 아래 포켓몬으로 교체, 상승했을 경우는 코스트가 가장 작은 포켓몬을 큰 포켓몬으로 교체
-        const colToPop = sortBy(defendersArr, col => col.mon[col.monId].cost)[isPromoted ? 0 : sortedCols.length - 1] // 가장 큰 코스트 또는 작은 코스트의 포켓몬
+        const colToPop = sortBy(defendersArr, col => col.mon[col.monId].cost)[isPromoted ? 0 : defendersArr.length - 1] // 가장 큰 코스트 또는 작은 코스트의 포켓몬
         const suitableCostCols = userCollections.filter(col => {
+          if (!col) return false
           if (isPromoted) {
             return col.mon[col.monId].cost <= colToPop.mon[colToPop.monId].cost - (currentCost - newMaxCost) && col.mon[col.monId].cost > colToPop.mon[colToPop.monId].cost
           } else {
