@@ -968,34 +968,43 @@ export const honors = [{
 }]
 
 export const items = [
+  // {
+  //   'type': 1, // 1: 포켓몬 보상, 2: 크레딧 충전
+  //   'name': { ko: '베이직+레어 채집권' },
+  //   'attrs': ['b', 'r'],
+  //   'cost': 10
+  // },
+  // {
+  //   'type': 1, // 1: 포켓몬 보상, 2: 크레딧 충전
+  //   'name': { ko: '레어 100% 채집권' },
+  //   'attrs': ['r'],
+  //   'cost': 30
+  // },
+  // {
+  //   'type': 1, // 1: 포켓몬 보상, 2: 크레딧 충전
+  //   'name': { ko: '엘리트 100% 채집권' },
+  //   'attrs': ['e'],
+  //   'cost': 2000
+  // },
   {
     'type': 1, // 1: 포켓몬 보상, 2: 크레딧 충전
-    'name': { ko: '베이직+레어 채집권' },
-    'attrs': ['b', 'r'],
-    'cost': 10
-  },
-  {
-    'type': 1, // 1: 포켓몬 보상, 2: 크레딧 충전
-    'name': { ko: '레어 100% 채집권' },
-    'attrs': ['r'],
-    'cost': 30
-  },
-  {
-    'type': 1, // 1: 포켓몬 보상, 2: 크레딧 충전
-    'name': { ko: '엘리트 100% 채집권' },
-    'attrs': ['e'],
-    'cost': 2000
-  },
-  {
-    'type': 2, // 1: 포켓몬 보상, 2: 크레딧 충전
-    'name': { ko: '채집크레딧 충전권' },
-    'creditType': 'pick',
-    'cost': 50
-  },
-  {
-    'type': 2, // 1: 포켓몬 보상, 2: 크레딧 충전
-    'name': { ko: '시합크레딧 충전권' },
-    'creditType': 'battle',
-    'cost': 100
+    'name': { ko: '레전드 100% 채집권' },
+    'grades': ['l'],
+    'cost': 10000,
+    'seq': 4,
+    'description': { ko: '레전드등급의 포켓몬을 즉시 채집합니다.' },
+    'img': 'https://firebasestorage.googleapis.com/v0/b/hand-pokemon-2.appspot.com/o/itemImages%2Fitem6.png?alt=media&token=0e2770f8-8ca1-4e60-8548-a4ed98a221f2'
   }
+  // {
+  //   'type': 2, // 1: 포켓몬 보상, 2: 크레딧 충전
+  //   'name': { ko: '채집크레딧 충전권' },
+  //   'creditType': 'pick',
+  //   'cost': 50
+  // },
+  // {
+  //   'type': 2, // 1: 포켓몬 보상, 2: 크레딧 충전
+  //   'name': { ko: '시합크레딧 충전권' },
+  //   'creditType': 'battle',
+  //   'cost': 100
+  // }
 ]

@@ -66,18 +66,41 @@ export const getStagePick = (firebase, totalAbility) => {
   })
 }
 
+export const getMonByName = (firebase, name) => {
+  return firebase.ref('mons').orderByChild('name/ko').equalTo(name).once('value')
+  .then(snapshot => snapshot.val()[Object.keys(snapshot.val())[0]])
+}
+
 export const getPickMons = (firebase, attrs, grades, mixCols) => {
   // TODO: 특정 포켓몬 교배처리 해야함
-  return firebase.ref('mons').once('value')
-  .then(snapshot => {
-    const mons = convertMapToArr(snapshot.val())
-    let picks = mons.filter(mon => {
-      if (mixCols) return _.includes(attrs, mon.mainAttr) && _.includes(grades, mon.grade) && !_.includes([mixCols[0].monId, mixCols[1].monId], mon.id)
-      return _.includes(attrs, mon.mainAttr) && _.includes(grades, mon.grade)
+  let specificPick = null
+  if (_.find(mixCols, col => col.mon[col.monId].name.ko === '야돈') && _.find(mixCols, col => col.mon[col.monId].name.ko === '셀러')) {
+    specificPick = ['야도란', '야도킹']
+  }
+  if (specificPick) {
+    const picks = []
+    const sequentialPromise = specificPick.reduce((promise, name) => {
+      return promise.then(() => getMonByName(firebase, name).then(pick => {
+        picks.push(pick)
+        return Promise.resolve()
+      }))
+    }, Promise.resolve())
+    return sequentialPromise
+    .then(() => {
+      return Promise.resolve(picks.map(pick => convertMonToCol(pick)))
     })
-    const takedPick = _.take(_.shuffle(picks), 5)
-    return Promise.resolve(takedPick.map(pick => convertMonToCol(pick)))
-  })
+  } else {
+    return firebase.ref('mons').once('value')
+    .then(snapshot => {
+      const mons = convertMapToArr(snapshot.val())
+      let picks = mons.filter(mon => {
+        if (mixCols) return _.includes(attrs, mon.mainAttr) && _.includes(grades, mon.grade) && !_.includes([mixCols[0].monId, mixCols[1].monId], mon.id)
+        return _.includes(attrs, mon.mainAttr) && _.includes(grades, mon.grade)
+      })
+      const takedPick = _.take(_.shuffle(picks), 5)
+      return Promise.resolve(takedPick.map(pick => convertMonToCol(pick)))
+    })
+  }
 }
 
 export const getNextMons = (firebase, evoluteCol) => {

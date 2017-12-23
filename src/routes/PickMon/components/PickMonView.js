@@ -151,6 +151,7 @@ class PickMonView extends React.Component {
             .then(result => {
               if (user.disableRoulette) {
                 this.setState({ multiPicks: [result] })
+                this._checkHonorGot()
               } else {
                 this.setState({ picks, pickedIdx, result })
               }
@@ -191,18 +192,19 @@ class PickMonView extends React.Component {
         .then(result => {
           if (user.disableRoulette) {
             this.setState({ multiPicks: [result] })
+            this._checkHonorGot()
           } else {
             this.setState({ picks, pickedIdx, result })
           }
           return Promise.resolve()
         })
       })
-      .catch(msg => {
-        showAlert(msg)
-          .then(() => {
-            this.context.router.replace('/pick-district')
-          })
-      })
+      // .catch(msg => {
+      //   showAlert(msg)
+      //     .then(() => {
+      //       this.context.router.replace('/pick-district')
+      //     })
+      // })
     } else if (evoluteCol) { // 진화일때
       getNextMons(firebase, evoluteCol)
       .then(nextMons => {

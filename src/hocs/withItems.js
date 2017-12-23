@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import shallowCompare from 'react-addons-shallow-compare'
 import { connect } from 'react-redux'
 import { firebaseConnect, dataToJS } from 'react-redux-firebase'
+import { sortBy } from 'lodash'
 
 import { convertMapToArr } from 'utils/commonUtil'
 
@@ -28,7 +29,7 @@ export default ComposedComponent => {
 
   const mapStateToProps = (state) => {
     return {
-      items: convertMapToArr(dataToJS(state.firebase, 'items'))
+      items: sortBy(convertMapToArr(dataToJS(state.firebase, 'items')), ['seq'])
     }
   }
 
