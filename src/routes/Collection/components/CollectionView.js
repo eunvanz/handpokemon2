@@ -42,86 +42,6 @@ class CollectionView extends React.Component {
       defenders: [],
       isLoading: false,
       currentCol: null,
-      filter: {
-        has: {
-          yes: true,
-          no: true
-        },
-        grade: {
-          b: true,
-          r: true,
-          s: true,
-          sr: true,
-          e: true,
-          l: true
-        },
-        mainAttr: {
-          '노말': true,
-          '불꽃': true,
-          '물': true,
-          '전기': true,
-          '풀': true,
-          '얼음': true,
-          '비행': true,
-          '요정': true,
-          '땅': true,
-          '독': true,
-          '격투': true,
-          '염력': true,
-          '벌레': true,
-          '바위': true,
-          '유령': true,
-          '용': true,
-          '악': true,
-          '강철': true
-        },
-        subAttr: {
-          '노말': true,
-          '불꽃': true,
-          '물': true,
-          '전기': true,
-          '풀': true,
-          '얼음': true,
-          '비행': true,
-          '요정': true,
-          '땅': true,
-          '독': true,
-          '격투': true,
-          '염력': true,
-          '벌레': true,
-          '바위': true,
-          '유령': true,
-          '용': true,
-          '악': true,
-          '강철': true,
-          '없음': true
-        },
-        cost: {
-          '1': true,
-          '2': true,
-          '3': true,
-          '4': true,
-          '5': true,
-          '6': true,
-          '7': true,
-          '8': true,
-          '9': true,
-          '10': true
-        },
-        generation: {
-          '1': true,
-          '2': true,
-          '3': true,
-          '4': true,
-          '5': true,
-          '6': true,
-          '7': true
-        },
-        isEvolutable: {
-          yes: true,
-          no: true
-        }
-      },
       filterCollapse: {
         has: false,
         grade: false,
@@ -147,7 +67,7 @@ class CollectionView extends React.Component {
     this._isMine = this._isMine.bind(this)
   }
   componentDidMount () {
-    const { pickMonInfo, setTutorialModal, setUserPath, user } = this.props
+    const { pickMonInfo, setTutorialModal, user } = this.props
     this._initCollectionState()
     .then(() => {
       if (pickMonInfo && pickMonInfo.mixCols) {
@@ -238,7 +158,7 @@ class CollectionView extends React.Component {
     }
   }
   _initCollectionState () {
-    const { params, firebase, mons, userCollections, auth, user } = this.props
+    const { params, firebase, mons, userCollections, auth, user, filter } = this.props
     const { userId } = params
     const collections = []
     const quantity = {
@@ -280,6 +200,7 @@ class CollectionView extends React.Component {
       return getUserToView() // 랭킹 업데이트 후 유저정보가져옴
     })
     .then(userToView => {
+      this._applyFilter(filter)
       this.setState({ userToView })
     })
   }
@@ -287,7 +208,7 @@ class CollectionView extends React.Component {
     this.setState({ showFilterModal: true })
   }
   _handleOnClickApplyFilter () {
-    const { filter } = this.state
+    const { filter } = this.props
     this._applyFilter(filter)
   }
   _applyFilter (filter, colId, shouldRefreshElements) { // 두번째 파라미터는 옵션 (교배시 교배대상 첫번째 포켓몬 제외용), 세번째 파라메터는 교배취소 시 차트와 콜렉션 리프레시용. 없으면 렌더링이 안됨
@@ -327,7 +248,7 @@ class CollectionView extends React.Component {
     })
   }
   _handleOnChangeFilterInput (e) {
-    const { filter } = this.state
+    const { filter, receiveFilter } = this.props
     const { name } = e.target
     const filterCategory = name.split('-')[0]
     const filterElement = name.split('-')[1]
@@ -354,13 +275,13 @@ class CollectionView extends React.Component {
       })
     } else newCategoryFilterMap = category.update(filterElement, val => !val)
     const newFilter = oldFilter.set(filterCategory, newCategoryFilterMap).toJS()
-    this.setState({ filter: newFilter })
+    receiveFilter(newFilter)
   }
   _initMixMode () {
-    const { pickMonInfo } = this.props
+    const { pickMonInfo, receiveFilter } = this.props
     const filter = Object.assign({}, this.state.filter, { has: { yes: true, no: false } })
+    receiveFilter(filter)
     this.setState({
-      filter,
       isInitializedMixMode: true
     })
     this._applyFilter(filter, pickMonInfo.mixCols[0].id)
@@ -384,10 +305,11 @@ class CollectionView extends React.Component {
     updatePickMonInfo(newPickMonInfo)
   }
   _cancelMix () {
+    const { receiveFilter } = this.props
     this.props.updatePickMonInfo(null)
     const filter = Object.assign({}, this.state.filter, { has: { yes: true, no: true } })
+    receiveFilter(filter)
     this.setState({
-      filter,
       mode: 'view',
       isInitializedMixMode: false
     })
@@ -412,8 +334,8 @@ class CollectionView extends React.Component {
     return auth && userId === auth.uid
   }
   render () {
-    const { filter, filteredCollections, filterCollapse, openFloatMenu, mode, userToView, defenders } = this.state
-    const { pickMonInfo, auth, params, user, locale } = this.props
+    const { filteredCollections, filterCollapse, openFloatMenu, mode, userToView, defenders } = this.state
+    const { filter, pickMonInfo, auth, params, user, locale } = this.props
     const { userId } = params
     const isMine = auth && userId === auth.uid
     const renderCollections = () => {
@@ -688,7 +610,9 @@ CollectionView.propTypes = {
   userCollections: PropTypes.array,
   locale: PropTypes.string.isRequired,
   messages: PropTypes.object.isRequired,
-  setTutorialModal: PropTypes.func.isRequried
+  setTutorialModal: PropTypes.func.isRequried,
+  receiveFilter: PropTypes.func.isRequired,
+  filter: PropTypes.object.isRequired
 }
 
 export default CollectionView

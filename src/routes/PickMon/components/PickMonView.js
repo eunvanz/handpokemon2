@@ -128,7 +128,7 @@ class PickMonView extends React.Component {
       this.context.router.replace('pick-district')
       return
     }
-    this.setState({ mode: quantity === 1 && (!evoluteCol || _.compact(evoluteCol.mon[evoluteCol.monId].next).length > 1) ? 'single' : 'multi' })
+    this.setState({ mode: quantity === 1 && (!evoluteCol || _.compact(evoluteCol.mon[evoluteCol.monId].next).length > 1) && !user.disableRoulette ? 'single' : 'multi' })
     let pickedMons = []
     const pickFuncArr = []
     if (!evoluteCol && !mixCols) { // 채집 또는 보상일때
@@ -149,7 +149,11 @@ class PickMonView extends React.Component {
           const pickedIdx = _.random(0, picks.length - 1)
           return postCollection(firebase, auth.uid, picks[pickedIdx], 'pick')
             .then(result => {
-              this.setState({ picks, pickedIdx, result })
+              if (user.disableRoulette) {
+                this.setState({ multiPicks: [result] })
+              } else {
+                this.setState({ picks, pickedIdx, result })
+              }
               return Promise.resolve()
             })
         } else {

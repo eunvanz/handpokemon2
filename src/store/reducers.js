@@ -6,6 +6,7 @@ import userModalReducer from './userModal'
 import creditInfoReducer from './creditInfo'
 import honorModalReducer from './honorModal'
 import tutorialModalReducer from './tutorialModal'
+import filterReducer from './filter'
 
 import { firebaseStateReducer } from 'react-redux-firebase'
 
@@ -19,6 +20,7 @@ export const makeRootReducer = (asyncReducers) => {
     creditInfo: creditInfoReducer,
     honorModal: honorModalReducer,
     tutorialModal: tutorialModalReducer,
+    filter: filterReducer,
     ...asyncReducers
   })
 }

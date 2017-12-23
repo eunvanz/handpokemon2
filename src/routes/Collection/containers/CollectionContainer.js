@@ -9,6 +9,7 @@ import CollectionView from '../components/CollectionView'
 import { updatePickMonInfo } from 'store/pickMonInfo'
 import { showUserModal } from 'store/userModal'
 import { setTutorialModal } from 'store/tutorialModal'
+import { receiveFilter } from 'store/filter'
 
 import withAuth from 'hocs/withAuth'
 import withUserCollections from 'hocs/withUserCollections'
@@ -17,7 +18,8 @@ const mapDispatchToProps = dispatch => {
   return {
     updatePickMonInfo: pickMonInfo => dispatch(updatePickMonInfo(pickMonInfo)),
     showUserModal: userModal => dispatch(showUserModal(userModal)),
-    setTutorialModal: tutorialModal => dispatch(setTutorialModal(tutorialModal))
+    setTutorialModal: tutorialModal => dispatch(setTutorialModal(tutorialModal)),
+    receiveFilter: filter => dispatch(receiveFilter(filter))
   }
 }
 const mapStateToProps = (state) => {
@@ -28,7 +30,8 @@ const mapStateToProps = (state) => {
     // mons: convertMapToArr(dataToJS(state.firebase, 'mons')),
     // userCollections: key ? convertMapToArr(userCollections[key]) : null,
     pickMonInfo: state.pickMonInfo,
-    userModal: state.userModal
+    userModal: state.userModal,
+    filter: state.filter
   }
 }
 const wrappedCollectionView = compose(withAuth(false), withUserCollections)(CollectionView)

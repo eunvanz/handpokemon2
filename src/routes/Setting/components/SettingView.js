@@ -33,6 +33,7 @@ class SettingView extends React.Component {
     this._handleOnClickSendPasswordResetEmail = this._handleOnClickSendPasswordResetEmail.bind(this)
     this._handleOnClickCodeCopy = this._handleOnClickCodeCopy.bind(this)
     this._handleOnChangeTutorial = this._handleOnChangeTutorial.bind(this)
+    this._handleOnChangeRoulette = this._handleOnChangeRoulette.bind(this)
   }
   shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
@@ -111,6 +112,13 @@ class SettingView extends React.Component {
     .then(() => setUserPath(firebase, auth.uid, 'tutorialStep', 1))
     .then(() => toast(`튜토리얼이 ${status}`))
   }
+  _handleOnChangeRoulette (e) {
+    const { firebase, auth } = this.props
+    const { checked } = e.target
+    let status = checked ? '활성화 됐습니다.' : '비활성화 됐습니다.'
+    setUserPath(firebase, auth.uid, 'disableRoulette', !checked)
+      .then(() => toast(`채집룰렛이 ${status}`))
+  }
   render () {
     const { messages, locale, user } = this.props
     const { profileImage, introduce, isImageEdited, isTextEdited, isLoading } = this.state
@@ -145,7 +153,10 @@ class SettingView extends React.Component {
             </div>
           }
           <p className='col-sm-offset-3 col-sm-6 f-700 m-t-30 toggle-switch'>
-            <label htmlFor='tutorial' className='ts-label f-700'>{getMsg(messages.setting.tutorial, locale)}</label><input type='checkbox' hidden='hidden' id='tutorial' onChange={this._handleOnChangeTutorial} /><label htmlFor='tutorial' className='ts-helper' />
+            <label htmlFor='roulette' className='ts-label f-700'>{getMsg(messages.setting.roulette, locale)}</label><input type='checkbox' hidden='hidden' id='roulette' checked={!user.disableRoulette} onChange={this._handleOnChangeRoulette} /><label htmlFor='roulette' className='ts-helper' />
+          </p>
+          <p className='col-sm-offset-3 col-sm-6 f-700 m-t-30 toggle-switch'>
+            <label htmlFor='tutorial' className='ts-label f-700'>{getMsg(messages.setting.tutorial, locale)}</label><input type='checkbox' hidden='hidden' id='tutorial' checked={user.isTutorialOn} onChange={this._handleOnChangeTutorial} /><label htmlFor='tutorial' className='ts-helper' />
           </p>
           <p className='col-sm-offset-3 col-sm-6 f-700 m-t-30'>{getMsg(messages.signUp.recommenderCode, locale)}</p>
           <p onClick={this._handleOnClickCodeCopy} style={{ cursor: 'pointer' }} className='col-sm-offset-3 col-sm-6 f-700 c-lightblue'>{user.recommenderCode} <i className='far fa-copy c-gray' /></p>

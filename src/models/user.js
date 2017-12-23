@@ -39,5 +39,6 @@ export default class User {
     this.stage = 1
     this.isTutorialOn = true
     this.tutorialStep = 1
+    this.disableRoulette = false
   }
 }
