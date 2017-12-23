@@ -189,7 +189,11 @@ class PickMonView extends React.Component {
         const pickedIdx = _.random(0, picks.length - 1)
         return postCollection(firebase, auth.uid, picks[pickedIdx], 'mix', mixCols)
         .then(result => {
-          this.setState({ picks, pickedIdx, result })
+          if (user.disableRoulette) {
+            this.setState({ multiPicks: [result] })
+          } else {
+            this.setState({ picks, pickedIdx, result })
+          }
           return Promise.resolve()
         })
       })

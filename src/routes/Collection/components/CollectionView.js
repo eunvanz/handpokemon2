@@ -213,6 +213,7 @@ class CollectionView extends React.Component {
   }
   _applyFilter (filter, colId, shouldRefreshElements) { // 두번째 파라미터는 옵션 (교배시 교배대상 첫번째 포켓몬 제외용), 세번째 파라메터는 교배취소 시 차트와 콜렉션 리프레시용. 없으면 렌더링이 안됨
     const { collections } = this.state
+    if (!collections) return
     const filteredCollections = collections.filter(col => {
       const mon = col.mon ? col.mon[col.monId] : col
       return filter.has[col.mon ? 'yes' : 'no'] &&
@@ -279,7 +280,7 @@ class CollectionView extends React.Component {
   }
   _initMixMode () {
     const { pickMonInfo, receiveFilter } = this.props
-    const filter = Object.assign({}, this.state.filter, { has: { yes: true, no: false } })
+    const filter = Object.assign({}, this.props.filter, { has: { yes: true, no: false } })
     receiveFilter(filter)
     this.setState({
       isInitializedMixMode: true
