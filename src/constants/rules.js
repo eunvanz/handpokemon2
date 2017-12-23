@@ -85,7 +85,7 @@ export const LEAGUE = [
   {
     name: '브론즈',
     maxCost: 12,
-    cut: 50,
+    cut: 60,
     icon: 'fa fa-certificate c-brown'
   },
   {
@@ -93,6 +93,12 @@ export const LEAGUE = [
     maxCost: 13,
     cut: 25,
     icon: 'fa fa-certificate c-gray'
+  },
+  {
+    name: '골드',
+    maxCost: 14,
+    cut: 10,
+    icon: 'fa fa-certificate c-amber'
   }
 ]
 

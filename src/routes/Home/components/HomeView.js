@@ -8,9 +8,8 @@ import { sortBy, reverse } from 'lodash'
 import $ from 'jquery'
 import LinesEllipsis from 'react-lines-ellipsis'
 
-import { getMsg, isScreenSize, isStringLength, isIE, isOlderVersion } from 'utils/commonUtil'
+import { getMsg, isScreenSize, isStringLength, isIE } from 'utils/commonUtil'
 
-import { VERSION } from 'constants/release'
 import { colors } from 'constants/colors'
 
 import Card from 'components/Card'
@@ -304,14 +303,6 @@ class HomeView extends React.Component {
           <div className='row'>
             <div className='col-xs-12'>
               <div className='alert alert-danger'>인터넷 익스플로러로 접속하셨습니다. 이 브라우저는 호환성이 떨어집니다. 크롬이나 파이어폭스, 사파리로 접속하시는 걸 권장합니다.</div>
-            </div>
-          </div>
-        }
-        {
-          isOlderVersion(VERSION, releaseInfo.version) &&
-          <div className='row'>
-            <div className='col-xs-12'>
-              <div className='alert alert-danger'>{getMsg(messages.common.isNotLatestVersion, locale)}</div>
             </div>
           </div>
         }

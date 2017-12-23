@@ -20,9 +20,11 @@ import withIntl from 'hocs/withIntl'
 import { closeUserModal } from 'store/userModal'
 import { setTutorialModal } from 'store/tutorialModal'
 
-import { convertMapToArr, showAlert } from 'utils/commonUtil'
+import { convertMapToArr, showAlert, isOlderVersion, getMsg } from 'utils/commonUtil'
 
 import { setUserPath } from 'services/UserService'
+
+import { VERSION } from 'constants/release'
 
 const mapStateToProps = state => ({
   userModal: state.userModal,
@@ -142,6 +144,14 @@ class CoreLayout extends React.Component {
         <section id='main'>
           <Sidebar messages={messages} locale={locale} />
           <section id='content' className='core-layout__viewport'>
+            {
+              isOlderVersion(VERSION, releaseInfo.version) &&
+              <div className='row'>
+                <div className='col-xs-12'>
+                  <div className='alert alert-danger'>{getMsg(messages.common.isNotLatestVersion, locale)}</div>
+                </div>
+              </div>
+            }
             {React.Children.map(children, child => React.cloneElement(child, { messages, locale, releaseInfo }))}
           </section>
           <Footer messages={messages} locale={locale} releaseInfo={releaseInfo} />
