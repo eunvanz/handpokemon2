@@ -2,20 +2,17 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import shallowCompare from 'react-addons-shallow-compare'
 import _ from 'lodash'
-import numeral from 'numeral'
+import validator from 'validator'
 
 import { isScreenSize } from 'utils/commonUtil'
 
 import { ATTR_MATCH, ATTR_IDX } from 'constants/rules'
+import { colors } from 'constants/colors'
 
 import Loading from 'components/Loading'
-import Img from 'components/Img'
 import MonCard from 'components/MonCard'
 import CenterMidContainer from 'components/CenterMidContainer'
-import Button from 'components/Button'
 import Card from 'components/Card'
-import HonorBadge from 'components/HonorBadge'
-import UserModal from 'components/UserModal'
 import UserInfo from './UserInfo'
 
 class ChooseEnemy extends React.Component {
@@ -133,6 +130,9 @@ class ChooseEnemy extends React.Component {
                 {isHidden && renderMonCards(defenders, user)}
                 {(!isHidden && chosenIdx !== idx) && renderAllHiddenCard(defenders)}
                 {(!isHidden && chosenIdx === idx) && renderAllMonCards(defenders, user)}
+                <div className='col-xs-12 col-md-offset-2 col-md-8 m-t-10 alert' style={{ backgroundColor: colors.lightGray, fontSize: '14px' }}>
+                  {validator.isEmpty(user.introduce) ? '자기소개가 없습니다.' : user.introduce}
+                </div>
               </div>
             }
           />
