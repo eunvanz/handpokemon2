@@ -17,13 +17,13 @@ import { honors, items } from 'constants/data'
 
 import Badge from 'components/Badge'
 
-import { refreshUserCredits, updateUserIndexes, updateUserPokemoney, getAllUser, setUserPath, getUserByUserId } from 'services/UserService'
+import { refreshUserCredits, updateUserIndexes, updateUserPokemoney, getAllUser, setUserPath, getUserByUserId, getUserRankingByUserId } from 'services/UserService'
 import { postHonor } from 'services/HonorService'
 import { updateMon, getMonById } from 'services/MonService'
 import { postItem } from 'services/ItemService'
-import { getCollectionsRefUserIdAndMonId, getUpdateColObj } from 'services/CollectionService'
+import { getCollectionsRefUserIdAndMonId, getUpdateColObj, setDefendersToMaxCostByUserId } from 'services/CollectionService'
 
-import { convertTimeToMMSS, getAuthUserFromFirebase, getMsg, getThumbnailImageUrl, updater } from 'utils/commonUtil'
+import { convertTimeToMMSS, getAuthUserFromFirebase, getMsg, getThumbnailImageUrl, updater, getLeague } from 'utils/commonUtil'
 
 import { receiveCreditInfo } from 'store/creditInfo'
 import { setTutorialModal } from 'store/tutorialModal'
@@ -46,6 +46,7 @@ class Sidebar extends React.Component {
     this._handleOnClickUpdateUser = this._handleOnClickUpdateUser.bind(this)
     this._handleOnClickSideMenu = this._handleOnClickSideMenu.bind(this)
     this._handleOnClickUpdateMon = this._handleOnClickUpdateMon.bind(this)
+    this._setUserLeagues = this._setUserLeagues.bind(this)
     this.state = {
       pickCreditTimer: null,
       battleCreditTimer: null,
@@ -320,6 +321,33 @@ class Sidebar extends React.Component {
       })
     }
   }
+  _setUserLeagues () {
+    const { firebase } = this.props
+    getAllUser(firebase)
+    .then(users => {
+      const allUsersNum = users.length
+      let completeNum = 0
+      users.forEach(user => {
+        getUserRankingByUserId(firebase, 'battle', user.id)
+        .then(userRank => {
+          console.log('userRank', userRank)
+          const league = getLeague(userRank, allUsersNum)
+          return setUserPath(firebase, user.id, 'league', league)
+        })
+        .then(() => {
+          return setDefendersToMaxCostByUserId(firebase, user.id)
+        })
+        .then(() => {
+          console.log(`${user.nickname}의 리그 적용 완료`)
+          console.log(`${completeNum} / ${allUsersNum} 완료`)
+          completeNum++
+        })
+        .catch((msg) => {
+          console.log(`${user.nickname}의 리그 적용 실패 - ${msg}`)
+        })
+      })
+    })
+  }
   render () {
     const { user, auth, messages, locale } = this.props
     const { pickCreditTimer, battleCreditTimer, adventureCreditTimer } = this.state
@@ -449,13 +477,10 @@ class Sidebar extends React.Component {
             user && user.authorization === 'admin' &&
             <div>
               <li className='f-700'>
-                <Link to='/forbidden-area'><i><i className='fa fa-lock' style={{ fontSize: '18px' }} /></i> 포켓몬관리</Link>
-              </li>
-              <li className='f-700'>
                 <Link to='/stage-management'><i><i className='fa fa-lock' style={{ fontSize: '18px' }} /></i> 스테이지관리</Link>
               </li>
               <li className='f-700'>
-                <i><i className='fa fa-lock' style={{ fontSize: '18px', cursor: 'pointer' }} onClick={this._handleOnClickUpdateMon} /></i> 커스텀 스크립트
+                <i><i className='fa fa-lock' style={{ fontSize: '18px', cursor: 'pointer' }} onClick={this._setUserLeagues} /></i> 커스텀 스크립트
               </li>
             </div>
           }

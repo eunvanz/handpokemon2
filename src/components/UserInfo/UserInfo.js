@@ -37,7 +37,7 @@ class UserInfo extends React.PureComponent {
           <div className='row' style={{ marginBottom: '15px' }}>
             <div className='col-xs-3 f-700'>리그</div>
             <div className='col-xs-9'>
-              <span className='c-lightblue f-700'>{LEAGUE[user.league].name}</span>리그
+              <span className='c-lightblue f-700'><i className={LEAGUE[user.league].icon} /> {LEAGUE[user.league].name}</span>리그
             </div>
           </div>
           <div className='row' style={{ marginBottom: '15px' }}>

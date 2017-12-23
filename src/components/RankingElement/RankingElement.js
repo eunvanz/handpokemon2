@@ -10,6 +10,7 @@ import Img from 'components/Img'
 import { isScreenSize, getThumbnailImageUrl } from 'utils/commonUtil'
 
 import { colors } from 'constants/colors'
+import { LEAGUE } from 'constants/rules'
 
 class RankingElement extends React.Component {
   constructor (props) {
@@ -62,7 +63,7 @@ class RankingElement extends React.Component {
           }
         </div>
         <div className={`pull-left text-center ${type === 'collection' ? '' : 'hidden-xs'}`} style={{ width: width[2], lineHeight }}><span className={type === 'collection' && !isHeader ? 'c-lightblue' : ''}>{isHeader ? <strong>콜렉션점수</strong> : numeral(user.colPoint).format('0,0')}</span>{isHeader ? '' : '점'}</div>
-        <div className={`pull-left text-center ${type === 'battle' ? '' : 'hidden-xs'}`} style={{ width: width[3], lineHeight }}><span className={type === 'battle' && !isHeader ? 'c-lightblue' : ''}>{isHeader ? <strong>시합점수</strong> : numeral(user.leaguePoint).format('0,0')}</span>{isHeader ? '' : '점'}</div>
+        <div className={`pull-left text-center ${type === 'battle' ? '' : 'hidden-xs'}`} style={{ width: width[3], lineHeight }}><span className={type === 'battle' && !isHeader ? 'c-lightblue' : ''}>{isHeader ? <strong>시합점수</strong> : numeral(user.leaguePoint).format('0,0')}</span>{isHeader ? '' : '점'} <i className={user ? LEAGUE[user.league].icon : null} /></div>
         <div className='pull-left text-center hidden-sm hidden-xs' style={{ width: width[4], lineHeight }}><span className={type === 'battle' && !isHeader ? 'c-lightblue' : ''}>{isHeader ? <strong>승</strong> : numeral(user.battleWin).format('0,0')}</span>{isHeader ? '' : '승'}</div>
         <div className='pull-left text-center hidden-sm hidden-xs' style={{ width: width[5], lineHeight }}><span className={type === 'battle' && !isHeader ? 'c-lightblue' : ''}>{isHeader ? <strong>패</strong> : numeral(user.battleLose).format('0,0')}</span>{isHeader ? '' : '패'}</div>
         <div className='pull-left text-center hidden-sm hidden-xs' style={{ width: width[6], lineHeight }}><span className={type === 'battle' && !isHeader ? 'c-lightblue' : ''}>{isHeader ? <strong>승률</strong> : numeral(user.battleWin * 100 / (user.battleWin + user.battleLose)).format('0.0')}</span>{isHeader ? '' : '%'}</div>

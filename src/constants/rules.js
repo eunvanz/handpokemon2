@@ -79,49 +79,70 @@ export const LEAGUE = [
   {
     name: '걸음마',
     maxCost: 11,
-    cut: 90
+    cut: 100,
+    icon: 'fa fa-bomb c-bluegray'
   },
   {
     name: '브론즈',
     maxCost: 12,
-    cut: 80
+    cut: 50,
+    icon: 'fa fa-certificate c-brown'
   },
   {
     name: '실버',
     maxCost: 13,
-    cut: 70
-  },
-  {
-    name: '골드',
-    maxCost: 14,
-    cut: 60
-  },
-  {
-    name: '다이아',
-    maxCost: 16,
-    cut: 50
-  },
-  {
-    name: '에이스',
-    maxCost: 18,
-    cut: 40
-  },
-  {
-    name: '챔피온',
-    maxCost: 20,
-    cut: 30
-  },
-  {
-    name: '마스터',
-    maxCost: 22,
-    cut: 20
-  },
-  {
-    name: '레전드',
-    maxCost: 24,
-    cut: 10
+    cut: 25,
+    icon: 'fa fa-certificate c-gray'
   }
 ]
+
+// export const LEAGUE = [
+//   {
+//     name: '걸음마',
+//     maxCost: 11,
+//     cut: 90
+//   },
+//   {
+//     name: '브론즈',
+//     maxCost: 12,
+//     cut: 80
+//   },
+//   {
+//     name: '실버',
+//     maxCost: 13,
+//     cut: 70
+//   },
+//   {
+//     name: '골드',
+//     maxCost: 14,
+//     cut: 60
+//   },
+//   {
+//     name: '다이아',
+//     maxCost: 16,
+//     cut: 50
+//   },
+//   {
+//     name: '에이스',
+//     maxCost: 18,
+//     cut: 40
+//   },
+//   {
+//     name: '챔피온',
+//     maxCost: 20,
+//     cut: 30
+//   },
+//   {
+//     name: '마스터',
+//     maxCost: 22,
+//     cut: 20
+//   },
+//   {
+//     name: '레전드',
+//     maxCost: 24,
+//     cut: 10
+//   }
+// ]
 
 export const ATTR_IDX = ['노말', '불꽃', '물', '전기', '풀', '얼음', '격투', '독', '땅',
   '비행', '염력', '벌레', '바위', '유령', '용', '악', '강철', '요정']

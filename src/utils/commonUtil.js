@@ -2,6 +2,8 @@ import _ from 'lodash'
 import numeral from 'numeral'
 import { pathToJS } from 'react-redux-firebase'
 
+import { LEAGUE } from 'constants/rules'
+
 export const isScreenSize = {
   xs: () => window.innerWidth < 768,
   sm: () => window.innerWidth < 992 && window.innerWidth >= 768,
@@ -217,8 +219,15 @@ export const flattenFirebaseObject = obj => {
 export const isOlderVersion = (src, tgt) => {
   const srcArr = src.split('.')
   const tgtArr = tgt.split('.')
-  if (Number(srcArr[0]) < Number(tgtArr[0])) return true
-  if (Number(srcArr[1]) < Number(tgtArr[1])) return true
-  if (Number(srcArr[2]) < Number(tgtArr[2])) return true
-  return false
+  if (Number(srcArr[0]) > Number(tgtArr[0])) return false
+  else if (Number(srcArr[1]) > Number(tgtArr[1])) return false
+  else if (Number(srcArr[2]) > Number(tgtArr[2])) return false
+  return true
+}
+
+export const getLeague = (userRank, allUserNum) => {
+  const pct = Math.round(userRank * 100 / allUserNum)
+  for (let i = LEAGUE.length - 1; i > -1; i--) {
+    if (pct <= LEAGUE[i].cut) return i
+  }
 }

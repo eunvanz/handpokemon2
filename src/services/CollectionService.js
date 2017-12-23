@@ -1,8 +1,13 @@
 import { levelUpCollection, levelDownCollection } from 'utils/monUtil'
 import { convertMapToArr, updater, convertNumberToStringForIndex } from 'utils/commonUtil'
 import keygen from 'keygenerator'
+import { sortBy, orderBy } from 'lodash'
+
+import { getUserByUserId } from './UserService'
 
 import Lucky from 'models/lucky'
+
+import { LEAGUE } from 'constants/rules'
 
 export const getCollectionsRefUserIdAndMonId = (firebase, userId, monId) => {
   return firebase.ref(`userCollections/${userId}`).once('value') // 사용자의 콜렉션 가져옴
@@ -229,4 +234,51 @@ export const updateIsDefender = (firebase, col, isDefender) => {
     [`monCollections/${col.monId}/${col.id}/isDefender`]: isDefender
   }
   return updater(firebase, updateObj)
+}
+
+export const getDefendersByUserId = (firebase, userId) => {
+  const ref = firebase.ref(`userCollections/${userId}`)
+  return ref.orderByChild('isDefender').equalTo(true).once('value')
+  .then(snapshot => {
+    return Promise.resolve(convertMapToArr(snapshot.val()))
+  })
+}
+
+export const setDefendersToMaxCostByUserId = (firebase, userId) => {
+  return getUserByUserId(firebase, userId)
+  .then(user => {
+    const userLeague = user.league
+    const newMaxCost = LEAGUE[userLeague].maxCost
+    return getCollectionsByUserId(firebase, userId)
+    .then(userCollections => {
+      const defendersArr = userCollections.filter(col => col.isDefender)
+      const currentCost = defendersArr.reduce((accm, col) => accm + col.mon[col.monId].cost, 0)
+      if (newMaxCost !== currentCost) {
+        const isPromoted = newMaxCost > currentCost
+        const sortedCols = sortBy(userCollections, col => col.mon[col.monId].cost)
+        // 강등됐을 경우는 코스트가 가장 큰 포켓몬 보다 코스트가 작은 아래 포켓몬으로 교체, 상승했을 경우는 코스트가 가장 작은 포켓몬을 큰 포켓몬으로 교체
+        const colToPop = sortBy(defendersArr, col => col.mon[col.monId].cost)[isPromoted ? 0 : sortedCols.length - 1] // 가장 큰 코스트 또는 작은 코스트의 포켓몬
+        const suitableCostCols = userCollections.filter(col => {
+          if (isPromoted) {
+            return col.mon[col.monId].cost <= colToPop.mon[colToPop.monId].cost - (currentCost - newMaxCost) && col.mon[col.monId].cost > colToPop.mon[colToPop.monId].cost
+          } else {
+            return col.mon[col.monId].cost <= colToPop.mon[colToPop.monId].cost - (currentCost - newMaxCost)
+          }
+        })
+        const availableCols = suitableCostCols.filter(col => !col.isDefender)
+        if (availableCols.length === 0) {
+          // 없을 경우 공석으로 냅둠
+          if (!isPromoted) return updateIsDefender(firebase, colToPop, false)
+          else return Promise.resolve()
+        } else {
+          // 교체 가능한 콜렉션 중에서 가장 전투력이 높은 포켓몬을 defender로 설정
+          const maxTotalCol = sortBy(availableCols, col => col.total + col.addedTotal)[availableCols.length - 1]
+          return updateIsDefender(firebase, colToPop, false)
+          .then(() => updateIsDefender(firebase, maxTotalCol, true))
+        }
+      } else {
+        return Promise.resolve()
+      }
+    })
+  })
 }

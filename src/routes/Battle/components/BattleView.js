@@ -15,10 +15,10 @@ import Battle from 'bizs/Battle'
 import Pick from 'bizs/Pick'
 
 import { setUserPath, updateUserToLose, decreaseCredit, updateUserToWin,
-  getUserRankingByUserId } from 'services/UserService'
-import { updateIsDefender } from 'services/CollectionService'
+  getUserRankingByUserId, getAllUser } from 'services/UserService'
+import { updateIsDefender, setDefendersToMaxCostByUserId } from 'services/CollectionService'
 
-import { getMsg } from 'utils/commonUtil'
+import { getMsg, getLeague } from 'utils/commonUtil'
 
 import User from 'models/user'
 
@@ -167,12 +167,14 @@ class BattleView extends React.Component {
     const { isAdventure } = this.state
     setUserPath(firebase, auth.uid, 'battleSpeed', speed)
     this.setState({ step: 6 })
+    console.log('isAdventure', isAdventure)
     if (!isAdventure) this._generateBattleResult()
   }
   _handleOnClickContinueBattle () {
     this.setState({ step: 1, chosenEnemy: null })
   }
   _generateBattleResult () {
+    console.log('generateBattleResult')
     const { auth, firebase, battleLog, user } = this.props
     const { chosenEnemy, winInRow } = this.state
     const battleResultInfo = {
@@ -217,6 +219,25 @@ class BattleView extends React.Component {
       tobeResultInfo.tobeEnemy.leagueRank = rank
       const lastBattleResultInfo = Object.assign({}, battleResultInfo, tobeResultInfo)
       this.setState({ battleResultInfo: lastBattleResultInfo })
+      return getAllUser(firebase)
+    })
+    .then(userArr => {
+      // user들의 리그를 다시 계산
+      const allUserNum = userArr.length
+      const userLeague = getLeague(tobeResultInfo.tobeUser.leagueRank, allUserNum)
+      const enemyLeague = getLeague(tobeResultInfo.tobeEnemy.leagueRank, allUserNum)
+      let setLeagueArr = []
+      if (userLeague !== user.league) setLeagueArr.push(setUserPath(firebase, auth.uid, 'league', userLeague))
+      if (enemyLeague !== chosenEnemy.league) setLeagueArr.push(setUserPath(firebase, chosenEnemy.id, 'league', enemyLeague))
+      let updateLeaguePromise = setLeagueArr.length > 0 ? () => Promise.all(setLeagueArr) : () => Promise.resolve()
+      return updateLeaguePromise()
+      .then(() => {
+        // user들이 하위리그 또는 상위로 변경됐을 경우 수비 포켓몬을 다시 지정
+        let setDefendersArr = []
+        if (userLeague !== user.league) setDefendersArr.push(setDefendersToMaxCostByUserId(firebase, auth.uid))
+        if (enemyLeague !== chosenEnemy.league) setDefendersArr.push(setDefendersToMaxCostByUserId(firebase, chosenEnemy.id))
+        return setDefendersArr.length > 0 ? Promise.all(setDefendersArr) : Promise.resolve()
+      })
     })
     .catch(err => {
       window.swal({ text: `에러가 발생했습니다. - ${err}` })

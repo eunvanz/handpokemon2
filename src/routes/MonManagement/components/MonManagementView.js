@@ -234,7 +234,7 @@ class MonManagementView extends React.Component {
         postTempMon(firebase, mon)
         .then(() => {
           toast('등록 신청되었습니다.')
-          this.setState({ showForm: false })
+          this.setState({ showForm: false, isLoading: false })
           this._clearForm()
         })
       }
