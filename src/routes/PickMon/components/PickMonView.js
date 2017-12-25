@@ -206,7 +206,7 @@ class PickMonView extends React.Component {
       //     })
       // })
     } else if (evoluteCol) { // 진화일때
-      getNextMons(firebase, evoluteCol)
+      getNextMons(firebase, evoluteCol, auth.uid)
       .then(nextMons => {
         const picks = _.compact(nextMons)
         if (picks.length > 1) { // 진화체가 여러개일 경우 단건채집과 같은방식으로 진행

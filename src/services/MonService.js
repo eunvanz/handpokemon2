@@ -1,6 +1,8 @@
 import { convertMapToArr } from 'utils/commonUtil'
 import { convertMonToCol, levelUpCollection } from 'utils/monUtil'
 
+import { postCollection } from 'services/CollectionService'
+
 import _ from 'lodash'
 
 export const getStartPick = firebase => {
@@ -105,7 +107,15 @@ export const getPickMons = (firebase, attrs, grades, mixCols) => {
   }
 }
 
-export const getNextMons = (firebase, evoluteCol) => {
+export const getNextMons = (firebase, evoluteCol, uid) => {
+  // 토중몬이 진화하는 경우 몰래 껍질몬 추가
+  if (evoluteCol.mon[evoluteCol.monId].name.ko === '토중몬') {
+    getMonByName(firebase, '껍질몬')
+    .then(mon => {
+      const col = convertMonToCol(mon)
+      postCollection(firebase, uid, col, 'pick')
+    })
+  }
   const nextIds = _.compact(evoluteCol.mon[evoluteCol.monId].next)
   return firebase.ref('mons').once('value')
   .then(snapshot => {
