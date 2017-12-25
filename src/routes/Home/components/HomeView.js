@@ -7,15 +7,18 @@ import { toast } from 'react-toastify'
 import { sortBy, reverse } from 'lodash'
 import $ from 'jquery'
 import LinesEllipsis from 'react-lines-ellipsis'
+import numeral from 'numeral'
 
 import { getMsg, isScreenSize, isStringLength, isIE } from 'utils/commonUtil'
 
 import { colors } from 'constants/colors'
+import { LEAGUE } from 'constants/rules'
 
 import Card from 'components/Card'
 import WorkshopCard from 'components/WorkshopCard'
 import ChatMessage from './ChatMessage'
 import MonCard from 'components/MonCard'
+import Button from 'components/Button'
 
 import { postChat } from 'services/ChatService'
 
@@ -314,6 +317,59 @@ class HomeView extends React.Component {
             {renderBanners()}
           </div>
         </div>
+        {
+          auth && user && user.colPoint &&
+          <div className='row' style={{ marginTop: '20px' }}>
+            <div className='col-xs-6 col-sm-3' style={{ paddingRight: isScreenSize.xs() ? '5px' : null, cursor: 'pointer' }} onClick={() => this.context.router.push('/pick-district')}>
+              <Card
+                body={
+                  <div className='text-center p-10'>
+                    <h4 className='f-700'>콜렉션점수</h4>
+                    <p className='m-b-10'><span className='c-lightblue'>{numeral(user.colPoint).format('0,0')}</span>점 (<span className='c-lightblue'>{numeral(user.colRank).format('0,0')}</span>위)</p>
+                  </div>
+                }
+                style={{ marginBottom: '10px' }}
+                clearPadding
+              />
+            </div>
+            <div className='col-xs-6 col-sm-3' style={{ paddingLeft: isScreenSize.xs() ? '5px' : null, cursor: 'pointer' }} onClick={() => this.context.router.push('/adventure')}>
+              <Card
+                body={
+                  <div className='text-center p-10'>
+                    <h4 className='f-700'>완료한 탐험</h4>
+                    <p className='m-b-10'><span className='c-lightblue'>{numeral((user.stage || 1) - 1).format('0,0')}</span>개</p>
+                  </div>
+                }
+                style={{ marginBottom: '10px' }}
+                clearPadding
+              />
+            </div>
+            <div className='col-xs-6 col-sm-3' style={{ paddingRight: isScreenSize.xs() ? '5px' : null, cursor: 'pointer' }} onClick={() => this.context.router.push('/battle')}>
+              <Card
+                body={
+                  <div className='text-center p-10'>
+                    <h4 className='f-700'>시합점수</h4>
+                    <p className='m-b-10'><span className='c-lightblue'>{numeral(user.leaguePoint).format('0,0')}</span>점 (<span className='c-lightblue'>{numeral(user.leagueRank).format('0,0')}</span>위) <i className={LEAGUE[user.league].icon} /></p>
+                  </div>
+                }
+                style={{ marginBottom: '10px' }}
+                clearPadding
+              />
+            </div>
+            <div className='col-xs-6 col-sm-3' style={{ paddingLeft: isScreenSize.xs() ? '5px' : null, cursor: 'pointer' }} onClick={() => this.context.router.push('/item-shop')}>
+              <Card
+                body={
+                  <div className='text-center p-10'>
+                    <h4 className='f-700'>포키머니</h4>
+                    <p className='m-b-10'><span className='c-lightblue'>{numeral(user.pokemoney).format('0,0')}</span>P</p>
+                  </div>
+                }
+                style={{ marginBottom: '10px' }}
+                clearPadding
+              />
+            </div>
+          </div>
+        }
         <div className='row' style={{ marginTop: '20px' }}>
           <div className='col-md-6'>
             <Card

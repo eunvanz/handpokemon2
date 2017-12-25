@@ -13,10 +13,13 @@ import withAuth from 'hocs/withAuth'
 
 import { colors } from 'constants/colors'
 
+import AttrCalcModal from '../AttrCalcModal'
+
 class Header extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
+      showAttrCalcModal: false
     }
     this._handleOnClickLogout = this._handleOnClickLogout.bind(this)
   }
@@ -51,6 +54,7 @@ class Header extends React.Component {
     }, () => {})
   }
   render () {
+    const { showAttrCalcModal } = this.state
     return (
       <header id='header' className='clearfix' style={{ backgroundColor: colors.lightBlue }}>
         <ul className='h-inner'>
@@ -66,6 +70,7 @@ class Header extends React.Component {
           </li>
           <li className='pull-right'>
             <ul className='hi-menu'>
+              <li><a style={{ cursor: 'pointer' }} onClick={() => this.setState({ showAttrCalcModal: true })}><i className='him-icon fa fa-calculator' /></a></li>
               {
                 !this.props.auth &&
                 <li><Link to='/sign-up'><i className='him-icon zmdi zmdi-account-add' /></Link></li>
@@ -85,6 +90,10 @@ class Header extends React.Component {
             </ul>
           </li>
         </ul>
+        <AttrCalcModal
+          show={showAttrCalcModal}
+          close={() => this.setState({ showAttrCalcModal: false })}
+        />
       </header>
     )
   }

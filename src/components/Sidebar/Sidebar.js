@@ -8,7 +8,6 @@ import $ from 'jquery'
 import shallowCompare from 'react-addons-shallow-compare'
 import Visibility from 'visibilityjs'
 import { compose } from 'recompose'
-import { Tooltip, OverlayTrigger } from 'react-bootstrap'
 
 import { DEFAULT_PROFILE_IMAGE_URL } from 'constants/urls'
 import { PICK_CREDIT_REFRESH, BATTLE_CREDIT_REFRESH, ADVENTURE_CREDIT_REFRESH,
@@ -265,8 +264,8 @@ class Sidebar extends React.Component {
   }
   _handleOnClickUpdateCollection () {
     // const { firebase } = this.props
-    // const userId = '1fAcJckbYSTZVM5vHwvTNWPLGm22'
-    // const monId = '-L-zSk9nrHLJ3RiTZkM3'
+    // const userId = 'EHcgz4miMYa9zmsRHaU03BTU0DE3'
+    // const monId = '-KtHW0lfGXHlZv0vCwvL'
     // getCollectionsRefUserIdAndMonId(firebase, userId, monId)
     // .then(snapshot => {
     //   const collection = snapshot.val()[Object.keys(snapshot.val())[0]]
@@ -276,6 +275,7 @@ class Sidebar extends React.Component {
     //   collection.addedSArmor = 0
     //   collection.addedSPower = 0
     //   collection.addedTotal = 0
+    //   collection.addedArmor = 0
     //   collection.level = 1
     //   console.log('collection', collection)
     //   const updateObj = getUpdateColObj(collection)
@@ -480,7 +480,7 @@ class Sidebar extends React.Component {
                 <Link to='/stage-management'><i><i className='fa fa-lock' style={{ fontSize: '18px' }} /></i> 스테이지관리</Link>
               </li>
               <li className='f-700'>
-                <i><i className='fa fa-lock' style={{ fontSize: '18px', cursor: 'pointer' }} onClick={this._handleOnClickPostHonor} /></i> 커스텀 스크립트
+                <i><i className='fa fa-lock' style={{ fontSize: '18px', cursor: 'pointer' }} onClick={this._handleOnClickUpdateCollection} /></i> 커스텀 스크립트
               </li>
             </div>
           }

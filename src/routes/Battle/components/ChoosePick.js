@@ -246,7 +246,7 @@ class ChoosePick extends React.Component {
     this._filterByAvailableCost(newCost, newPick)
   }
   _filterByAvailableCost (cost, pick) {
-    const { isDefenseMode } = this.props
+    const { isDefenseMode, isAdventure } = this.props
     if (pick.length === 3) return this.setState({ sortedCollections: pick })
     const { collections } = this.props
     const { maxCost } = this.state
@@ -255,7 +255,7 @@ class ChoosePick extends React.Component {
     if (isDefenseMode) {
       originCollections = _.orderBy(adjustCollections, ['isChosen', 'isFavorite', 'totalIdx'], ['desc', 'desc', 'desc'])
     } else {
-      originCollections = _.orderBy(adjustCollections.filter(c => !c.isDefender), ['isChosen', 'isFavorite', 'totalIdx'], ['desc', 'desc', 'desc'])
+      originCollections = _.orderBy(isAdventure ? adjustCollections : adjustCollections.filter(c => !c.isDefender), ['isChosen', 'isFavorite', 'totalIdx'], ['desc', 'desc', 'desc'])
     }
     const restPick = 2 - pick.length
     const availableCost = maxCost - cost - restPick

@@ -308,7 +308,7 @@ class CollectionView extends React.Component {
   _cancelMix () {
     const { receiveFilter } = this.props
     this.props.updatePickMonInfo(null)
-    const filter = Object.assign({}, this.state.filter, { has: { yes: true, no: true } })
+    const filter = Object.assign({}, this.props.filter, { has: { yes: true, no: true } })
     receiveFilter(filter)
     this.setState({
       mode: 'view',

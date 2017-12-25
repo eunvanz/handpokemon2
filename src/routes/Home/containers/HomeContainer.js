@@ -29,7 +29,8 @@ const mapStateToProps = (state) => {
     chats: {
       global: sortBy(convertMapToArr(dataToJS(state.firebase, 'chats/global')), item => item.id)
     },
-    luckies: reverse(sortBy(convertMapToArr(dataToJS(state.firebase, 'luckies')), ['date']))
+    luckies: reverse(sortBy(convertMapToArr(dataToJS(state.firebase, 'luckies')), ['date'])),
+    creditInfo: state.creditInfo
   }
 }
 

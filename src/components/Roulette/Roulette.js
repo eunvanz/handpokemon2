@@ -68,7 +68,7 @@ class Roulette extends React.Component {
     }
     updatePickMonInfo(pickMonInfo)
     .then(() => {
-      this.context.router.push(`pick-mon?f=${keygen._()}`)
+      this.context.router.replace(`pick-mon?f=${keygen._()}`)
     })
   }
   _handleOnClickMix (mon) {
@@ -79,7 +79,7 @@ class Roulette extends React.Component {
     }
     updatePickMonInfo(pickMonInfo)
     .then(() => {
-      this.context.router.push(`/collection/${mon.userId}`)
+      this.context.router.replace(`/collection/${mon.userId}`)
     })
   }
   _startRoulette () {
@@ -102,7 +102,7 @@ class Roulette extends React.Component {
     if (!this.state.stop) this.setState({ stop: true })
   }
   _handleOnClickContinue () {
-    this.context.router.push(`pick-mon?f=${keygen._()}`)
+    this.context.router.replace(`pick-mon?f=${keygen._()}`)
   }
   render () {
     const { images, size, id, style, innerSize, mon, btnComponent, user } = this.props

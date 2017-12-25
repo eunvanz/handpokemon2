@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import keygen from 'keygenerator'
 import shallowCompare from 'react-addons-shallow-compare'
+import { browserHistory } from 'react-router'
 
 import CustomModal from 'components/CustomModal'
 import Button from 'components/Button'
@@ -59,7 +60,7 @@ class MonModal extends React.Component {
     updatePickMonInfo(pickMonInfo)
     .then(() => {
       close()
-      this.context.router.push(`/pick-mon?f=${keygen._()}`)
+      browserHistory.replace(`/pick-mon?f=${keygen._()}`)
     })
   }
   _handleOnClickMix () {
@@ -79,7 +80,7 @@ class MonModal extends React.Component {
     updatePickMonInfo(pickMonInfo)
     .then(() => {
       close()
-      this.context.router.push(`/collection/${mon.tobe.userId}`)
+      this.context.router.replace(`/collection/${mon.tobe.userId}`)
     })
   }
   render () {
