@@ -702,7 +702,7 @@ class MonManagementView extends React.Component {
                   <Selectbox
                     id='prev'
                     defaultValue='진화 전 포켓몬'
-                    options={this.props.mons.map(mon => {
+                    options={_.sortBy(this.props.mons, mon => mon.name.ko).map(mon => {
                       return { name: mon.name.ko, value: mon.id }
                     })}
                     onChange={this._handleOnChangeInput}

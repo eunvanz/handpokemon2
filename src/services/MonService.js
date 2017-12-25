@@ -76,6 +76,8 @@ export const getPickMons = (firebase, attrs, grades, mixCols) => {
   let specificPick = null
   if (_.find(mixCols, col => col.mon[col.monId].name.ko === '야돈') && _.find(mixCols, col => col.mon[col.monId].name.ko === '셀러')) {
     specificPick = ['야도란', '야도킹']
+  } else if (_.find(mixCols, col => col.mon[col.monId].name.ko === '딱정곤') && _.find(mixCols, col => col.mon[col.monId].name.ko === '쪼마리')) {
+    specificPick = ['슈바르고', '어지리더']
   }
   if (specificPick) {
     const picks = []
