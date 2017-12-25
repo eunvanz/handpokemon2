@@ -25,7 +25,7 @@ class Pick {
     this.adjSPower = this.sPower
     this.adjSArmor = this.sArmor
     this.adjDex = this.dex
-    this.totalHp = this.hp * 4 + 300
+    this.totalHp = this.hp * 4 + 360
     this.restHp = this.totalHp
     this.battlePoint = 0
     this.col = col
