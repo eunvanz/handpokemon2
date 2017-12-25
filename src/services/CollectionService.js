@@ -4,6 +4,7 @@ import keygen from 'keygenerator'
 import { sortBy, orderBy } from 'lodash'
 
 import { getUserByUserId } from './UserService'
+import { postLucky } from './LuckyService'
 
 import Lucky from 'models/lucky'
 
@@ -99,6 +100,7 @@ export const postCollection = (firebase, userId, collection, type, srcCols) => {
   let checkSrcCols
   let isError = false
   let user
+  let lucky = null
   if (type === 'evolution' || type === 'mix') {
     const proms = srcCols.map(srcCol => {
       return () => firebase.ref(`collections/${srcCol.id}/level`).transaction(asisLevel => {
@@ -123,18 +125,14 @@ export const postCollection = (firebase, userId, collection, type, srcCols) => {
     resultPoint = user.colPoint
     leaguePoint = user.leaguePoint
     if (collectionMon.grade !== 'b' && (collectionMon.grade === 'e' || collectionMon.grade === 'l')) { // 방송되는 포켓몬을 뽑았을경우
-      updateObj = {
-        [`luckies/${keygen._()}`]: Object.assign({}, new Lucky(), { user, collection, type })
-      }
+      lucky = Object.assign({}, new Lucky(), { user, collection, type })
     }
     return getCollectionsRefUserIdAndMonId(firebase, userId, collection.monId) // userId와 monId로 콜렉션을 가져옴
   })
   .then(snapshot => {
     if (!snapshot.val()) { // mon이 user에게 없을경우
       if (collectionMon.grade !== 'b' && (collection.rank === 'SS' || collection.rank === 'S')) { // 새포켓몬인 경우에만 체크
-        updateObj = {
-          [`luckies/${keygen._()}`]: Object.assign({}, new Lucky(), { user, collection, type })
-        }
+        lucky = Object.assign({}, new Lucky(), { user, collection, type })
       }
       resultPoint += collectionMon.point
       const updateUserObj = {
@@ -209,6 +207,7 @@ export const postCollection = (firebase, userId, collection, type, srcCols) => {
   })
   .then(() => {
     return updater(firebase, updateObj)
+    .then(() => lucky ? postLucky(firebase, lucky) : Promise.resolve())
   })
   .then(() => {
     return Promise.resolve({ asis, tobe })

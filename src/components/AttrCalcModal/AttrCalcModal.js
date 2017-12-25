@@ -45,11 +45,11 @@ class AttrCalcModal extends React.Component {
     }
     result *= 100
     if (result > 100) {
-      return `+${numeral(result - 100).format('0')}%`
+      return `데미지 보너스 +${numeral(result - 100).format('0')}%`
     } else if (result === 100) {
       return '보너스 없음'
     } else {
-      return `-${numeral(100 - result).format('0')}%`
+      return `데미지 패널티 -${numeral(100 - result).format('0')}%`
     }
   }
   _handleOnClickReverse () {

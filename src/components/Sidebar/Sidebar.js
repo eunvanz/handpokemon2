@@ -21,6 +21,7 @@ import { postHonor } from 'services/HonorService'
 import { updateMon, getMonById } from 'services/MonService'
 import { postItem } from 'services/ItemService'
 import { getCollectionsRefUserIdAndMonId, getUpdateColObj, setDefendersToMaxCostByUserId } from 'services/CollectionService'
+import { clearLucky } from 'services/LuckyService'
 
 import { convertTimeToMMSS, getAuthUserFromFirebase, getMsg, getThumbnailImageUrl, updater, getLeague } from 'utils/commonUtil'
 
@@ -46,6 +47,7 @@ class Sidebar extends React.Component {
     this._handleOnClickSideMenu = this._handleOnClickSideMenu.bind(this)
     this._handleOnClickUpdateMon = this._handleOnClickUpdateMon.bind(this)
     this._setUserLeagues = this._setUserLeagues.bind(this)
+    this._handleOnClickClearLuckies = this._handleOnClickClearLuckies.bind(this)
     this.state = {
       pickCreditTimer: null,
       battleCreditTimer: null,
@@ -348,6 +350,10 @@ class Sidebar extends React.Component {
       })
     })
   }
+  _handleOnClickClearLuckies () {
+    const { firebase } = this.props
+    clearLucky(firebase)
+  }
   render () {
     const { user, auth, messages, locale } = this.props
     const { pickCreditTimer, battleCreditTimer, adventureCreditTimer } = this.state
@@ -481,6 +487,9 @@ class Sidebar extends React.Component {
               </li>
               <li className='f-700'>
                 <i><i className='fa fa-lock' style={{ fontSize: '18px', cursor: 'pointer' }} onClick={this._handleOnClickUpdateCollection} /></i> 커스텀 스크립트
+              </li>
+              <li className='f-700'>
+                <i><i className='fa fa-lock' style={{ fontSize: '18px', cursor: 'pointer' }} onClick={this._handleOnClickClearLuckies} /></i> 럭키 청소
               </li>
             </div>
           }

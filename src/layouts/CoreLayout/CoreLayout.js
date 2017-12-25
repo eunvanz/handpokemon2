@@ -47,7 +47,7 @@ class CoreLayout extends React.Component {
     return !is(fromJS(nextProps), fromJS(this.props)) || !is(fromJS(nextState), fromJS(this.state))
   }
   componentDidUpdate (prevProps, prevState) {
-    if (prevProps.luckies && prevProps.luckies.length !== 0 && prevProps.luckies.length !== this.props.luckies.length) {
+    if (prevProps.luckies && prevProps.luckies.length !== 0 && prevProps.luckies[prevProps.luckies.length - 1].date !== this.props.luckies[this.props.luckies.length - 1].date) {
       const getTypeName = type => {
         if (type === 'signUp') return '초기픽에서'
         else if (type === 'pick') return '채집권으로'
