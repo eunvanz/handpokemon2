@@ -150,10 +150,10 @@ export default class Battle {
     return Math.round(pureDamage - pureDamage * this._getArmorPct(armor, defenderPick.adjDex))
   }
   _getArmorPct (armor, dex) {
-    let pct = 0.001 + armor * 0.003 + dex * 0.0005
-    if (pct > 0.8) {
-      const restPct = pct - 0.8
-      pct = 0.8
+    let pct = 0.001 + armor * 0.0035 + dex * 0.0005
+    if (pct > 0.85) {
+      const restPct = pct - 0.85
+      pct = 0.85
       if (_.random(0.0, 1.0) < restPct) pct = 1
     }
     return pct
