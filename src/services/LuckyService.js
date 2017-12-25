@@ -3,7 +3,6 @@ export const clearLucky = (firebase) => {
   return ref.once('value')
   .then(snapshot => {
     const keys = Object.keys(snapshot.val())
-    console.log('keys', keys)
     for (let i = 0; i < keys.length - 3; i++) {
       firebase.remove(`luckies/${keys[i]}`)
     }

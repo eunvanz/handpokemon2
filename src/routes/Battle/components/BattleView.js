@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import shallowCompare from 'react-addons-shallow-compare'
 import { toast } from 'react-toastify'
+import { find } from 'lodash'
 
 import BattleReady from './BattleReady'
 import ChooseEnemy from './ChooseEnemy'
@@ -83,6 +84,9 @@ class BattleView extends React.Component {
       return !isAdventure ? fetchCandidates(firebase, user.league, auth.uid) : Promise.resolve()
     })
     .then(() => {
+      if (find(userPick, pick => pick.mon[pick.monId].name.ko === '미싱노')) {
+        // TODO
+      }
       setUserPicks(userPick)
       let state
       if (isAdventure) {

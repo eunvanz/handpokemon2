@@ -99,6 +99,12 @@ export const LEAGUE = [
     maxCost: 14,
     cut: 10,
     icon: 'fa fa-certificate c-amber'
+  },
+  {
+    name: '다이아',
+    maxCost: 16,
+    cut: 5,
+    icon: 'fa fa-gem c-cyan'
   }
 ]
 

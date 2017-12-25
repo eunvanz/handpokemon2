@@ -18,12 +18,13 @@ import Badge from 'components/Badge'
 
 import { refreshUserCredits, updateUserIndexes, updateUserPokemoney, getAllUser, setUserPath, getUserByUserId, getUserRankingByUserId } from 'services/UserService'
 import { postHonor } from 'services/HonorService'
-import { updateMon, getMonById } from 'services/MonService'
+import { updateMon, getMonById, getMonByName } from 'services/MonService'
 import { postItem } from 'services/ItemService'
-import { getCollectionsRefUserIdAndMonId, getUpdateColObj, setDefendersToMaxCostByUserId } from 'services/CollectionService'
+import { getCollectionsRefUserIdAndMonId, getUpdateColObj, setDefendersToMaxCostByUserId, postCollection } from 'services/CollectionService'
 import { clearLucky } from 'services/LuckyService'
 
 import { convertTimeToMMSS, getAuthUserFromFirebase, getMsg, getThumbnailImageUrl, updater, getLeague } from 'utils/commonUtil'
+import { convertMonToCol } from 'utils/monUtil'
 
 import { receiveCreditInfo } from 'store/creditInfo'
 import { setTutorialModal } from 'store/tutorialModal'
@@ -48,6 +49,7 @@ class Sidebar extends React.Component {
     this._handleOnClickUpdateMon = this._handleOnClickUpdateMon.bind(this)
     this._setUserLeagues = this._setUserLeagues.bind(this)
     this._handleOnClickClearLuckies = this._handleOnClickClearLuckies.bind(this)
+    this._postCollection = this._postCollection.bind(this)
     this.state = {
       pickCreditTimer: null,
       battleCreditTimer: null,
@@ -354,6 +356,15 @@ class Sidebar extends React.Component {
     const { firebase } = this.props
     clearLucky(firebase)
   }
+  _postCollection () {
+    const { firebase } = this.props
+    const uid = 'YRomg9yZpoavn4hQumiY6gj04JF2'
+    getMonByName(firebase, '무장조')
+    .then(mon => {
+      const col = convertMonToCol(mon)
+      postCollection(firebase, uid, col, 'pick')
+    })
+  }
   render () {
     const { user, auth, messages, locale } = this.props
     const { pickCreditTimer, battleCreditTimer, adventureCreditTimer } = this.state
@@ -486,7 +497,7 @@ class Sidebar extends React.Component {
                 <Link to='/stage-management'><i><i className='fa fa-lock' style={{ fontSize: '18px' }} /></i> 스테이지관리</Link>
               </li>
               <li className='f-700'>
-                <i><i className='fa fa-lock' style={{ fontSize: '18px', cursor: 'pointer' }} onClick={this._handleOnClickUpdateCollection} /></i> 커스텀 스크립트
+                <i><i className='fa fa-lock' style={{ fontSize: '18px', cursor: 'pointer' }} onClick={this._setUserLeagues} /></i> 커스텀 스크립트
               </li>
               <li className='f-700'>
                 <i><i className='fa fa-lock' style={{ fontSize: '18px', cursor: 'pointer' }} onClick={this._handleOnClickClearLuckies} /></i> 럭키 청소
