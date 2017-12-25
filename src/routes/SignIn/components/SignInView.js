@@ -5,11 +5,13 @@ import { fromJS } from 'immutable'
 import validator from 'validator'
 import { toast } from 'react-toastify'
 
-import { signIn } from 'services/UserService'
+import { signIn, isDupEmail } from 'services/UserService'
 
 import { showAlert, getMsg, isScreenSize } from 'utils/commonUtil'
 
 import Button from 'components/Button'
+import CustomModal from 'components/CustomModal'
+import LabelInput from 'components/LabelInput'
 
 class SignInView extends React.Component {
   constructor (props) {
@@ -18,12 +20,14 @@ class SignInView extends React.Component {
       formData: {
         email: '',
         password: '',
-        remember: false
+        remember: false,
+        emailToFindPassword: ''
       },
       isSignInLoading: false,
       isGoogleLoading: false,
       isFacebookLoading: false,
-      showFindPasswordModal: false
+      showFindPasswordModal: false,
+      isFindPasswordLoading: false
     }
     this._handleOnChangeInput = this._handleOnChangeInput.bind(this)
     this._handleOnClickLogin = this._handleOnClickLogin.bind(this)
@@ -31,6 +35,8 @@ class SignInView extends React.Component {
     this._checkPasswordField = this._checkPasswordField.bind(this)
     this._loginProcess = this._loginProcess.bind(this)
     this._handleOnClickSignInWith = this._handleOnClickSignInWith.bind(this)
+    this._handleOnClickFindPassword = this._handleOnClickFindPassword.bind(this)
+    this._handleOnClickSendEmail = this._handleOnClickSendEmail.bind(this)
   }
   componentDidMount () {
     const { auth, user } = this.props
@@ -129,11 +135,29 @@ class SignInView extends React.Component {
     firebase.login({ provider })
   }
   _handleOnClickFindPassword () {
-    showFindPasswordModal: true
+    this.setState({ showFindPasswordModal: true })
+  }
+  _handleOnClickSendEmail () {
+    const { firebase } = this.props
+    const { formData } = this.state
+    this.setState({ isFindPasswordLoading: true })
+    isDupEmail(firebase, formData.emailToFindPassword)
+    .then(user => {
+      if (!user) return Promise.reject('가입된 이메일이 아닙니다.')
+      else return firebase.resetPassword(formData.emailToFindPassword)
+    })
+    .then(() => {
+      window.swal({ text: formData.emailToFindPassword + ' 주소로 이메일이 전송되었습니다.' })
+      this.setState({ showFindPasswordModal: false, isFindPasswordLoading: false })
+    })
+    .catch(msg => {
+      window.swal({ text: msg })
+      this.setState({ isFindPasswordLoading: false })
+    })
   }
   render () {
     const { messages, locale } = this.props
-    const { isSignInLoading, isGoogleLoading, isFacebookLoading } = this.state
+    const { isSignInLoading, isGoogleLoading, isFacebookLoading, showFindPasswordModal } = this.state
     return (
       <div className='text-center'
         style={{ backgroundColor: '#f3f3f3', height: `${300}px`, minHeight: '300px' }}>
@@ -184,12 +208,40 @@ class SignInView extends React.Component {
               <span>회원가입</span>
             </Link>
             <a data-ma-block='#l-forget-password' onClick={this._handleOnClickFindPassword}
-              style={{ background: 'rgba(0, 150, 136, 1)' }}>
+              style={{ background: 'rgba(0, 150, 136, 1)', cursor: 'pointer' }}>
               <i>?</i>
               <span>비밀번호찾기</span>
             </a>
           </div>
         </div>
+        <CustomModal
+          show={showFindPasswordModal}
+          close={() => this.setState({ showFindPasswordModal: false })}
+          title='비밀번호찾기'
+          id='findPasswordModal'
+          width={400}
+          bodyComponent={
+            <div className='form-horizontal m-t-30'>
+              <LabelInput
+                label='가입한 이메일주소'
+                id='emailToFindPassword'
+                name='emailToFindPassword'
+                type='text'
+                onChange={this._handleOnChangeInput}
+                value={this.state.formData.emailToFindPassword}
+                length={12}
+                fontSize='md'
+                floating
+              />
+            </div>
+          }
+          footerComponent={
+            <div>
+              <Button link text='닫기' onClick={() => this.setState({ showFindPasswordModal: false })} />
+              <Button text='메일보내기' loading={this.state.isFindPasswordLoading} disabled={!validator.isEmail(this.state.formData.emailToFindPassword)} onClick={this._handleOnClickSendEmail} icon='fa fa-envelope' />
+            </div>
+          }
+        />
       </div>
     )
   }

@@ -24,6 +24,7 @@ import User from 'models/user'
 
 import doctorOh from '../../Adventure/components/assets/doctor_oh.png'
 import woongImg from '../../../components/TutorialModal/assets/KakaoTalk_2017-12-21-11-30-42_Photo_14.png'
+import realWoongImg from '../../../components/TutorialModal/assets/KakaoTalk_Photo_2017-12-19-01-31-13.png'
 
 class BattleView extends React.Component {
   constructor (props) {
@@ -129,6 +130,8 @@ class BattleView extends React.Component {
       return Object.assign({}, new User(), { nickname: getMsg(messages.adventure.trainerName[0], locale), profileImage: doctorOh })
     } else if (user.stage <= 80) {
       return Object.assign({}, new User(), { nickname: getMsg(messages.adventure.trainerName[1], locale), profileImage: woongImg, enabledHonors: [{ burf: [5, 5, 5, 5, 5, 5], name: '특급트레이너', type: 1, id: '-L-MK6QhWji8QtK0kQ8Y', reward: 50, condition: 100 }] })
+    } else if (user.stage <= 100) {
+      return Object.assign({}, new User(), { nickname: getMsg(messages.adventure.trainerName[2], locale), profileImage: realWoongImg, enabledHonors: [{ burf: [10, 10, 10, 10, 10, 10], name: '초급짐리더', type: 1, id: '-L-MK6QhWji8QtK0kQ8Y', reward: 1500, condition: 3000 }, { burf: [0, 0, 0, 4, 0, 6], name: '바위애호가', type: 2, id: '-L-MK6QhWji8QtK0kQ8Y', attr: '바위', reward: 500, condition: 20 }] })
     }
   }
   _getEnemyPicksForAdventure () {

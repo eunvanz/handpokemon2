@@ -29,7 +29,6 @@ class AdventureView extends React.Component {
     this._handleOnClickNext = this._handleOnClickNext.bind(this)
     this._getTrainer = this._getTrainer.bind(this)
     this._getRewardName = this._getRewardName.bind(this)
-    this._getTrainerImg = this._getTrainerImg.bind(this)
     this._getRewardItem = this._getRewardItem.bind(this)
   }
   componentDidMount () {
@@ -63,13 +62,9 @@ class AdventureView extends React.Component {
     } else if (user.stage <= 80) {
       return Object.assign({}, new User(), { nickname: getMsg(messages.adventure.trainerName[1], locale), profileImage: woongImg, enabledHonors: [{ burf: [5, 5, 5, 5, 5, 5], name: '특급트레이너', type: 1, id: '-L-MK6QhWji8QtK0kQ8Y', reward: 50, condition: 100 }] })
     } else if (user.stage <= 100) {
-      return Object.assign({}, new User(), { nickname: getMsg(messages.adventure.trainerName[2], locale), profileImage: realWoongImg, enabledHonors: [{ burf: [10, 10, 10, 10, 10, 10], name: '초급짐리더', type: 1 }, { burf: [0, 0, 0, 4, 0, 6], name: '바위애호가', type: 2 }] })
+      return Object.assign({}, new User(), { nickname: getMsg(messages.adventure.trainerName[2], locale), profileImage: realWoongImg, enabledHonors: [{ burf: [10, 10, 10, 10, 10, 10], name: '초급짐리더', type: 1, id: '-L-MK6QhWji8QtK0kQ8Y', reward: 1500, condition: 3000 }, { burf: [0, 0, 0, 4, 0, 6], name: '바위애호가', type: 2, id: '-L-MK6QhWji8QtK0kQ8Y', attr: '바위', reward: 500, condition: 20 }] })
     }
-  }
-  _getTrainerImg (stage) {
-    if (stage <= 50) {
-      return doctorOh
-    }
+    // 추가시 BattleView에도 추가해야함
   }
   _handleOnClickNext () {
     this.context.router.push('/battle?type=adventure')
