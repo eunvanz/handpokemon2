@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import Helmet from 'react-helmet'
 import { fromJS, is } from 'immutable'
 import { compose } from 'recompose'
 import { firebaseConnect, dataToJS } from 'react-redux-firebase'
@@ -90,56 +89,6 @@ class CoreLayout extends React.Component {
     if (!releaseInfo) return <div>Checking Version...</div>
     return (
       <div>
-        <Helmet
-          title='Hand Pokémon'
-          link={[
-            {
-              'rel': 'stylesheet',
-              'type': 'text/css',
-              'href': '//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSans-kr.css'
-            },
-            {
-              'rel': 'stylesheet',
-              'href': '/vendors/bower_components/animate.css/animate.min.css'
-            },
-            {
-              'rel': 'stylesheet',
-              'href': '/vendors/bower_components/sweetalert2/dist/sweetalert2.min.css'
-            },
-            {
-              'rel': 'stylesheet',
-              'href': '/vendors/bower_components/material-design-iconic-font/dist/css/material-design-iconic-font.min.css'
-            },
-            {
-              'rel': 'stylesheet',
-              'href': '/vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css'
-            },
-            {
-              'rel': 'stylesheet',
-              'href': '/vendors/bower_components/nouislider/distribute/nouislider.min.css'
-            },
-            {
-              'rel': 'stylesheet',
-              'href': '/vendors/fontawesome/web-fonts-with-css/css/fontawesome-all.min.css'
-            },
-            {
-              'rel': 'stylesheet',
-              'href': 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.css'
-            },
-            {
-              'rel': 'stylesheet',
-              'href': 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick-theme.min.css'
-            },
-            {
-              'rel': 'stylesheet',
-              'href': '/css/inc/app_1.css'
-            },
-            {
-              'rel': 'stylesheet',
-              'href': '/css/inc/app_2.css'
-            }
-          ]}
-        />
         <Header />
         <section id='main'>
           <Sidebar messages={messages} locale={locale} />
