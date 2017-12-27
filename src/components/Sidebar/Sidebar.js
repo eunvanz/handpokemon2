@@ -299,10 +299,10 @@ class Sidebar extends React.Component {
   }
   _handleOnClickUpdateMon () {
     const { firebase } = this.props
-    const monId = '-L0LULd1hWG56-6-NbUA'
+    const monId = '-L0AwPJ7gKGijLIAoCaJ'
     getMonById(firebase, monId)
     .then(mon => {
-      mon.next = ['-L0tcQcm_ugDcEhllbgz']
+      mon.next = ['-L18CqQdBUpdq6I4qWQj']
       console.log('updatedMon', mon)
       updateMon(firebase, mon)
     })
@@ -497,7 +497,7 @@ class Sidebar extends React.Component {
                 <Link to='/stage-management'><i><i className='fa fa-lock' style={{ fontSize: '18px' }} /></i> 스테이지관리</Link>
               </li>
               <li className='f-700'>
-                <i><i className='fa fa-lock' style={{ fontSize: '18px', cursor: 'pointer' }} onClick={this._setUserLeagues} /></i> 커스텀 스크립트
+                <i><i className='fa fa-lock' style={{ fontSize: '18px', cursor: 'pointer' }} onClick={this._handleOnClickUpdatePokemoney} /></i> 커스텀 스크립트
               </li>
               <li className='f-700'>
                 <i><i className='fa fa-lock' style={{ fontSize: '18px', cursor: 'pointer' }} onClick={this._handleOnClickClearLuckies} /></i> 럭키 청소

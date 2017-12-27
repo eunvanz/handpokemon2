@@ -154,7 +154,7 @@ export default class Battle {
     if (pct > 0.85) {
       const restPct = pct - 0.85
       pct = 0.85
-      if (_.random(0.0, 1.0) < restPct) pct = 1
+      if (_.random(0.001, 0.999) < restPct) pct = 1
     }
     return pct
   }
