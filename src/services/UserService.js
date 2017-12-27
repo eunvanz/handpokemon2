@@ -223,7 +223,7 @@ export const getUserRanking = (firebase, type, page, prevPoint, prevKey) => {
     const result = []
     snapshot.forEach(child => {
       const user = child.val()
-      if (!user.colRank || !user.leagueRank) return
+      if (!user.nickname || !user.colRank || !user.leagueRank) return
       user.id = child.key
       if (user.id === 'null' || user.id === 'undefined') return // 임시조치임. 실제로 이렇게 세팅하는 부분 찾아서 수정해야함
       result.push(user)
@@ -242,7 +242,7 @@ export const getUserRankingByUserId = (firebase, type, userId) => { // update겸
     snapshot.forEach(child => {
       const user = child.val()
       user.id = child.key
-      if (user.id === 'null' || user.id === 'undefined') return
+      if (user.id === 'null' || user.id === 'undefined' || !user.nickname) return
       result.push(user)
     })
     const reversed = _.reverse(result)
