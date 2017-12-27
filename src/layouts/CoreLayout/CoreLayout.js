@@ -12,6 +12,8 @@ import Sidebar from 'components/Sidebar'
 import Footer from 'components/Footer'
 import UserModal from 'components/UserModal'
 import TutorialModal from 'components/TutorialModal'
+import Loading from 'components/Loading'
+import CenterMidContainer from 'components/CenterMidContainer'
 
 import withAuth from 'hocs/withAuth'
 import withIntl from 'hocs/withIntl'
@@ -86,7 +88,7 @@ class CoreLayout extends React.Component {
   }
   render () {
     const { children, messages, locale, userModal, closeUserModal, releaseInfo, tutorialModal } = this.props
-    if (!releaseInfo) return <div>Checking Version...</div>
+    if (!releaseInfo) return <div id='parent' style={{ height: `${window.innerHeight}px` }}><CenterMidContainer rootId='parent' clear bodyComponent={<Loading text='Checking Version...' />}></CenterMidContainer></div>
     return (
       <div>
         <Header />
