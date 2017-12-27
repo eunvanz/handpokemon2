@@ -416,7 +416,7 @@ class Sidebar extends React.Component {
             console.log('levelDownCol', levelDownCol)
             updateCollection(firebase, levelDownCol)
             .then(() => {
-              const item = allItems.filter(item => item.grades[0] === col.mon[col.monId].grade)[0]
+              const item = allItems.filter(item => item.grades && item.grades[0] === col.mon[col.monId].grade)[0]
               console.log('item', item)
               console.log('col.userId', col.userId)
               updateUserInventory(firebase, col.userId, item, 'save', numberToDown)
