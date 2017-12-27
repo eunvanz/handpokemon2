@@ -81,7 +81,7 @@ class MonCard extends React.Component {
   render () {
     const { mon, pick, className, type, isSelectable, onUnselect, isToggleable, isSelected, noMonOfTheMatch, blinkInfo,
       isNotMine, firebase, showStatusBadge, isDummy, onClickShield, onClickSetDefenderBtn, blinkMix, blinkCost, blinkRank,
-      isCustomSize, disableChangeBtn, user, kills, point, isMom, locale, messages, dispatch, ...restProps } = this.props
+      isCustomSize, disableChangeBtn, user, kills, point, isMom, locale, messages, dispatch, showBattery, ...restProps } = this.props
     const tobeMon = mon ? mon.tobe : null
     const renderSetDefenderBtn = () => {
       return <Button
@@ -136,6 +136,10 @@ class MonCard extends React.Component {
             {
               showStatusBadge &&
               <StatusBadge icon='zmdi zmdi-shield-check' side='left' isActive={tobeMon.isDefender} activeColor={colors.cyan} onClick={this._handleOnClickShield} />
+            }
+            {
+              showBattery &&
+              <StatusBadge icon={`far fa-battery-${tobeMon.battery === 0 ? 'empty' : tobeMon.battery === 1 ? 'half' : 'full'}`} side='left' isActive activeColor={tobeMon.battery === 0 ? colors.red : tobeMon.battery === 1 ? colors.orange : colors.green} onClick={this._handleOnClickShield} />
             }
             {
               showStatusBadge &&
@@ -209,7 +213,8 @@ MonCard.propTypes = {
   noMonOfTheMatch: PropTypes.bool,
   blinkMix: PropTypes.bool,
   blinkCost: PropTypes.bool,
-  blinkRank: PropTypes.bool
+  blinkRank: PropTypes.bool,
+  showBattery: PropTypes.bool
 }
 
 export default compose(firebaseConnect(), withIntl)(MonCard)

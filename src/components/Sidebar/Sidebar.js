@@ -20,7 +20,8 @@ import { refreshUserCredits, updateUserIndexes, updateUserPokemoney, getAllUser,
 import { postHonor } from 'services/HonorService'
 import { updateMon, getMonById, getMonByName } from 'services/MonService'
 import { postItem } from 'services/ItemService'
-import { getCollectionsRefUserIdAndMonId, getUpdateColObj, setDefendersToMaxCostByUserId, postCollection } from 'services/CollectionService'
+import { getCollectionsRefUserIdAndMonId, getUpdateColObj, setDefendersToMaxCostByUserId, postCollection,
+  getAllCollections, updateCollection } from 'services/CollectionService'
 import { clearLucky } from 'services/LuckyService'
 
 import { convertTimeToMMSS, getAuthUserFromFirebase, getMsg, getThumbnailImageUrl, updater, getLeague } from 'utils/commonUtil'
@@ -50,6 +51,7 @@ class Sidebar extends React.Component {
     this._setUserLeagues = this._setUserLeagues.bind(this)
     this._handleOnClickClearLuckies = this._handleOnClickClearLuckies.bind(this)
     this._postCollection = this._postCollection.bind(this)
+    this._updateCollections = this._updateCollections.bind(this)
     this.state = {
       pickCreditTimer: null,
       battleCreditTimer: null,
@@ -252,19 +254,19 @@ class Sidebar extends React.Component {
     firebase.remove('userCollections')
   }
   _handleOnClickUpdatePokemoney () {
-    console.log('started')
-    const { firebase } = this.props
-    getAllUser(firebase)
-    .then(users => {
-      console.log('users', users)
-      users.forEach(user => {
-        console.log('user.pokemoney', user.pokemoney)
-        if (user.pokemoney === 0) {
-          console.log(user)
-          updateUserPokemoney(firebase, user.id, 200)
-        }
-      })
-    })
+    // console.log('started')
+    // const { firebase } = this.props
+    // getAllUser(firebase)
+    // .then(users => {
+    //   console.log('users', users)
+    //   users.forEach(user => {
+    //     console.log('user.pokemoney', user.pokemoney)
+    //     if (user.pokemoney !== 0) {
+    //       console.log(user)
+    //       updateUserPokemoney(firebase, user.id, 200)
+    //     }
+    //   })
+    // })
   }
   _handleOnClickUpdateCollection () {
     // const { firebase } = this.props
@@ -363,6 +365,16 @@ class Sidebar extends React.Component {
     .then(mon => {
       const col = convertMonToCol(mon)
       postCollection(firebase, uid, col, 'pick')
+    })
+  }
+  _updateCollections () {
+    const { firebase } = this.props
+    getAllCollections(firebase)
+    .then(collections => {
+      collections.forEach(col => {
+        const newCol = Object.assign({}, col, { battery: 2 })
+        updateCollection(firebase, newCol)
+      })
     })
   }
   render () {
@@ -497,7 +509,7 @@ class Sidebar extends React.Component {
                 <Link to='/stage-management'><i><i className='fa fa-lock' style={{ fontSize: '18px' }} /></i> 스테이지관리</Link>
               </li>
               <li className='f-700'>
-                <i><i className='fa fa-lock' style={{ fontSize: '18px', cursor: 'pointer' }} onClick={this._handleOnClickUpdatePokemoney} /></i> 커스텀 스크립트
+                <i><i className='fa fa-lock' style={{ fontSize: '18px', cursor: 'pointer' }} onClick={this._updateCollections} /></i> 커스텀 스크립트
               </li>
               <li className='f-700'>
                 <i><i className='fa fa-lock' style={{ fontSize: '18px', cursor: 'pointer' }} onClick={this._handleOnClickClearLuckies} /></i> 럭키 청소

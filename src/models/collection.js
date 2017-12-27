@@ -23,7 +23,7 @@ export const collection = {
   weight: 0,
   isDefender: false,
   isFavorite: false,
-  status: 2 // 0: 휴식중, 1: 회복중, 2: 출전가능
+  battery: 2 // 0: 휴식중, 1: 회복중, 2: 출전가능
 }
 
 export default collection

@@ -228,8 +228,17 @@ class ChoosePick extends React.Component {
     this.setState({ showFilterModal: false, sortedCollections: filteredCollections })
   }
   _handleOnSelectMon (col) {
+    const { isAdventure } = this.props
     const { currentCost, chosenPick, maxCost } = this.state
     const newCost = currentCost + col.mon[col.monId].cost
+    if (!isAdventure && col.battery < 2) {
+      return window.swal({
+        confirmButtonText: '확인',
+        title: 'Zzz..',
+        text: '회복이 필요한 포켓몬입니다.',
+        type: 'error'
+      })
+    }
     if (newCost > maxCost) {
       return window.swal({ text: '최대 코스트 초과입니다.' })
     }
@@ -250,12 +259,12 @@ class ChoosePick extends React.Component {
     if (pick.length === 3) return this.setState({ sortedCollections: pick })
     const { collections } = this.props
     const { maxCost } = this.state
-    const adjustCollections = collections.map(col => Object.assign({}, col, { totalIdx: col.total + col.addedTotal }, { isChosen: _.find(pick, p => col.id === p.id) != undefined }))
+    const adjustCollections = collections.map(col => Object.assign({}, col, { totalIdx: col.total + col.addedTotal, battery: col.battery == undefined ? 2 : col.battery }, { isChosen: _.find(pick, p => col.id === p.id) != undefined }))
     let originCollections
     if (isDefenseMode) {
       originCollections = _.orderBy(adjustCollections, ['isChosen', 'isFavorite', 'totalIdx'], ['desc', 'desc', 'desc'])
     } else {
-      originCollections = _.orderBy(isAdventure ? adjustCollections : adjustCollections.filter(c => !c.isDefender), ['isChosen', 'isFavorite', 'totalIdx'], ['desc', 'desc', 'desc'])
+      originCollections = _.orderBy(isAdventure ? adjustCollections : adjustCollections.filter(c => !c.isDefender), isAdventure ? ['isChosen', 'isFavorite', 'totalIdx'] : ['isChosen', 'isFavorite', 'battery', 'totalIdx'], isAdventure ? ['desc', 'desc', 'desc'] : ['desc', 'desc', 'desc', 'desc'])
     }
     const restPick = 2 - pick.length
     const availableCost = maxCost - cost - restPick
@@ -325,7 +334,7 @@ class ChoosePick extends React.Component {
     this.setState({ filterCollapse: Object.assign({}, filterCollapse, { [key]: !filterCollapse[key] }) })
   }
   render () {
-    const { user, messages, locale, isDefenseMode } = this.props
+    const { user, messages, locale, isDefenseMode, isAdventure } = this.props
     const { currentCost, maxCost, sortedCollections, chosenPick, filterCollapse, filter, isLoading } = this.state
     const renderFilterBody = () => {
       const grades = {
@@ -453,6 +462,7 @@ class ChoosePick extends React.Component {
                   onUnselect={() => this._handleOnUnselectMon(col)} user={user}
                   isSelected={this._findColInChosenPick(col) != null}
                   key={col.id} mon={{ asis: null, tobe: col }} type='collection'
+                  showBattery={!isAdventure}
                   locale={locale} messages={messages}
                 />
               )

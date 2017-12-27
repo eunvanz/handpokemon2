@@ -34,6 +34,14 @@ export const getCollectionsByUserId = (firebase, userId) => {
   })
 }
 
+export const getAllCollections = (firebase) => {
+  return firebase.ref('collections').once('value')
+  .then(snapshot => {
+    const collections = convertMapToArr(snapshot.val())
+    return Promise.resolve(collections)
+  })
+}
+
 export const updateCollection = (firebase, col) => {
   const updateObj = {
     [`collections/${col.id}`]: col,

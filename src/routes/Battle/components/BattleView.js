@@ -17,9 +17,9 @@ import Pick from 'bizs/Pick'
 
 import { setUserPath, updateUserToLose, decreaseCredit, updateUserToWin,
   getUserRankingByUserId, getAllUser } from 'services/UserService'
-import { updateIsDefender, setDefendersToMaxCostByUserId } from 'services/CollectionService'
+import { updateIsDefender, setDefendersToMaxCostByUserId, getUpdateColObj } from 'services/CollectionService'
 
-import { getMsg, getLeague } from 'utils/commonUtil'
+import { getMsg, getLeague, updater } from 'utils/commonUtil'
 
 import User from 'models/user'
 
@@ -75,7 +75,7 @@ class BattleView extends React.Component {
   }
   _handleOnClickPickNext (userPick) {
     const { isAdventure } = this.state
-    const { setUserPicks, firebase, auth, fetchCandidates, messages, locale, user, setEnemyPicks } = this.props
+    const { setUserPicks, firebase, auth, fetchCandidates, messages, locale, user, setEnemyPicks, userCollections } = this.props
     return decreaseCredit(firebase, auth.uid, 1, isAdventure ? 'adventure' : 'battle')
     .then(() => {
       return !isAdventure ? updateUserToLose(firebase, auth.uid, 'attackLose', 5) : Promise.resolve()
@@ -102,6 +102,23 @@ class BattleView extends React.Component {
       }
       this.setState(state)
       return Promise.resolve()
+    })
+    .then(() => {
+      if (!isAdventure) {
+        const noBatteryCollections = userCollections.filter(col => col.battery === 1 || col.battery === 0)
+        let updateObj = {}
+        userPick.forEach(col => {
+          const newCol = Object.assign({}, col, { battery : 0 })
+          updateObj = Object.assign({}, updateObj, getUpdateColObj(newCol))
+        })
+        noBatteryCollections.forEach(col => {
+          const newCol = Object.assign({}, col, { battery: col.battery + 1 })
+          updateObj = Object.assign({}, updateObj, getUpdateColObj(newCol))
+        })
+        return updater(firebase, updateObj)
+      } else {
+        return Promise.resolve()
+      }
     })
     .catch(msg => {
       window.swal({ text: `${getMsg(messages.common.fail, locale)} - ${msg}` })
