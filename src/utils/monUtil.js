@@ -4,6 +4,8 @@ import collection from 'models/collection'
 import _ from 'lodash'
 import { fromJS } from 'immutable'
 
+import { MAX_ADD_BY_COLPOINT, MAX_ADD_BY_GRADE } from 'constants/rules'
+
 export const getMonImage = mon => {
   if (mon.mon && mon.mon[mon.monId]) {
     return mon.mon[mon.monId].monImage.filter(monImage => mon.imageSeq === monImage.seq)[0]
@@ -143,4 +145,20 @@ export const mergePickResults = pickArr => {
     }
   })
   return result
+}
+
+export const isMaxLevel = (col, user) => {
+  const maxByGrade = MAX_ADD_BY_GRADE[col.mon[col.monId].grade]
+  const points = Object.keys(MAX_ADD_BY_COLPOINT)
+  let point = points[0]
+  for (let i = 0; i < points.length; i++) {
+    if (user.colPoint < Number(points[i])) {
+      point = points[i]
+      break
+    }
+  }
+  const maxByColPoint = MAX_ADD_BY_COLPOINT[point]
+  const maxAdd = maxByGrade + maxByColPoint
+  if (maxAdd < col.addedTotal + col.mon[col.monId].point) return true
+  return false
 }

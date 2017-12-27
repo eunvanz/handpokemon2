@@ -15,7 +15,7 @@ import LabelBadge from '../LabelBadge'
 import StatusBadge from '../StatusBadge'
 import Button from '../Button'
 
-import { getMonImage } from 'utils/monUtil'
+import { getMonImage, isMaxLevel } from 'utils/monUtil'
 
 import { toggleFavorite } from 'services/CollectionService'
 
@@ -28,12 +28,13 @@ import withIntl from 'hocs/withIntl'
 class MonCard extends React.Component {
   constructor (props) {
     super(props)
-    const { mon } = props
+    const { mon, user } = props
     const tobeMon = mon ? mon.tobe : null
     this.state = {
       showMonModal: false,
       isSelected: props.isSelected || false,
-      isFavorite: tobeMon ? tobeMon.isFavorite : false
+      isFavorite: tobeMon ? tobeMon.isFavorite : false,
+      isMaxLevel: tobeMon && tobeMon.level && user ? isMaxLevel(tobeMon, user) : false
     }
     this._showMonModal = this._showMonModal.bind(this)
     this._handleOnSelect = this._handleOnSelect.bind(this)
@@ -92,6 +93,7 @@ class MonCard extends React.Component {
     const { mon, pick, className, type, isSelectable, onUnselect, isToggleable, isSelected, noMonOfTheMatch, blinkInfo,
       isNotMine, firebase, showStatusBadge, isDummy, onClickShield, onClickSetDefenderBtn, blinkMix, blinkCost, blinkRank,
       isCustomSize, disableChangeBtn, user, kills, point, isMom, locale, messages, dispatch, showBattery, ...restProps } = this.props
+    const { isMaxLevel } = this.state
     const tobeMon = mon ? mon.tobe : null
     const renderSetDefenderBtn = () => {
       return <Button
@@ -109,7 +111,7 @@ class MonCard extends React.Component {
       if (mon.asis) {
         // 레벨 업 시
         return <div className='text-center m-b-30' style={{ height: '60px' }}>
-          <MonLevel level={mon.asis.level} style={{ backgroundColor: colors.gray }} /> <i className='fa fa-long-arrow-right c-gray' /> <MonLevel level={mon.tobe.level} style={{ fontSize: 'small' }} />
+          <MonLevel level={mon.asis.level} style={{ backgroundColor: colors.gray }} /> <i className='fa fa-long-arrow-right c-gray' /> <MonLevel level={mon.tobe.level} style={{ fontSize: 'small' }} isMaxLevel={mon.tobe, user} />
           <p className='m-t-5'>레벨 <span className='c-lightblue f-700'>+{mon.tobe.level - mon.asis.level}</span></p>
         </div>
       } else {
@@ -124,7 +126,7 @@ class MonCard extends React.Component {
       <div className={`${isCustomSize ? '' : 'col-md-2 col-sm-3 col-xs-6'} text-left ${className || ''}${blinkMix ? ' blink-opacity' : ''}`} {...restProps}
         style={{ padding: '0px 5px' }} onClick={isSelectable ? (this.state.isSelected ? this._handleOnUnselect : this._handleOnSelect) : this._showMonModal}
       >
-        {!isDummy && (type === 'collection' || type === 'defender') && <MonLevel level={tobeMon.level}
+        {!isDummy && (type === 'collection' || type === 'defender') && <MonLevel level={tobeMon.level} isMaxLevel={isMaxLevel}
           style={{ position: 'absolute', top: '0px', borderRadius: '0px 0px 2px 0px', backgroundColor: tobeMon.level >= (tobeMon.mon[tobeMon.monId].evoLv === 0 ? 99999 : tobeMon.mon[tobeMon.monId].evoLv) ? colors.deepOrange : colors.lightBlue }} />}
         <div className='text-right' style={{ marginRight: '18px' }}>
           {!isDummy && (type === 'collection' || type === 'defender') && <MonRank rank={tobeMon.rank} style={{ borderRadius: '0px 0px 0px 2px' }} blink={blinkRank} />}
@@ -182,7 +184,7 @@ class MonCard extends React.Component {
           pick &&
           renderLevelUpInfo()
         }
-        { !isDummy && <MonModal locale={locale} mon={mon} type={this.props.type} show={this.state.showMonModal} isNotMine={isNotMine} user={user} blinkMix={blinkMix}
+        { !isDummy && <MonModal locale={locale} mon={mon} type={this.props.type} show={this.state.showMonModal} isNotMine={isNotMine} user={user} blinkMix={blinkMix} isMaxLevel={isMaxLevel}
           close={() => this.setState({ showMonModal: false })} />
         }
         {

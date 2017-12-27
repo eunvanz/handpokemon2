@@ -3,13 +3,14 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import keygen from 'keygenerator'
 import shallowCompare from 'react-addons-shallow-compare'
-import { browserHistory } from 'react-router'
+import { browserHistory, Link } from 'react-router'
 
 import CustomModal from 'components/CustomModal'
 import Button from 'components/Button'
 import MonLevel from 'components/MonLevel'
 import MonInfo from 'components/MonInfo'
 import Img from 'components/Img'
+import Info from 'components/Info'
 
 import { getMonImage } from 'utils/monUtil'
 import { showAlert } from 'utils/commonUtil'
@@ -84,13 +85,13 @@ class MonModal extends React.Component {
     })
   }
   render () {
-    const { mon, show, close, type, updatePickMonInfo, pickMonInfo, isNotMine, user, locale, blinkMix, ...restProps } = this.props
+    const { mon, show, close, type, updatePickMonInfo, pickMonInfo, isNotMine, user, locale, blinkMix, isMaxLevel, ...restProps } = this.props
     const tobeMon = mon.tobe
     const renderLevel = () => {
       if (mon.asis) {
         return (
           <div className='text-center m-b-30' style={{ height: '60px' }}>
-            <MonLevel level={mon.asis.level} style={{ backgroundColor: colors.gray }} /> <i className='fa fa-long-arrow-right c-gray' /> <MonLevel level={mon.tobe.level} style={{ fontSize: 'small' }} />
+            <MonLevel level={mon.asis.level} style={{ backgroundColor: colors.gray }} /> <i className='fa fa-long-arrow-right c-gray' /> <MonLevel level={mon.tobe.level} style={{ fontSize: 'small' }} isMaxLevel={isMaxLevel} />
             {
             !isNotMine &&
             <div className='m-t-15'>
@@ -106,7 +107,7 @@ class MonModal extends React.Component {
       }
       return (
         <div>
-          <MonLevel level={tobeMon.level} />
+          <MonLevel level={tobeMon.level} isMaxLevel={isMaxLevel} /> {isMaxLevel && <Info id='maxLevelInfo' title='최대레벨' content={<div>현재 포켓몬이 최대레벨에 도달했습니다. 콜렉션 점수가 높으면 높을수록 최대레벨 한도도 올라갑니다. 자세한 사항은 <Link to='/board-list/guide/-L1Nv0pE3BopkKsqQDRH'>이곳</Link>을 참조해주세요.</div>} />}
           {
             !isNotMine && type !== 'defender' &&
             <div className='m-t-15'>
@@ -174,7 +175,8 @@ MonModal.propTypes = {
   isNotMine: PropTypes.bool,
   user: PropTypes.object,
   locale: PropTypes.string,
-  blinkMix: PropTypes.bool
+  blinkMix: PropTypes.bool,
+  isMaxLevel: PropTypes.bool
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(MonModal)
