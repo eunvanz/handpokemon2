@@ -151,10 +151,13 @@ export default class Battle {
   }
   _getArmorPct (armor, dex) {
     let pct = 0.001 + armor * 0.0035 + dex * 0.0005
-    if (pct > 0.85) {
+    const armorIdx = _.random(0, 100)
+    if (armorIdx < armor * 0.1) pct = 1
+    if (pct < 1 && pct > 0.85) {
       const restPct = pct - 0.85
       pct = 0.85
-      if (_.random(0.001, 0.999) < restPct) pct = 1
+      const restPctIdx = _.random(0.001, 0.999)
+      if (restPctIdx < restPct) pct = 1
     }
     return pct
   }

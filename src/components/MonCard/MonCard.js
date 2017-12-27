@@ -111,7 +111,7 @@ class MonCard extends React.Component {
       if (mon.asis) {
         // 레벨 업 시
         return <div className='text-center m-b-30' style={{ height: '60px' }}>
-          <MonLevel level={mon.asis.level} style={{ backgroundColor: colors.gray }} /> <i className='fa fa-long-arrow-right c-gray' /> <MonLevel level={mon.tobe.level} style={{ fontSize: 'small' }} isMaxLevel={mon.tobe, user} />
+          <MonLevel level={mon.asis.level} style={{ backgroundColor: colors.gray }} /> <i className='fa fa-long-arrow-right c-gray' /> <MonLevel level={mon.tobe.level} style={{ fontSize: 'small' }} isMaxLevel={isMaxLevel} />
           <p className='m-t-5'>레벨 <span className='c-lightblue f-700'>+{mon.tobe.level - mon.asis.level}</span></p>
         </div>
       } else {
