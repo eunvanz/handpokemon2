@@ -83,6 +83,7 @@ class Roulette extends React.Component {
     })
   }
   _startRoulette () {
+    const { mon } = this.props
     const $ = window.$
     if ($(`#${this.props.id} img`).length < this.props.images.length) {
       setTimeout(() => this._startRoulette(), 500)
@@ -93,6 +94,13 @@ class Roulette extends React.Component {
         stopImageNumber: this.props.stopIdx,
         stopCallback: () => {
           this.setState({ isStopped: true, stop: true })
+          if (mon.maxLevel) {
+            window.swal({
+              title: '최대레벨',
+              text: `이미 ${mon.tobe.mon[mon.tobe.monId].name.ko}이(가) 최대레벨에 도달했으므로 ${mon.tobe.mon[mon.tobe.monId].point}P를 획득했습니다.`,
+              type: 'success'
+            })
+          }
         }
       }
       $(`#${this.props.id}`).roulette(option).delay(this.props.delay || 0).roulette('start')

@@ -4,7 +4,7 @@ import { fromJS, is } from 'immutable'
 import { compose } from 'recompose'
 import { firebaseConnect, dataToJS } from 'react-redux-firebase'
 import { connect } from 'react-redux'
-import { ToastContainer, toast } from 'react-toastify'
+import { ToastContainer, toast, style } from 'react-toastify'
 import { sortBy } from 'lodash'
 
 import Header from 'components/Header'
@@ -26,6 +26,11 @@ import { convertMapToArr, showAlert, isOlderVersion, getMsg } from 'utils/common
 import { setUserPath } from 'services/UserService'
 
 import { VERSION } from 'constants/release'
+
+style({
+  colorDefault: '#323232',
+  colorProgressDefault: 'rgba(255, 255, 255, 0.5)'
+})
 
 const mapStateToProps = state => ({
   userModal: state.userModal,

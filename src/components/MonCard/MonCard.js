@@ -41,6 +41,16 @@ class MonCard extends React.Component {
     this._handleOnClickFavorite = this._handleOnClickFavorite.bind(this)
     this._handleOnClickShield = this._handleOnClickShield.bind(this)
   }
+  componentDidMount () {
+    const { mon } = this.props
+    if (mon.maxLevel) {
+      window.swal({
+        title: '최대레벨',
+        text: `이미 ${mon.tobe.mon[mon.tobe.monId].name.ko}이(가) 최대레벨에 도달했으므로 ${mon.tobe.mon[mon.tobe.monId].point}P를 획득했습니다.`,
+        type: 'success'
+      })
+    }
+  }
   componentDidUpdate (prevProps, prevState) {
     if (prevProps.isSelected !== this.props.isSelected) {
       this.setState({ isSelected: this.props.isSelected })

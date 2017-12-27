@@ -3,12 +3,12 @@ import { convertMapToArr, updater, convertNumberToStringForIndex } from 'utils/c
 import keygen from 'keygenerator'
 import { sortBy, orderBy } from 'lodash'
 
-import { getUserByUserId } from './UserService'
+import { getUserByUserId, updateUserPokemoney } from './UserService'
 import { postLucky } from './LuckyService'
 
 import Lucky from 'models/lucky'
 
-import { LEAGUE } from 'constants/rules'
+import { LEAGUE, MAX_ADD_BY_GRADE, MAX_ADD_BY_COLPOINT } from 'constants/rules'
 
 export const getCollectionsRefUserIdAndMonId = (firebase, userId, monId) => {
   return firebase.ref(`userCollections/${userId}`).once('value') // 사용자의 콜렉션 가져옴
@@ -98,7 +98,7 @@ const getResolveLevelDownObj = (firebase, srcCol, type, asisPoint, leaguePoint) 
   }
 }
 
-export const postCollection = (firebase, userId, collection, type, srcCols) => {
+export const postCollection = (firebase, userId, collection, type, srcCols, colPoint) => {
   let updateObj = {}
   const collectionMon = collection.mon[collection.monId]
   let asis = null
@@ -109,6 +109,7 @@ export const postCollection = (firebase, userId, collection, type, srcCols) => {
   let isError = false
   let user
   let lucky = null
+  let maxLevel = false
   if (type === 'evolution' || type === 'mix') {
     const proms = srcCols.map(srcCol => {
       return () => firebase.ref(`collections/${srcCol.id}/level`).transaction(asisLevel => {
@@ -168,6 +169,26 @@ export const postCollection = (firebase, userId, collection, type, srcCols) => {
         asis = snap.val()
       })
       tobe = levelUpCollection(asis)
+      // tobe가 최대 레벨을 넘어갈 경우 체크
+      const maxByGrade = MAX_ADD_BY_GRADE[tobe.mon[tobe.monId].grade]
+      const points = Object.keys(MAX_ADD_BY_COLPOINT)
+      let point = points[0]
+      for (let i = 0; i < points.length; i++) {
+        if (colPoint < Number(points[i])) {
+          point = points[i]
+          break
+        }
+      }
+      const maxByColPoint = MAX_ADD_BY_COLPOINT[point]
+      if (tobe.addedTotal > maxByColPoint + maxByGrade) {
+        // 최대치를 넘어설 경우 포키머니를 증가시키고 reject
+        maxLevel = true
+        return updateUserPokemoney(firebase, userId, tobe.mon[tobe.monId].point)
+        .then(() => {
+          tobe = asis
+          return Promise.resolve()
+        })
+      }
       // collections와 userCollections 다중 업데이트
       const updateColObj = {
         [`collections/${colId}`]: tobe,
@@ -218,7 +239,7 @@ export const postCollection = (firebase, userId, collection, type, srcCols) => {
     .then(() => lucky ? postLucky(firebase, lucky) : Promise.resolve())
   })
   .then(() => {
-    return Promise.resolve({ asis, tobe })
+    return Promise.resolve({ asis, tobe, maxLevel })
   })
   .catch(msg => {
     return Promise.reject(msg)

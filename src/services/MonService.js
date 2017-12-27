@@ -107,13 +107,13 @@ export const getPickMons = (firebase, attrs, grades, mixCols) => {
   }
 }
 
-export const getNextMons = (firebase, evoluteCol, uid) => {
+export const getNextMons = (firebase, evoluteCol, uid, colPoint) => {
   // 토중몬이 진화하는 경우 몰래 껍질몬 추가
   if (evoluteCol.mon[evoluteCol.monId].name.ko === '토중몬') {
     getMonByName(firebase, '껍질몬')
     .then(mon => {
       const col = convertMonToCol(mon)
-      postCollection(firebase, uid, col, 'pick')
+      postCollection(firebase, uid, col, 'pick', null, colPoint)
     })
   }
   const nextIds = _.compact(evoluteCol.mon[evoluteCol.monId].next)

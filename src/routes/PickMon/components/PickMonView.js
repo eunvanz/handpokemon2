@@ -147,7 +147,7 @@ class PickMonView extends React.Component {
         if (quantity === 1) {
           const picks = pickedMons[0]
           const pickedIdx = _.random(0, picks.length - 1)
-          return postCollection(firebase, auth.uid, picks[pickedIdx], 'pick')
+          return postCollection(firebase, auth.uid, picks[pickedIdx], 'pick', null, user.colPoint)
             .then(result => {
               if (user.disableRoulette) {
                 this.setState({ multiPicks: [result] })
@@ -188,7 +188,7 @@ class PickMonView extends React.Component {
       getPickMons(firebase, allAttrs, getMixGrades(mixCols), mixCols) // 마지막 파라미터는 특정 포켓몬 교배 처리를 위함
       .then(picks => {
         const pickedIdx = _.random(0, picks.length - 1)
-        return postCollection(firebase, auth.uid, picks[pickedIdx], 'mix', mixCols)
+        return postCollection(firebase, auth.uid, picks[pickedIdx], 'mix', mixCols, user.colPoint)
         .then(result => {
           if (user.disableRoulette) {
             this.setState({ multiPicks: [result] })
@@ -206,12 +206,12 @@ class PickMonView extends React.Component {
       //     })
       // })
     } else if (evoluteCol) { // 진화일때
-      getNextMons(firebase, evoluteCol, auth.uid)
+      getNextMons(firebase, evoluteCol, auth.uid, user.colPoint)
       .then(nextMons => {
         const picks = _.compact(nextMons)
         if (picks.length > 1) { // 진화체가 여러개일 경우 단건채집과 같은방식으로 진행
           const pickedIdx = _.random(0, picks.length - 1)
-          return postCollection(firebase, auth.uid, picks[pickedIdx], 'evolution', [evoluteCol])
+          return postCollection(firebase, auth.uid, picks[pickedIdx], 'evolution', [evoluteCol], user.colPoint)
           .then(result => {
             this.setState({ picks, pickedIdx, result })
             return Promise.resolve()

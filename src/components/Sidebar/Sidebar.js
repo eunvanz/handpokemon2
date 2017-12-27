@@ -11,21 +11,23 @@ import { compose } from 'recompose'
 
 import { DEFAULT_PROFILE_IMAGE_URL } from 'constants/urls'
 import { PICK_CREDIT_REFRESH, BATTLE_CREDIT_REFRESH, ADVENTURE_CREDIT_REFRESH,
-  MAX_PICK_CREDIT, MAX_BATTLE_CREDIT, MAX_ADVENTURE_CREDIT } from 'constants/rules'
+  MAX_PICK_CREDIT, MAX_BATTLE_CREDIT, MAX_ADVENTURE_CREDIT, MAX_ADD_BY_GRADE, MAX_ADD_BY_COLPOINT } from 'constants/rules'
 import { honors, items } from 'constants/data'
 
 import Badge from 'components/Badge'
 
-import { refreshUserCredits, updateUserIndexes, updateUserPokemoney, getAllUser, setUserPath, getUserByUserId, getUserRankingByUserId } from 'services/UserService'
+import { refreshUserCredits, updateUserIndexes, updateUserPokemoney, getAllUser, setUserPath, getUserByUserId,
+  getUserRankingByUserId, updateUserInventory } from 'services/UserService'
 import { postHonor } from 'services/HonorService'
 import { updateMon, getMonById, getMonByName } from 'services/MonService'
 import { postItem } from 'services/ItemService'
 import { getCollectionsRefUserIdAndMonId, getUpdateColObj, setDefendersToMaxCostByUserId, postCollection,
   getAllCollections, updateCollection } from 'services/CollectionService'
 import { clearLucky } from 'services/LuckyService'
+import { getAllItems } from 'services/ItemService'
 
 import { convertTimeToMMSS, getAuthUserFromFirebase, getMsg, getThumbnailImageUrl, updater, getLeague } from 'utils/commonUtil'
-import { convertMonToCol } from 'utils/monUtil'
+import { convertMonToCol, levelDownCollection } from 'utils/monUtil'
 
 import { receiveCreditInfo } from 'store/creditInfo'
 import { setTutorialModal } from 'store/tutorialModal'
@@ -52,6 +54,8 @@ class Sidebar extends React.Component {
     this._handleOnClickClearLuckies = this._handleOnClickClearLuckies.bind(this)
     this._postCollection = this._postCollection.bind(this)
     this._updateCollections = this._updateCollections.bind(this)
+    this._updateCollectionsForMaxLevel = this._updateCollectionsForMaxLevel.bind(this)
+    this._pushUserInventory = this._pushUserInventory.bind(this)
     this.state = {
       pickCreditTimer: null,
       battleCreditTimer: null,
@@ -301,10 +305,10 @@ class Sidebar extends React.Component {
   }
   _handleOnClickUpdateMon () {
     const { firebase } = this.props
-    const monId = '-L0AwPJ7gKGijLIAoCaJ'
+    const monId = '-L18CqQdBUpdq6I4qWQj'
     getMonById(firebase, monId)
     .then(mon => {
-      mon.next = ['-L18CqQdBUpdq6I4qWQj']
+      mon.next = ['-L18HTaowAsL7_vJ_LxY']
       console.log('updatedMon', mon)
       updateMon(firebase, mon)
     })
@@ -374,6 +378,63 @@ class Sidebar extends React.Component {
       collections.forEach(col => {
         const newCol = Object.assign({}, col, { battery: 2 })
         updateCollection(firebase, newCol)
+      })
+    })
+  }
+  _updateCollectionsForMaxLevel () {
+    const { firebase } = this.props
+    let allItems = null
+    getAllItems(firebase)
+    .then(items => {
+      console.log('items', items)
+      allItems = items
+      return getAllCollections(firebase)
+    })
+    .then(collections => {
+      const filteredCollections = collections.filter(col => col.mon[col.monId].grade === 'e' || col.mon[col.monId].grade === 'sr')
+      filteredCollections.forEach(col => {
+        getUserByUserId(firebase, col.userId)
+        .then(user => {
+          const colPoint = user.colPoint
+          const maxByGrade = MAX_ADD_BY_GRADE[col.mon[col.monId].grade]
+          const points = Object.keys(MAX_ADD_BY_COLPOINT)
+          let point = points[0]
+          for (let i = 0; i < points.length; i++) {
+            if (colPoint < Number(points[i])) {
+              point = points[i]
+              break
+            }
+          }
+          const maxByColPoint = MAX_ADD_BY_COLPOINT[point]
+          const maxAdd = maxByColPoint + maxByGrade
+          if (col.addedTotal > maxAdd) {
+            const numberToDown = Math.ceil((col.addedTotal - maxAdd) / col.mon[col.monId].point)
+            console.log('maxAdd', maxByColPoint + maxByGrade)
+            console.log('col', col)
+            console.log('numberToDown', numberToDown)
+            const levelDownCol = levelDownCollection(col, numberToDown)
+            console.log('levelDownCol', levelDownCol)
+            updateCollection(firebase, levelDownCol)
+            .then(() => {
+              const item = allItems.filter(item => item.grades[0] === col.mon[col.monId].grade)[0]
+              console.log('item', item)
+              console.log('col.userId', col.userId)
+              updateUserInventory(firebase, col.userId, item, 'save', numberToDown)
+            })
+          }
+        })
+      })
+    })
+  }
+  _pushUserInventory () {
+    const { firebase } = this.props
+    getAllItems(firebase)
+    .then(items => {
+      console.log('items', items)
+      const userIds = ['EHcgz4miMYa9zmsRHaU03BTU0DE3', 'mkMRzn0ophbIPYQ8F8GcVEis5GF3', 'uaYKQI3SfsNx0jzYqZRbwD5axjD3']
+      const item = items.filter(item => item.grades && item.grades[0] === 'e')[0]
+      userIds.forEach((id, idx) => {
+        updateUserInventory(firebase, id, item, 'save', idx === 0 ? 2 : 1)
       })
     })
   }
@@ -509,7 +570,7 @@ class Sidebar extends React.Component {
                 <Link to='/stage-management'><i><i className='fa fa-lock' style={{ fontSize: '18px' }} /></i> 스테이지관리</Link>
               </li>
               <li className='f-700'>
-                <i><i className='fa fa-lock' style={{ fontSize: '18px', cursor: 'pointer' }} onClick={this._updateCollections} /></i> 커스텀 스크립트
+                <i><i className='fa fa-lock' style={{ fontSize: '18px', cursor: 'pointer' }} onClick={this._pushUserInventory} /></i> 커스텀 스크립트
               </li>
               <li className='f-700'>
                 <i><i className='fa fa-lock' style={{ fontSize: '18px', cursor: 'pointer' }} onClick={this._handleOnClickClearLuckies} /></i> 럭키 청소
