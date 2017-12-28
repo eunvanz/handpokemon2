@@ -427,16 +427,16 @@ class Sidebar extends React.Component {
     })
   }
   _pushUserInventory () {
-    const { firebase } = this.props
-    getAllItems(firebase)
-    .then(items => {
-      console.log('items', items)
-      const userIds = ['EHcgz4miMYa9zmsRHaU03BTU0DE3', 'mkMRzn0ophbIPYQ8F8GcVEis5GF3', 'uaYKQI3SfsNx0jzYqZRbwD5axjD3']
-      const item = items.filter(item => item.grades && item.grades[0] === 'e')[0]
-      userIds.forEach((id, idx) => {
-        updateUserInventory(firebase, id, item, 'save', idx === 0 ? 2 : 1)
-      })
-    })
+    // const { firebase } = this.props
+    // getAllItems(firebase)
+    // .then(items => {
+    //   console.log('items', items)
+    //   const userIds = ['EHcgz4miMYa9zmsRHaU03BTU0DE3', 'mkMRzn0ophbIPYQ8F8GcVEis5GF3', 'uaYKQI3SfsNx0jzYqZRbwD5axjD3']
+    //   const item = items.filter(item => item.grades && item.grades[0] === 'e')[0]
+    //   userIds.forEach((id, idx) => {
+    //     updateUserInventory(firebase, id, item, 'save', idx === 0 ? 2 : 1)
+    //   })
+    // })
   }
   render () {
     const { user, auth, messages, locale } = this.props

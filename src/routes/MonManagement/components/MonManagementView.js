@@ -285,7 +285,7 @@ class MonManagementView extends React.Component {
       return Promise.resolve()
     })
     .then(() => {
-      this.setState({ isLoading: false, formData: mon })
+      this.setState({ isLoading: false, formData: Object.assign({}, mon, { name: mon.name.ko, description: mon.description.ko, skill: mon.skill.ko }) })
       showAlert({
         title: '저장완료!',
         text: '성공적으로 저장 되었습니다',

@@ -18,6 +18,7 @@ export const getCollectionsRefUserIdAndMonId = (firebase, userId, monId) => {
 }
 
 export const getUpdateColObj = col => {
+  console.log('col', col)
   const updateObj = {
     [`collections/${col.id}`]: col,
     [`userCollections/${col.userId}/${col.id}`]: col,
@@ -47,6 +48,15 @@ export const updateCollection = (firebase, col) => {
     [`collections/${col.id}`]: col,
     [`userCollections/${col.userId}/${col.id}`]: col,
     [`monCollections/${col.monId}/${col.id}`]: col
+  }
+  return firebase.ref().update(updateObj)
+}
+
+export const updateCollectionPath = (firebase, col, path, value) => {
+  const updateObj = {
+    [`collections/${col.id}/${path}`]: value,
+    [`userCollections/${col.userId}/${col.id}/${path}`]: value,
+    [`monCollections/${col.monId}/${col.id}/${path}`]: value
   }
   return firebase.ref().update(updateObj)
 }

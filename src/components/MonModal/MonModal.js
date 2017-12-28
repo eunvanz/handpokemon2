@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import keygen from 'keygenerator'
 import shallowCompare from 'react-addons-shallow-compare'
 import { browserHistory, Link } from 'react-router'
+import $ from 'jquery'
 
 import CustomModal from 'components/CustomModal'
 import Button from 'components/Button'
@@ -11,6 +12,7 @@ import MonLevel from 'components/MonLevel'
 import MonInfo from 'components/MonInfo'
 import Img from 'components/Img'
 import Info from 'components/Info'
+import Selectbox from 'components/Selectbox'
 
 import { getMonImage } from 'utils/monUtil'
 import { showAlert } from 'utils/commonUtil'
@@ -18,6 +20,8 @@ import { showAlert } from 'utils/commonUtil'
 import { colors } from 'constants/colors'
 
 import { updatePickMonInfo } from 'store/pickMonInfo'
+
+import { updateCollectionPath } from 'services/CollectionService'
 
 const mapDispatchToProps = dispatch => {
   return {
@@ -36,10 +40,12 @@ class MonModal extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      showStat: false
+      showStat: false,
+      imageSeq: props.mon.tobe.imageSeq
     }
     this._handleOnClickEvolution = this._handleOnClickEvolution.bind(this)
     this._handleOnClickMix = this._handleOnClickMix.bind(this)
+    this._handleOnChangeImage = this._handleOnChangeImage.bind(this)
   }
   shouldComponentUpdate (nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState)
@@ -84,8 +90,18 @@ class MonModal extends React.Component {
       this.context.router.replace(`/collection/${mon.tobe.userId}`)
     })
   }
+  _handleOnChangeImage (e) {
+    const { value } = e.target
+    const { firebase, mon } = this.props
+    if (value === '') return
+    this.setState({ imageSeq: Number(value) })
+    updateCollectionPath(firebase, mon.tobe, 'imageSeq', Number(value))
+    const url = mon.tobe.mon[mon.tobe.monId].monImage.filter(image => image.seq === Number(value))[0].url
+    $(`img#${mon.tobe.id}`).attr('src', url)
+  }
   render () {
-    const { mon, show, close, type, updatePickMonInfo, pickMonInfo, isNotMine, user, locale, blinkMix, isMaxLevel, ...restProps } = this.props
+    const { mon, show, close, type, updatePickMonInfo, pickMonInfo, isNotMine, user, locale, blinkMix, isMaxLevel, firebase, ...restProps } = this.props
+    const { imageSeq } = this.state
     const tobeMon = mon.tobe
     const renderLevel = () => {
       if (mon.asis) {
@@ -126,9 +142,25 @@ class MonModal extends React.Component {
         <div className='row'>
           <div className='col-sm-4 col-xs-12 text-center' style={{ marginBottom: '20px' }}>
             <p style={{ marginBottom: '10px' }}>
-              <Img src={type === 'collection' || type === 'defender' ? getMonImage(tobeMon).url : 'hidden'} width='100%'
+              <Img src={type === 'collection' || type === 'defender' ? getMonImage(tobeMon, imageSeq).url : 'hidden'} width='100%'
                 style={{ border: '1px dotted #e2e2e2', maxWidth: '200px' }} cache />
             </p>
+            {
+              !isNotMine && tobeMon.mon && tobeMon.mon[tobeMon.monId].monImage.length > 1 &&
+              <div className='row'>
+                <div className='col-xs-8 col-xs-offset-2 col-sm-offset-0 col-sm-12'>
+                  <Selectbox
+                    id='monImage'
+                    defaultValue='일러스트선택'
+                    options={tobeMon.mon[tobeMon.monId].monImage.map(item => {
+                      return { name: `${item.designer}`, value: item.seq }
+                    })}
+                    onChange={this._handleOnChangeImage}
+                    value={this.state.imageSeq}
+                  />
+                </div>
+              </div>
+            }
             {tobeMon.level &&
               renderLevel()
             }
@@ -176,7 +208,8 @@ MonModal.propTypes = {
   user: PropTypes.object,
   locale: PropTypes.string,
   blinkMix: PropTypes.bool,
-  isMaxLevel: PropTypes.bool
+  isMaxLevel: PropTypes.bool,
+  firebase: PropTypes.object
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(MonModal)

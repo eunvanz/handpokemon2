@@ -142,7 +142,7 @@ class MonCard extends React.Component {
             backgroundColor: 'white'
           }}>
           <a className='ci-avatar'>
-            <Img cache src={(type === 'collection' || type === 'defender') && !isDummy ? getMonImage(tobeMon).url : unloader} width='100%' height='100%' style={{ border: '1px dotted #e2e2e2' }} />
+            <Img cache id={tobeMon && tobeMon.id} src={(type === 'collection' || type === 'defender') && !isDummy ? getMonImage(tobeMon).url : unloader} width='100%' height='100%' style={{ border: '1px dotted #e2e2e2' }} />
           </a>
           <div className='c-info text-center' style={{ margin: '5px 0px', position: 'relative' }}>
             {
@@ -185,7 +185,7 @@ class MonCard extends React.Component {
           renderLevelUpInfo()
         }
         { !isDummy && <MonModal locale={locale} mon={mon} type={this.props.type} show={this.state.showMonModal} isNotMine={isNotMine} user={user} blinkMix={blinkMix} isMaxLevel={isMaxLevel}
-          close={() => this.setState({ showMonModal: false })} />
+          close={() => this.setState({ showMonModal: false })} firebase={firebase} />
         }
         {
           type === 'defender' &&

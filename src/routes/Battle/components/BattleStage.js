@@ -236,7 +236,7 @@ class BattleStage extends React.Component {
               const damageInfoDiv = $(`#${defender}-${defenderIdx}-damageInfo`)
               damageInfoDiv.css('top', 0).css('fontSize', '16px')
               damageInfoDiv
-                .text(-1 * finalDamage)
+                .text(finalDamage === 0 ? '완벽방어' : -1 * finalDamage)
                 .animate({ opacity: 1, top: isScreenSize.xs() ? -30 : -40, fontSize: fontSizeByDamage(finalDamage) }, damageSpeed * speedVar)
               setTimeout(() => {
                 damageInfoDiv.animate({ opacity: 0 }, damageSpeed * speedVar)

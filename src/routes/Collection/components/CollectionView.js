@@ -336,7 +336,7 @@ class CollectionView extends React.Component {
   }
   render () {
     const { filteredCollections, filterCollapse, openFloatMenu, mode, userToView, defenders } = this.state
-    const { filter, pickMonInfo, auth, params, user, locale } = this.props
+    const { filter, pickMonInfo, auth, params, user, locale, firebase } = this.props
     const { userId } = params
     const isMine = auth && userId === auth.uid
     const renderCollections = () => {
@@ -346,8 +346,8 @@ class CollectionView extends React.Component {
       }
       const collectionsArr = filteredCollections.map((col, idx) => {
         const isMineAndHave = isMine && col.userId
-        return <MonCard blinkMix={user && user.isTutorialOn && user.tutorialStep === 5 && isMineAndHave} isSelectable={this.state.mode === 'mix'} onSelect={() => this._handleOnSelectMon(col)}
-          onUnselect={() => { }} isNotMine={!isMine} showStatusBadge={isMineAndHave && mode === 'view'} user={userToView}
+        return <MonCard blinkMix={user && user.isTutorialOn && user.tutorialStep === 5 && isMineAndHave} isSelectable={this.state.mode === 'mix'}
+          onUnselect={() => { }} isNotMine={!isMine} showStatusBadge={isMineAndHave && mode === 'view'} user={userToView} firebase={firebase} onChangeMonImage={this._handleOnClickApplyFilter}
           key={col.id} mon={{ asis: null, tobe: col }} type={col.mon ? 'collection' : 'mon'} onClickShield={() => this._handleOnClickShield(col)} />
       })
       return <div key={collectionsKey}>{collectionsArr}</div>

@@ -29,8 +29,8 @@ Selectbox.propTypes = {
   options: PropTypes.array.isRequired, // { name, value }
   id: PropTypes.string,
   onChange: PropTypes.func.isRequired,
-  defaultValue: PropTypes.string.isRequired,
-  value: PropTypes.string,
+  defaultValue: PropTypes.any.isRequired,
+  value: PropTypes.any,
   name: PropTypes.string
 }
 
