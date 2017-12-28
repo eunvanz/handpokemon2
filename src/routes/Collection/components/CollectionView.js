@@ -347,7 +347,7 @@ class CollectionView extends React.Component {
       const collectionsArr = filteredCollections.map((col, idx) => {
         const isMineAndHave = isMine && col.userId
         return <MonCard blinkMix={user && user.isTutorialOn && user.tutorialStep === 5 && isMineAndHave} isSelectable={this.state.mode === 'mix'}
-          onUnselect={() => { }} isNotMine={!isMine} showStatusBadge={isMineAndHave && mode === 'view'} user={userToView} firebase={firebase} onChangeMonImage={this._handleOnClickApplyFilter}
+          onUnselect={() => { }} isNotMine={!isMine} showStatusBadge={isMineAndHave && mode === 'view'} user={userToView} firebase={firebase} onSelect={() => this._handleOnSelectMon(col)}
           key={col.id} mon={{ asis: null, tobe: col }} type={col.mon ? 'collection' : 'mon'} onClickShield={() => this._handleOnClickShield(col)} />
       })
       return <div key={collectionsKey}>{collectionsArr}</div>
