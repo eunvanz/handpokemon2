@@ -5,6 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const project = require('./project.config')
 const debug = require('debug')('app:config:webpack')
+require('babel-polyfill')
 
 const __DEV__ = project.globals.__DEV__
 const __PROD__ = project.globals.__PROD__
@@ -44,7 +45,7 @@ const APP_ENTRY = project.paths.client('main.js')
 webpackConfig.entry = {
   app : __DEV__
     ? [APP_ENTRY].concat(`webpack-hot-middleware/client?path=${project.compiler_public_path}__webpack_hmr`)
-    : [APP_ENTRY],
+    : [APP_ENTRY].concat('babel-polyfill'),
   vendor : project.compiler_vendors
 }
 

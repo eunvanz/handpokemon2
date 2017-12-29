@@ -18,7 +18,6 @@ export const getCollectionsRefUserIdAndMonId = (firebase, userId, monId) => {
 }
 
 export const getUpdateColObj = col => {
-  console.log('col', col)
   const updateObj = {
     [`collections/${col.id}`]: col,
     [`userCollections/${col.userId}/${col.id}`]: col,
