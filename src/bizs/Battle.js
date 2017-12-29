@@ -96,7 +96,7 @@ export default class Battle {
     if (isAvoid) {
       defenderPick.point += pureDamage
     } else {
-      finalDamage = this._getFinalDamage(attackType, pureDamage, defenderPick)
+      finalDamage = this._getFinalDamage(attackType, pureDamage, defenderPick, attackerPick)
       afterHp -= finalDamage
       afterHp = afterHp < 0 ? 0 : afterHp
       if (afterHp === 0) attackerPick.kills++
@@ -144,15 +144,17 @@ export default class Battle {
       attackMon.adjDex * 0.1 * attackRange) *
       this._getAttrMatchAdjustedVar(attackMon, defenseMon))
   }
-  _getFinalDamage (attackType, pureDamage, defenderPick) {
+  _getFinalDamage (attackType, pureDamage, defenderPick, attackerPick) {
     let armor = defenderPick.adjArmor
     if (attackType === 2) armor = defenderPick.adjSArmor
-    return Math.round(pureDamage - pureDamage * this._getArmorPct(armor, defenderPick.adjDex))
+    return Math.round(pureDamage - pureDamage * this._getArmorPct(armor, defenderPick.adjDex, attackType === 2 ? attackerPick.adjSPower : attackerPick.adjPower))
   }
-  _getArmorPct (armor, dex) {
+  _getArmorPct (armor, dex, power) {
     let pct = 0.001 + armor * 0.0035 + dex * 0.0005
-    const armorIdx = _.random(0.1, 99.9)
-    if (armorIdx < armor * 0.1) pct = 1
+    if (armor > power) {
+      const armorIdx = _.random(0.1, 99.9)
+      if (armorIdx < (armor - power) * 0.2) pct = 1
+    }
     if (pct < 1 && pct > 0.85) {
       const restPct = pct - 0.85
       pct = 0.85
