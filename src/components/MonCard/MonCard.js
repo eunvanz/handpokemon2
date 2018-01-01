@@ -45,9 +45,15 @@ class MonCard extends React.Component {
   componentDidMount () {
     const { mon } = this.props
     if (mon && mon.maxLevel) {
+      let text
+      if (mon.tobe.mon[mon.tobe.monId].grade === 's' || mon.tobe.mon[mon.tobe.monId].grade === 'sr') {
+        text = `이미 ${mon.tobe.mon[mon.tobe.monId].name.ko}이(가) 최대레벨에 도달했으므로 ${mon.tobe.mon[mon.tobe.monId].point * 5}P를 획득했습니다.`
+      } else {
+        text = `이미 ${mon.tobe.mon[mon.tobe.monId].name.ko}이(가) 최대레벨에 도달했으므로 채집권을 획득했습니다.`
+      }
       window.swal({
         title: '최대레벨',
-        text: `이미 ${mon.tobe.mon[mon.tobe.monId].name.ko}이(가) 최대레벨에 도달했으므로 ${mon.tobe.mon[mon.tobe.monId].point}P를 획득했습니다.`,
+        text,
         type: 'success'
       })
     }

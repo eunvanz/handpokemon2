@@ -105,6 +105,12 @@ export const LEAGUE = [
     maxCost: 16,
     cut: 5,
     icon: 'fa fa-gem c-cyan'
+  },
+  {
+    name: '챔피온',
+    maxCost: 18,
+    cut: 2,
+    icon: 'fa fa-trophy c-orange'
   }
 ]
 

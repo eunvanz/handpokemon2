@@ -67,7 +67,7 @@ export const fetchCandidates = (firebase, league, userId) => {
   return dispatch => {
     return getUsersByLeagueForBattle(firebase, league, userId)
     .then(users => {
-      const userArr = convertMapToArr(users)
+      const userArr = convertMapToArr(users).filter(user => user.leagueRank !== 0)
       const result = []
       const promArr = []
       const ids = []

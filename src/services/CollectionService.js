@@ -3,8 +3,9 @@ import { convertMapToArr, updater, convertNumberToStringForIndex } from 'utils/c
 import keygen from 'keygenerator'
 import { sortBy, orderBy } from 'lodash'
 
-import { getUserByUserId, updateUserPokemoney } from './UserService'
+import { getUserByUserId, updateUserPokemoney, updateUserInventory } from './UserService'
 import { postLucky } from './LuckyService'
+import { getAllItems } from './ItemService'
 
 import Lucky from 'models/lucky'
 
@@ -190,9 +191,21 @@ export const postCollection = (firebase, userId, collection, type, srcCols, colP
       }
       const maxByColPoint = MAX_ADD_BY_COLPOINT[point]
       if (tobe.addedTotal > maxByColPoint + maxByGrade) {
-        // 최대치를 넘어설 경우 포키머니를 증가시키고 reject
+        // 최대치를 넘어설 경우, 베이직, 엘리트, 레어, 레전드인 경우 각각 아이템 지급, 아닌경우 포키머니를 증가
         maxLevel = true
-        return updateUserPokemoney(firebase, userId, tobe.mon[tobe.monId].point)
+        let processReward = null
+        if (tobe.mon[tobe.monId].grade === 'sr' || tobe.mon[tobe.monId].grade === 's') {
+          processReward = () => updateUserPokemoney(firebase, userId, tobe.mon[tobe.monId].point * 5)
+        } else {
+          processReward = () => {
+            return getAllItems(firebase)
+            .then(items => {
+              const item = items.filter(item => item.grades && item.grades[0] === tobe.mon[tobe.monId].grade)[0]
+              return updateUserInventory(firebase, userId, item, 'save', 1)
+            })
+          }
+        }
+        return processReward()
         .then(() => {
           tobe = asis
           return Promise.resolve()
