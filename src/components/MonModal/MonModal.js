@@ -21,7 +21,7 @@ import { colors } from 'constants/colors'
 
 import { updatePickMonInfo } from 'store/pickMonInfo'
 
-import { updateCollectionPath } from 'services/CollectionService'
+import { updateCollectionPath, updateCollection } from 'services/CollectionService'
 
 const mapDispatchToProps = dispatch => {
   return {
@@ -98,6 +98,25 @@ class MonModal extends React.Component {
     updateCollectionPath(firebase, mon.tobe, 'imageSeq', Number(value))
     const url = mon.tobe.mon[mon.tobe.monId].monImage.filter(image => image.seq === Number(value))[0].url
     $(`img#${mon.tobe.id}`).attr('src', url)
+    if (mon.tobe.mon[mon.tobe.monId].name.ko === '킬가르도') {
+      const newCol = Object.assign({}, mon.tobe)
+      const power = mon.tobe.mon[mon.tobe.monId].power
+      const armor = mon.tobe.mon[mon.tobe.monId].armor
+      const sPower = mon.tobe.mon[mon.tobe.monId].sPower
+      const sArmor = mon.tobe.mon[mon.tobe.monId].sArmor
+      if (value === 1) {
+        newCol.mon[newCol.monId].power = power > armor ? power : armor
+        newCol.mon[newCol.monId].armor = power > armor ? armor : power
+        newCol.mon[newCol.monId].sPower = sPower > sArmor ? sPower : sArmor
+        newCol.mon[newCol.monId].sArmor = sPower > sArmor ? sArmor : sPower
+      } else if (value === 0) {
+        newCol.mon[newCol.monId].power = power > armor ? armor : power
+        newCol.mon[newCol.monId].armor = power > armor ? power : armor
+        newCol.mon[newCol.monId].sPower = sPower > sArmor ? sArmor : sPower
+        newCol.mon[newCol.monId].sArmor = sPower > sArmor ? sPower : sArmor
+      }
+      updateCollection(firebase, newCol)
+    }
   }
   render () {
     const { mon, show, close, type, updatePickMonInfo, pickMonInfo, isNotMine, user, locale, blinkMix, isMaxLevel, firebase, ...restProps } = this.props

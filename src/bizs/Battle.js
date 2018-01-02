@@ -7,6 +7,35 @@ import { deepCopyArray } from 'utils/commonUtil'
 
 export default class Battle {
   constructor (userPicks, enemyPicks, firstAttacker) {
+    const caspongIdx = _.findIndex(userPicks, pick => pick.col.mon[pick.col.monId].name.ko === '캐스퐁')
+    if (caspongIdx > -1) {
+      const strongestEnemyPick = _.sortBy(enemyPicks, ['totalAbility'])[2]
+      const attrs = ['노말', '불꽃', '물', '얼음']
+      let maxIdx = 0
+      let maxResult = 0
+      attrs.forEach((attr, idx) => {
+        const attackerMainAttrIdx = ATTR_IDX.indexOf(attr)
+        const defenderMainAttrIdx = ATTR_IDX.indexOf(strongestEnemyPick.col.mon[strongestEnemyPick.col.monId].mainAttr)
+        const defenderSubAttrIdx = ATTR_IDX.indexOf(strongestEnemyPick.col.mon[strongestEnemyPick.col.monId].subAttr)
+        let result = 0
+        result = ATTR_MATCH[attackerMainAttrIdx][defenderMainAttrIdx]
+        if (defenderSubAttrIdx !== -1) result = result * ATTR_MATCH[attackerMainAttrIdx][defenderSubAttrIdx]
+        if (maxResult < result) {
+          maxIdx = idx
+          maxResult = result
+        }
+      })
+      let imgUrl = 'https://firebasestorage.googleapis.com/v0/b/hand-pokemon-2.appspot.com/o/monImages%2F%E1%84%8F%E1%85%A2%E1%84%89%E1%85%B3%E1%84%91%E1%85%A9%E1%86%BC.png?alt=media&token=e29f3ae8-6ce5-4670-8565-f4f3708da8ad'
+      if (maxIdx === 1) {
+        imgUrl = 'https://firebasestorage.googleapis.com/v0/b/hand-pokemon-2.appspot.com/o/monImages%2Fcaspong_hot.png?alt=media&token=3f169974-443f-4ca6-8915-601b34857353'
+      } else if (maxIdx === 2) {
+        imgUrl = 'https://firebasestorage.googleapis.com/v0/b/hand-pokemon-2.appspot.com/o/monImages%2Fcaspong_rain.png?alt=media&token=ed955182-e41d-49a7-8c92-e46340547c82'
+      } else if (maxIdx === 3) {
+        imgUrl = 'https://firebasestorage.googleapis.com/v0/b/hand-pokemon-2.appspot.com/o/monImages%2Fcaspong_snow.png?alt=media&token=1503c852-5bb5-4a72-a2ac-4b87e0a06a86'
+      }
+      userPicks[caspongIdx].col.mon[userPicks[caspongIdx].col.monId].mainAttr = attrs[maxIdx]
+      userPicks[caspongIdx].col.mon[userPicks[caspongIdx].col.monId].monImage[0].url = imgUrl
+    }
     this.firstAttacker = firstAttacker
     this.userPicks = userPicks
     this.enemyPicks = enemyPicks
