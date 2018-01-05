@@ -1,11 +1,13 @@
 import { connect } from 'react-redux'
 import { firebaseConnect, dataToJS } from 'react-redux-firebase'
+import { compose } from 'recompose'
 
 import HonorView from '../components/HonorView'
 
 import { convertMapToArr } from 'utils/commonUtil'
 
 import withAuth from 'hocs/withAuth'
+import withUserCollections from 'hocs/withUserCollections'
 
 const mapDispatchToProps = dispatch => {
   return {
@@ -14,13 +16,12 @@ const mapDispatchToProps = dispatch => {
 
 const mapStateToProps = (state) => {
   return {
-    honors: convertMapToArr(dataToJS(state.firebase, 'honors')),
-    userCollections: dataToJS(state.firebase, 'userCollections')
+    honors: convertMapToArr(dataToJS(state.firebase, 'honors'))
   }
 }
 
-const wrappedHonorView = firebaseConnect([
+const wrappedHonorView = compose(firebaseConnect([
   '/honors'
-])(HonorView)
+]), withAuth(true), withUserCollections)(HonorView)
 
-export default connect(mapStateToProps, mapDispatchToProps)(withAuth(true)(wrappedHonorView))
+export default connect(mapStateToProps, mapDispatchToProps)(wrappedHonorView)

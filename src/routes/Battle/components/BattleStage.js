@@ -307,7 +307,7 @@ class BattleStage extends React.Component {
           }
           <div className={`col-md-1 col-sm-2 col-xs-3${type === 'enemy' ? ' col-md-offset-4 col-sm-offset-2' : ''}`}>
             <GeneralRoulette
-              images={myPicks.map(p => p.mon[p.monId].monImage[p.imageSeq].url)}
+              images={myPicks.map(p => p.mon[p.monId].monImage.filter(item => item.seq === p.imageSeq)[0].url)}
               id={`${type}Roulette-1`}
               style={rouletteStyle}
               size={isScreenSize.xs() ? 50 : isScreenSize.smallerThan('md') ? 70 : 80}
@@ -316,7 +316,7 @@ class BattleStage extends React.Component {
           </div>
           <div className='col-md-1 col-sm-2 col-xs-3'>
             <GeneralRoulette
-              images={otherPicks.map(p => p.mon[p.monId].monImage[p.imageSeq].url)}
+              images={otherPicks.map(p => p.mon[p.monId].monImage.filter(item => item.seq === p.imageSeq)[0].url)}
               id={`${type}Roulette-2`}
               style={rouletteStyle}
               size={isScreenSize.xs() ? 50 : isScreenSize.smallerThan('md') ? 70 : 80}

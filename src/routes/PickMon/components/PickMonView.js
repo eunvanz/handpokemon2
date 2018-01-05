@@ -282,7 +282,6 @@ class PickMonView extends React.Component {
     let isTobeGotHonorsChanged = false
     const messages = []
     const honorsForModal = []
-    const userCollectionsArr = convertMapToArr(userCollections[auth.uid])
     // 전체 honors에서 user의 colPoint보다 낮으면서 gotHonor에 없는 honor가 있는지 탐색
     // 전체 honors에서 user가 얻은 포켓몬 속성에 대해서만 user가 가진 해당 속성 콜렉션의 수와 비교
     // enabledHonor에서 user가 자격 미달인 honor가 있는지 탐색
@@ -298,7 +297,7 @@ class PickMonView extends React.Component {
           }
         } else {
           const attr = honor.attr
-          if (countAttrsInCollections(attr, userCollectionsArr) < honor.condition) {
+          if (countAttrsInCollections(attr, userCollections) < honor.condition) {
             messages.push('콜렉션 개체 수 하락으로 아래 칭호가 해제되었습니다.')
             honorsForModal.push(honor)
             // TODO: enabledHonor 삭제 로직
@@ -341,7 +340,7 @@ class PickMonView extends React.Component {
       }
     }
     for (const honorNotGotType2 of honorsNotGotType2) {
-      if (honorNotGotType2.condition < countAttrsInCollections(honorNotGotType2.attr, userCollectionsArr)) {
+      if (honorNotGotType2.condition < countAttrsInCollections(honorNotGotType2.attr, userCollections)) {
         messages.push('콜렉션 개체 수 상승으로 아래 칭호를 획득했습니다.')
         honorsForModal.push(honorNotGotType2)
         isTobeGotHonorsChanged = true

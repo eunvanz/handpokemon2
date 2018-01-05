@@ -25,7 +25,7 @@ class MonUnit extends React.Component {
         <div className='progress' id={`${id}-hpGuage`} style={{ margin: 'auto', width: isScreenSize.xs() ? '64%' : '40%', maxWidth: '96px', marginBottom: isScreenSize.xs() ? '5px' : '10px', backgroundColor: 'red' }}>
           <div className='progress-bar restHp' style={{ backgroundColor: colors.amber, width: `${(mon.restHp * 100) / mon.totalHp}%` }} />
         </div>
-        <Img cache src={mon.col.mon[mon.col.monId].monImage[mon.col.imageSeq].url} style={{ width: isScreenSize.xs() ? '70%' : '50%', maxWidth: '120px' }} onClick={() => this.setState({ showMonModal: true })} />
+        <Img cache src={mon.col.mon[mon.col.monId].monImage.filter(item => item.seq === mon.col.imageSeq)[0].url} style={{ width: isScreenSize.xs() ? '70%' : '50%', maxWidth: '120px' }} onClick={() => this.setState({ showMonModal: true })} />
         <div style={{ margin: 'auto', fontSize: isScreenSize.xs() ? '10px' : '12px', marginTop: isScreenSize.xs() ? '5px' : '10px' }}>
           {
             isScreenSize.largerThan('xs') &&

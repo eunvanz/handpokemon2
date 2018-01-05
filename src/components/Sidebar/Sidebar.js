@@ -56,6 +56,7 @@ class Sidebar extends React.Component {
     this._updateCollections = this._updateCollections.bind(this)
     this._updateCollectionsForMaxLevel = this._updateCollectionsForMaxLevel.bind(this)
     this._pushUserInventory = this._pushUserInventory.bind(this)
+    this._updateMon = this._updateMon.bind(this)
     this.state = {
       pickCreditTimer: null,
       battleCreditTimer: null,
@@ -438,6 +439,16 @@ class Sidebar extends React.Component {
     //   })
     // })
   }
+  _updateMon () {
+    const { firebase } = this.props
+    getMonByName(firebase, '아차모')
+    .then(mon => {
+      console.log('mon', mon)
+      mon.monImage[0].seq = 2
+      return updateMon(firebase, mon)
+    })
+    .then(() => console.log('업데이트완료'))
+  }
   render () {
     const { user, auth, messages, locale } = this.props
     const { pickCreditTimer, battleCreditTimer, adventureCreditTimer } = this.state
@@ -570,7 +581,7 @@ class Sidebar extends React.Component {
                 <Link to='/stage-management'><i><i className='fa fa-lock' style={{ fontSize: '18px' }} /></i> 스테이지관리</Link>
               </li>
               <li className='f-700'>
-                <i><i className='fa fa-lock' style={{ fontSize: '18px', cursor: 'pointer' }} onClick={this._setUserLeagues} /></i> 커스텀 스크립트
+                <i><i className='fa fa-lock' style={{ fontSize: '18px', cursor: 'pointer' }} onClick={this._updateMon} /></i> 커스텀 스크립트
               </li>
               <li className='f-700'>
                 <i><i className='fa fa-lock' style={{ fontSize: '18px', cursor: 'pointer' }} onClick={this._handleOnClickClearLuckies} /></i> 럭키 청소

@@ -9,7 +9,7 @@ import Button from 'components/Button'
 import HonorBadge from 'components/HonorBadge'
 import Loading from 'components/Loading'
 
-import { isScreenSize, convertMapToArr, countAttrsInCollections, showAlert } from 'utils/commonUtil'
+import { isScreenSize, countAttrsInCollections } from 'utils/commonUtil'
 
 import { nullContainerHeight } from 'constants/styles'
 
@@ -44,7 +44,7 @@ class HonorView extends React.Component {
   _handleOnClickActivate (honor) {
     const replaceTypeHonor = (srcHonors, honorToInsert) => {
       const { type } = honorToInsert
-      const tobeEnabledHonors = _.dropWhile(srcHonors, honor => honor.type === type)
+      const tobeEnabledHonors = srcHonors.filter(honor => honor.type !== type)
       tobeEnabledHonors.push(honorToInsert)
       return tobeEnabledHonors
     }
@@ -63,8 +63,7 @@ class HonorView extends React.Component {
   }
   render () {
     const { honorsType1, honorsType2, showBurfInfo } = this.state
-    const { user, honors, auth, userCollections } = this.props
-    const userCollectionsArr = auth && userCollections ? convertMapToArr(userCollections[auth.uid]) : null
+    const { user, honors, userCollections } = this.props
     let enabledHonors
     let gotHonors
     if (user) {
@@ -78,7 +77,7 @@ class HonorView extends React.Component {
       return _.findIndex(enabledHonors, enabledHonor => enabledHonor.id === honor.id) > -1
     }
     const isDeservable = honor => {
-      return honor.type === 1 ? user.colPoint >= honor.condition : countAttrsInCollections(honor.attr, userCollectionsArr) >= honor.condition
+      return honor.type === 1 ? user.colPoint >= honor.condition : countAttrsInCollections(honor.attr, userCollections) >= honor.condition
     }
     const renderBody = honors => {
       if (!honors || honors.length === 0) return <Loading text='업적정보를 불러오는 중...' height={nullContainerHeight} />
@@ -136,7 +135,7 @@ class HonorView extends React.Component {
         </table>
       )
     }
-    if (user && honors) {
+    if (user && honors && userCollections) {
       return (
         <div>
           <ContentContainer
@@ -168,7 +167,7 @@ HonorView.propTypes = {
   auth: PropTypes.object,
   user: PropTypes.object,
   honors: PropTypes.array.isRequired,
-  userCollections: PropTypes.object
+  userCollections: PropTypes.array
 }
 
 export default HonorView

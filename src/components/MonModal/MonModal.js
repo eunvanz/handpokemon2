@@ -41,7 +41,8 @@ class MonModal extends React.Component {
     super(props)
     this.state = {
       showStat: false,
-      imageSeq: props.mon.tobe.imageSeq
+      imageSeq: props.mon.tobe.imageSeq,
+      mon: props.mon
     }
     this._handleOnClickEvolution = this._handleOnClickEvolution.bind(this)
     this._handleOnClickMix = this._handleOnClickMix.bind(this)
@@ -101,21 +102,34 @@ class MonModal extends React.Component {
     if (mon.tobe.mon[mon.tobe.monId].name.ko === '킬가르도') {
       const newCol = Object.assign({}, mon.tobe)
       const power = mon.tobe.mon[mon.tobe.monId].power
+      const colPower = mon.tobe.power
       const armor = mon.tobe.mon[mon.tobe.monId].armor
+      const colArmor = mon.tobe.armor
       const sPower = mon.tobe.mon[mon.tobe.monId].sPower
+      const colSPower = mon.tobe.sPower
       const sArmor = mon.tobe.mon[mon.tobe.monId].sArmor
-      if (value === 1) {
+      const colSArmor = mon.tobe.sArmor
+      if (value === '1') {
         newCol.mon[newCol.monId].power = power > armor ? power : armor
+        newCol.power = colPower > colArmor ? colPower : colArmor
         newCol.mon[newCol.monId].armor = power > armor ? armor : power
+        newCol.armor = colPower > colArmor ? colArmor : colPower
         newCol.mon[newCol.monId].sPower = sPower > sArmor ? sPower : sArmor
+        newCol.sPower = colSPower > colSArmor ? colSPower : colSArmor
         newCol.mon[newCol.monId].sArmor = sPower > sArmor ? sArmor : sPower
-      } else if (value === 0) {
-        newCol.mon[newCol.monId].power = power > armor ? armor : power
-        newCol.mon[newCol.monId].armor = power > armor ? power : armor
-        newCol.mon[newCol.monId].sPower = sPower > sArmor ? sArmor : sPower
-        newCol.mon[newCol.monId].sArmor = sPower > sArmor ? sPower : sArmor
+        newCol.sArmor = colSPower > colSArmor ? colSArmor : colSPower
+      } else if (value === '0') {
+        newCol.mon[newCol.monId].power = power < armor ? power : armor
+        newCol.power = colPower < colArmor ? colPower : colArmor
+        newCol.mon[newCol.monId].armor = power < armor ? armor : power
+        newCol.armor = colPower < colArmor ? colArmor : colPower
+        newCol.mon[newCol.monId].sPower = sPower < sArmor ? sPower : sArmor
+        newCol.sPower = colSPower < colSArmor ? colSPower : colSArmor
+        newCol.mon[newCol.monId].sArmor = sPower < sArmor ? sArmor : sPower
+        newCol.sArmor = colSPower < colSArmor ? colSArmor : colSPower
       }
       updateCollection(firebase, newCol)
+      this.setState({ mon: Object.assign({}, mon, { tobe: newCol }) })
     }
   }
   render () {
@@ -184,7 +198,7 @@ class MonModal extends React.Component {
               renderLevel()
             }
           </div>
-          <MonInfo monObj={mon} showStat={this.state.showStat} type={type} forModal user={user} locale={locale} />
+          <MonInfo monObj={this.state.mon} showStat={this.state.showStat} type={type} forModal user={user} locale={locale} />
         </div>
       )
     }
