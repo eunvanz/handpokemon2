@@ -93,7 +93,8 @@ class MonModal extends React.Component {
   }
   _handleOnChangeImage (e) {
     const { value } = e.target
-    const { firebase, mon } = this.props
+    const { firebase } = this.props
+    const { mon } = this.state
     if (value === '') return
     this.setState({ imageSeq: Number(value) })
     updateCollectionPath(firebase, mon.tobe, 'imageSeq', Number(value))
@@ -128,6 +129,67 @@ class MonModal extends React.Component {
         newCol.mon[newCol.monId].sArmor = sPower < sArmor ? sArmor : sPower
         newCol.sArmor = colSPower < colSArmor ? colSArmor : colSPower
       }
+      newCol.imageSeq = Number(value)
+      updateCollection(firebase, newCol)
+      this.setState({ mon: Object.assign({}, mon, { tobe: newCol }) })
+    } else if (mon.tobe.mon[mon.tobe.monId].name.ko === '로토무') {
+      const newCol = Object.assign({}, mon.tobe)
+      const cost = newCol.mon[newCol.monId].cost
+      const power = mon.tobe.mon[mon.tobe.monId].power
+      const colPower = mon.tobe.power
+      const armor = mon.tobe.mon[mon.tobe.monId].armor
+      const colArmor = mon.tobe.armor
+      const sPower = mon.tobe.mon[mon.tobe.monId].sPower
+      const colSPower = mon.tobe.sPower
+      const sArmor = mon.tobe.mon[mon.tobe.monId].sArmor
+      const colSArmor = mon.tobe.sArmor
+      const dex = mon.tobe.mon[mon.tobe.monId].dex
+      const colDex = mon.tobe.dex
+      if (value === '0') {
+        newCol.mon[newCol.monId].subAttr = '유령'
+        newCol.mon[newCol.monId].cost = 5
+        if (cost !== 5) {
+          newCol.mon[newCol.monId].power = power - 15
+          newCol.mon[newCol.monId].armor = armor - 30
+          newCol.mon[newCol.monId].sPower = sPower - 10
+          newCol.mon[newCol.monId].sArmor = sArmor - 30
+          newCol.mon[newCol.monId].dex = dex + 10
+          newCol.power = colPower - 15
+          newCol.armor = colArmor - 30
+          newCol.sPower = colSPower - 10
+          newCol.sArmor = colSArmor - 30
+          newCol.dex = colDex + 10
+          $(`.mon-cost#${mon.tobe.id} > i`).removeClass('c-amber')
+        }
+      } else {
+        newCol.mon[newCol.monId].cost = 7
+        if (value === '1') {
+          newCol.mon[newCol.monId].subAttr = '불꽃'
+        } else if (value === '2') {
+          newCol.mon[newCol.monId].subAttr = '비행'
+        } else if (value === '3') {
+          newCol.mon[newCol.monId].subAttr = '얼음'
+        } else if (value === '4') {
+          newCol.mon[newCol.monId].subAttr = '물'
+        } else if (value === '5') {
+          newCol.mon[newCol.monId].subAttr = '풀'
+        }
+        if (cost !== 7) {
+          newCol.mon[newCol.monId].power = power + 15
+          newCol.mon[newCol.monId].armor = armor + 30
+          newCol.mon[newCol.monId].sPower = sPower + 10
+          newCol.mon[newCol.monId].sArmor = sArmor + 30
+          newCol.mon[newCol.monId].dex = dex - 10
+          newCol.power = colPower + 15
+          newCol.armor = colArmor + 30
+          newCol.sPower = colSPower + 10
+          newCol.sArmor = colSArmor + 30
+          newCol.dex = colDex - 10
+          $(`.mon-cost#${mon.tobe.id} > i:nth-child(1)`).addClass('c-amber')
+          $(`.mon-cost#${mon.tobe.id} > i:nth-child(2)`).addClass('c-amber')
+        }
+      }
+      newCol.imageSeq = Number(value)
       updateCollection(firebase, newCol)
       this.setState({ mon: Object.assign({}, mon, { tobe: newCol }) })
     }

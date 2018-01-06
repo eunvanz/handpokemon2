@@ -168,7 +168,7 @@ class MonCard extends React.Component {
               <StatusBadge icon={`fa fa-info${blinkInfo ? ' blink-opacity' : ''}`} side='right' isActive activeColor={colors.blueGray} onClick={this._showMonModal} />
             }
             <MonCost cost={isDummy ? 0 : (type === 'collection' || type === 'defender') ? tobeMon.mon[tobeMon.monId].cost : tobeMon.cost}
-              style={{ marginBottom: '5px' }} blink={blinkCost} />
+              style={{ marginBottom: '5px' }} blink={blinkCost} id={tobeMon && tobeMon.id} />
             <MonAttr grade={isDummy ? null : (type === 'collection' || type === 'defender') ? tobeMon.mon[tobeMon.monId].grade : tobeMon.grade}
               mainAttr={isDummy ? null : (type === 'collection' || type === 'defender') ? tobeMon.mon[tobeMon.monId].mainAttr : tobeMon.mainAttr}
               subAttr={isDummy ? null : (type === 'collection' || type === 'defender') ? tobeMon.mon[tobeMon.monId].subAttr : tobeMon.subAttr}

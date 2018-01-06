@@ -8,7 +8,7 @@ import { MAX_ADD_BY_COLPOINT, MAX_ADD_BY_GRADE } from 'constants/rules'
 
 export const getMonImage = (mon, customIdx) => {
   if (mon.mon && mon.mon[mon.monId]) {
-    return mon.mon[mon.monId].monImage.filter(monImage => (customIdx || mon.imageSeq) === monImage.seq)[0]
+    return mon.mon[mon.monId].monImage.filter(monImage => (customIdx || mon.imageSeq) == monImage.seq)[0]
   } else {
     return mon.monImage[0]
   }

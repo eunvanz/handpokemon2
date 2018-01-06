@@ -31,7 +31,7 @@ class MonCost extends React.Component {
       return resultComponent
     }
     return (
-      <div className={`${classNames({ 'blink-opacity': blink, [className]: className })}`} {...rest}>
+      <div className={`${classNames({ 'blink-opacity': blink, [className]: className }, 'mon-cost')}`} {...rest}>
         {renderCost()}
       </div>
     )
