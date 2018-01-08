@@ -44,7 +44,12 @@ class HonorView extends React.Component {
   _handleOnClickActivate (honor) {
     const replaceTypeHonor = (srcHonors, honorToInsert) => {
       const { type } = honorToInsert
-      const tobeEnabledHonors = srcHonors.filter(honor => honor.type !== type)
+      let tobeEnabledHonors
+      if (srcHonors) {
+        tobeEnabledHonors = srcHonors.filter(honor => honor.type !== type)
+      } else {
+        tobeEnabledHonors = []
+      }
       tobeEnabledHonors.push(honorToInsert)
       return tobeEnabledHonors
     }

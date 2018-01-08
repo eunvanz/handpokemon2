@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import shallowCompare from 'react-addons-shallow-compare'
 import { connect } from 'react-redux'
 import { firebaseConnect, dataToJS } from 'react-redux-firebase'
 
@@ -9,10 +8,7 @@ import { convertMapToArr } from 'utils/commonUtil'
 import LoadingContainer from 'components/LoadingContainer'
 
 export default ComposedComponent => {
-  class withUserCollections extends React.Component {
-    shouldComponentUpdate (nextProps, nextState) {
-      return shallowCompare(this, nextProps, nextState)
-    }
+  class withUserCollections extends React.PureComponent {
     render () {
       const { userCollections, mons, ...props } = this.props
       if (!mons) return <LoadingContainer text='콜렉션 정보를 가져오는 중...' />

@@ -26,7 +26,7 @@ import { colors } from 'constants/colors'
 
 import { showAlert, getMsg } from 'utils/commonUtil'
 
-class CollectionView extends React.Component {
+class CollectionView extends React.PureComponent {
   constructor (props) {
     super(props)
     this.state = {
@@ -92,9 +92,6 @@ class CollectionView extends React.Component {
         })
       }
     })
-  }
-  shouldComponentUpdate (nextProps, nextState) {
-    return shallowCompare(this, nextProps, nextState)
   }
   componentWillUpdate (nextProps, nextState) {
     if (!this.props.pickMonInfo && nextProps.pickMonInfo && nextProps.pickMonInfo.mixCols && nextProps.pickMonInfo.mixCols.length === 1) {

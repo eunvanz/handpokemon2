@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import createStore from './store/createStore'
 import AppContainer from './containers/AppContainer'
+import { whyDidYouUpdate } from 'why-did-you-update'
 
 // ========================================================
 // Store Instantiation
@@ -26,6 +27,7 @@ let render = () => {
 // This code is excluded from production bundle
 if (__DEV__) {
   if (module.hot) {
+    // whyDidYouUpdate(React)
     // Development render functions
     const renderApp = render
     const renderError = (error) => {
